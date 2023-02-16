@@ -1,0 +1,112 @@
+﻿/* *****************************************************************************
+// Localizable resource description for the MaxBIM21 ARCHICAD Add-On
+// API Development Kit; Mac/Win
+//
+// Namespaces:		Contact person:
+//		-None-
+//
+// [SG compatible] - Yes
+// ****************************************************************************/
+
+#include "ResourceIDs.h"
+
+'STR#' ID_ADDON_INFO "Add-on Name and Description" {
+/* [  1] */		"MaxBIM21"
+/* [  2] */		"MaxBIM21 ARCHICAD Add-On"
+}
+
+
+'STR#' ID_MENU_STRINGS_FORMWORKS "Menu strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"테이블폼 배치"
+/* [  1] */			"벽 테이블폼 배치^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  2] */			"슬래브 테이블폼 배치^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  3] */			"보 테이블폼 배치^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  4] */			"기둥 테이블폼 배치^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  5] */			"기초 테이블폼 배치^E3^ES^EE^EI^ED^EL^EW^ET"
+}
+
+
+'STR#' ID_MENU_PROMPT_STRINGS_FORMWORKS "Status bar strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"테이블폼 배치"
+/* [  1] */			"벽면에 테이블폼을 배치합니다."
+/* [  2] */			"천장 슬래브에 테이블폼 그리고 장선, 멍에제, 동바리를 배치합니다."
+/* [  3] */			"보에 테이블폼을 배치합니다."
+/* [  4] */			"기둥에 테이블폼을 배치합니다."
+/* [  5] */			"기초(낮은 슬래브/벽)에 테이블폼을 배치합니다."
+}
+
+'STR#' ID_MENU_STRINGS_LAYER_TOOLS "Menu strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"레이어 도구"
+/* [  1] */			"레이어 쉽게 선택하기^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  2] */			"레이어 쉽게 만들기^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  3] */			"레이어 쉽게 지정하기^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  4] */			"레이어 이름 검사하기^E3^ES^EE^EI^ED^EL^EW^ET"
+}
+
+'STR#' ID_MENU_PROMPT_STRINGS_LAYER_TOOLS "Status bar strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"레이어 도구"
+/* [  1] */			"조건들을 선택/선택해제하여 레이어들을 쉽게 선택할 수 있게 해줍니다."
+/* [  2] */			"사용자가 입력한 조건들에 해당하는 레이어들을 자동으로 생성해 줍니다."
+/* [  3] */			"선택한 객체들의 레이어 속성을 사용자가 입력한 조건들에 해당하는 레이어로 설정해 줍니다."
+/* [  4] */			"MaxBIM의 레이어 이름 체계에 맞지 않는 레이어 이름들을 보여주고 바로 변경할 수 있게 해줍니다."
+}
+
+'STR#' ID_MENU_STRINGS_EXPORTING "Menu strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"내보내기"
+/* [  1] */			"부재 정보 내보내기 (현재 선택한 것만)^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  2] */			"부재 정보 내보내기 (보이는 레이어 별로)^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  3] */			"부재별 선택 후 보여주기^E3"
+/* [  4] */			"보 테이블폼 물량표 작성^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  5] */			"테이블폼 면적 계산^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  6] */			"모든 입면도 PDF로 내보내기 (현재 뷰만)^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  7] */			"모든 입면도 PDF로 내보내기 (보이는 레이어 별로)^E3^ES^EE^EI^ED^EL^EW^ET"
+}
+
+'STR#' ID_MENU_PROMPT_STRINGS_EXPORTING "Status bar strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"내보내기"
+/* [  1] */			"선택한 부재에 한해서만 부재의 정보를 정리하여 CSV 파일로 내보냅니다."
+/* [  2] */			"보이는 레이어들 각각의 전체 부재 정보를 정리하여 CSV 파일로 내보냅니다."
+/* [  3] */			"부재별 품명 기준으로 사용자가 원하는 요소들만 선택 후 보여줍니다."
+/* [  4] */			"보의 좌우측면과 하부면에 배치된 보 테이블폼의 합판, 유로폼 규격을 레이어 별로 구분하여 요약합니다. (단, 보 테이블폼 내 합판, 유로폼은 동일 레이어 상에 있어야 함)"
+/* [  5] */			"보이는 레이어들 각각으로 분류된 테이블폼이 덮는 면적을 계산하여 CSV 파일로 내보냅니다."
+/* [  6] */			"각각의 입면도를 캡쳐해서 PDF 파일로 내보냅니다."
+/* [  7] */			"각각의 입면도를 레이어 별로 캡쳐해서 PDF 파일로 내보냅니다."
+}
+
+'STR#' ID_MENU_STRINGS_SEMIAUTO_ARRANGE "Menu strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"반자동 배치"
+/* [  1] */			"물량합판 부착하기^E3"
+/* [  2] */			"단열재 부착하기^E3"
+}
+
+'STR#' ID_MENU_PROMPT_STRINGS_SEMIAUTO_ARRANGE "Status bar strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"반자동 배치"
+/* [  1] */			"물량합판을 부착하는 데 도움을 주는 팔레트를 엽니다. 레이어와 물량합판 분류를 선택하고 그리기 버튼을 누르면 됩니다."
+/* [  2] */			"단열재를 부착하는 데 도움을 주는 팔레트를 엽니다. 레이어, 가로/세로 길이 제한을 설정하고 그리기 버튼을 누르면 됩니다."
+}
+
+'STR#' ID_MENU_STRINGS_FACILITIES "Menu strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"편의 기능"
+/* [  1] */			"3D 품질/속도 조정하기^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  2] */			"영역에 3D 라벨 붙이기^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  3] */			"현재 평면도의 테이블폼에 버블 자동 배치^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  4] */			"카메라 위치 저장하기/불러오기^E3^ES^EE^EI^ED^EL^EW^ET"
+}
+
+'STR#' ID_MENU_PROMPT_STRINGS_FACILITIES "Status bar strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"편의 기능"
+/* [  1] */			"보이는 레이어 상의 모든 객체들의 해상도(gs_resol) 값을 사용자가 선택한 값으로 변경합니다."
+/* [  2] */			"아키캐드 영역(Zone)에 3D 라벨을 부착합니다."
+/* [  3] */			"현재 평면도에서 선택한 테이블폼마다 버블을 부착합니다."
+/* [  4] */			"카메라 위치 정보를 DB에 저장하거나 다시 불러옵니다. 기존 정보를 활용하려면 cameraInfo.db 파일을 C:\\Program Files\\GRAPHISOFT\\ArchiCAD 21 폴더에 두십시오."
+}
