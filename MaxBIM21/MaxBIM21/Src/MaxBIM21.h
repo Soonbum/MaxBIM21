@@ -17,28 +17,18 @@
 #include	<exception>
 #include	<algorithm>
 
-#define TRUE	1
-#define FALSE	0
+#include	"Definitions.hpp"
+#include	"StringConversion.hpp"
 
-// 팔레트 창 제어를 위한 함수
-static void	EnablePaletteControls(short dialogID, bool enable)
-{
-	if (dialogID != 0 && DGIsDialogOpen(dialogID)) {
-		if (enable == true)
-			DGEnableItem(dialogID, DG_ALL_ITEMS);
-		else
-			DGDisableItem(dialogID, DG_ALL_ITEMS);
-	}
-
-	return;
-}
+#include	"UtilityFunctions.h"
 
 // 벽 관련 정보
 struct InfoWall
 {
 	API_Guid	guid;			// 벽의 GUID
-	double	wallThk;			// 벽 두께
 	short	floorInd;			// 층 인덱스
+
+	double	wallThk;			// 벽 두께
 	double	bottomOffset;		// 벽 하단 오프셋
 
 	double	begX;				// 시작점 X
@@ -52,6 +42,7 @@ struct InfoSlab
 {
 	API_Guid	guid;			// 슬래브의 GUID
 	short	floorInd;			// 층 인덱스
+
 	double	offsetFromTop;		// 슬래브 윗면과 레퍼런스 레벨과의 수직 거리
 	double	thickness;			// 슬래브 두께
 	double	level;				// 레퍼런스 레벨의 고도
@@ -61,8 +52,8 @@ struct InfoSlab
 struct InfoBeam
 {
 	API_Guid	guid;	// 보의 GUID
-
 	short	floorInd;	// 층 인덱스
+
 	double	height;		// 보 높이
 	double	width;		// 보 너비
 	double	offset;		// 보 중심으로부터 보의 레퍼런스 라인의 오프셋입니다.
@@ -122,5 +113,7 @@ struct InfoMesh
 	double		level;		// 메시 베이스 평면의 고도
 	double		skirtLevel;	// 메시 베이스 평면으로부터 메시 밑면의 거리
 };
+
+#pragma warning (disable: 4244)
 
 #endif //__MAXBIM_H__

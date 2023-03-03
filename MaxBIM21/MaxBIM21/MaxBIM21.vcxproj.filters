@@ -55,6 +55,9 @@
     <ClInclude Include="Src\Layers.h">
       <Filter>Src\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Src\WallTableformPlacer.h">
+      <Filter>Src\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\..\Support\Modules\DGLib\Win\DGImp.lib">

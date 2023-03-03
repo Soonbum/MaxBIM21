@@ -20,7 +20,7 @@
 
 #include	"UtilityFunctions.h"
 
-//#include "WallTableformPlacer.h"
+#include	"WallTableformPlacer.h"
 //#include "SlabTableformPlacer.h"
 //#include "BeamTableformPlacer.h"
 //#include "ColumnTableformPlacer.h"
@@ -41,23 +41,17 @@
 GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 {
 	GSErrCode err;
-	API_MenuItemRef	itemRef;
-	GSFlags			itemFlags;
+	//API_MenuItemRef	itemRef;
+	//GSFlags			itemFlags;
 
 	switch(menuParams->menuItemRef.menuResID) {
 		// 테이블폼 배치
 		case ID_MENU_STRINGS_FORMWORKS:
 			switch(menuParams->menuItemRef.itemIndex) {
 				case 1:		// 벽 테이블폼 배치
-					err = ACAPI_CallUndoableCommand("테스트", [&]() -> GSErrCode {
-						EasyObjectPlacement euroform;
-						euroform.init(L"유로폼v2.0.gsm", 1, 0, 0, 0, 0, 0);
-						euroform.placeObject(4,
-							"eu_stan_onoff", APIParT_Boolean, "1.0",
-							"eu_wid", APIParT_CString, "500",
-							"eu_hei", APIParT_CString, "900",
-							"u_ins", APIParT_CString, "벽세우기");
-						return NoError;
+					err = ACAPI_CallUndoableCommand(L"벽에 테이블폼 배치", [&]() -> GSErrCode {
+						err = placeWallTableform();
+						return err;
 					});
 					break;
 				case 2:		// 슬래브 테이블폼 배치
