@@ -57,7 +57,6 @@ namespace namespaceWallTableform {
 		int		nCellsHor;		// 수평 방향 셀 개수
 		int		nCellsVer;		// 수직 방향 셀 개수
 		double	cellHorLen[10];	// 셀 길이 (가로)
-		double	cellVerLen[10];	// 셀 길이 (세로)
 	};
 
 	struct MarginCell
@@ -217,7 +216,6 @@ namespace namespaceWallTableform {
 					this->cellsBasic[i][j].nCellsVer = 0;
 					for (int m = 0; m < 10; m++) {
 						this->cellsBasic[i][j].cellHorLen[m] = 0.0;
-						this->cellsBasic[i][j].cellVerLen[m] = 0.0;
 					}
 
 					this->cellsExtra[i][j].leftBottomX = 0.0;
@@ -231,7 +229,6 @@ namespace namespaceWallTableform {
 					this->cellsExtra[i][j].nCellsVer = 0;
 					for (int m = 0; m < 10; m++) {
 						this->cellsExtra[i][j].cellHorLen[m] = 0.0;
-						this->cellsExtra[i][j].cellVerLen[m] = 0.0;
 					}
 
 					this->marginCellsBasic[i][j].leftBottomX = 0.0;
@@ -271,10 +268,6 @@ namespace namespaceWallTableform {
 					this->cellsBasic[i][j].cellHorLen[2] = 0.450;
 					this->cellsBasic[i][j].cellHorLen[3] = 0.600;
 
-					for (int m = 0; m < 10; m++) {
-						this->cellsBasic[i][j].cellVerLen[m] = 1.200;
-					}
-
 					// 뒷면
 					this->cellsExtra[i][j].horLen = 2.250;
 					this->cellsExtra[i][j].verLen = 1.200;
@@ -286,10 +279,6 @@ namespace namespaceWallTableform {
 					this->cellsExtra[i][j].cellHorLen[1] = 0.600;
 					this->cellsExtra[i][j].cellHorLen[2] = 0.450;
 					this->cellsExtra[i][j].cellHorLen[3] = 0.600;
-
-					for (int m = 0; m < 10; m++) {
-						this->cellsExtra[i][j].cellVerLen[m] = 1.200;
-					}
 				}
 			}
 		}
@@ -327,6 +316,8 @@ namespace namespaceWallTableform {
 
 		char numStr[32];
 		double remainHeight, remainWidth;
+		GS::UniString buttonName;
+		short targetIndex;
 		
 		switch (message) {
 		case DG_MSG_INIT:
@@ -409,12 +400,12 @@ namespace namespaceWallTableform {
 			DGShowItem(dialogID, itemIndex);
 
 			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_RADIOBUTTON, DG_BT_PUSHTEXT, 4, 180, 85, 50, 25);
-			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
 			DGSetItemText(dialogID, itemIndex, L"앞면");
 			DGShowItem(dialogID, itemIndex);
 
 			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_RADIOBUTTON, DG_BT_PUSHTEXT, 4, 235, 85, 50, 25);
-			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
 			DGSetItemText(dialogID, itemIndex, L"뒷면");
 			DGShowItem(dialogID, itemIndex);
 
@@ -574,6 +565,7 @@ namespace namespaceWallTableform {
 			DGSetItemValLong(dialogID, RADIOBUTTON_DUAL_SIDE, true);	// 배치면: 양면
 			DGSetItemValLong(dialogID, RADIOBUTTON_VERTICAL, true);		// 테이블폼 방향: 세로
 			DGSetItemValLong(dialogID, RADIOBUTTON_PROPS_ON, true);		// Push-Pull Props: 설치
+			DGSetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT, true);	// 표시면 선택: 앞면
 
 			// 기본값 설정: 너비 팝업컨트롤
 			for (int i = POPUP_OBJ_WIDTH_START_INDEX; i <= POPUP_OBJ_WIDTH_START_INDEX + placingZone.nCellsHor; i++) {
@@ -598,8 +590,131 @@ namespace namespaceWallTableform {
 			break;
 
 		case DG_MSG_CHANGE:
-			// ... 테이블폼 방향 라디오 버튼
-				// ... 기존 팝업 컨트롤의 내용물을 전부 지우고 다시 채움 (테이블폼, 유로폼)
+			// 테이블폼 방향 라디오 버튼 변경시
+			if (item == RADIOBUTTON_VERTICAL || item == RADIOBUTTON_HORIZONTAL) {
+				// 셀 정보 초기화
+				placingZone.initCells();
+
+				// 세로 방향으로 전환하면,
+				if (DGGetItemValLong(dialogID, RADIOBUTTON_VERTICAL) == 1) {
+			//		// 너비 팝업컨트롤 내용을 지웠다가 다시 채움
+			//		for (int i = BUTTON_OBJ_TYPE_START_INDEX; i <= BUTTON_OBJ_TYPE_START_INDEX + placingZone.nCellsHor; i++) {
+			//			buttonName = DGGetItemText(dialogID, i);
+
+			//			// 테이블폼A, 테이블폼B, 테이블폼C인 경우,
+			//			if ((buttonName.Compare(L"테이블폼A") == 1) || (buttonName.Compare(L"테이블폼B") == 1) || (buttonName.Compare(L"테이블폼C") == 1)) {
+			//				targetIndex = POPUP_OBJ_WIDTH_START_INDEX + (i - BUTTON_OBJ_TYPE_START_INDEX);
+			//				DGPopUpDeleteItem(dialogID, targetIndex, DG_ALL_ITEMS);
+			//				for (int j = 0; j < sizeof(placingZone.tableformPresetVertical) / sizeof(int); j++) {
+			//					DGPopUpInsertItem(dialogID, targetIndex, DG_POPUP_BOTTOM);
+			//					_itoa(placingZone.tableformPresetVertical[j], numStr, 10);
+			//					DGPopUpSetItemText(dialogID, targetIndex, DG_POPUP_BOTTOM, numStr);
+			//				}
+			//				DGPopUpSelectItem(dialogID, targetIndex, DG_POPUP_TOP);
+			//			}
+
+			//			// 유로폼인 경우,
+			//			if (buttonName.Compare(L"유로폼") == 1) {
+			//				targetIndex = POPUP_OBJ_WIDTH_START_INDEX + (i - BUTTON_OBJ_TYPE_START_INDEX);
+			//				DGPopUpDeleteItem(dialogID, targetIndex, DG_ALL_ITEMS);
+			//				for (int j = 0; j < sizeof(placingZone.euroformPresetVertical) / sizeof(int); j++) {
+			//					DGPopUpInsertItem(dialogID, targetIndex, DG_POPUP_BOTTOM);
+			//					_itoa(placingZone.euroformPresetVertical[j], numStr, 10);
+			//					DGPopUpSetItemText(dialogID, targetIndex, DG_POPUP_BOTTOM, numStr);
+			//				}
+			//				DGPopUpSelectItem(dialogID, targetIndex, DG_POPUP_TOP);
+			//			}
+			//		}
+
+			//		// 높이 팝업컨트롤 내용을 지웠다가 다시 채움 (낮은쪽)
+			//		if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1) {
+			//			for (int i = POPUP_OBJ_HEIGHT_START_INDEX; i <= POPUP_OBJ_HEIGHT_START_INDEX + placingZone.nCellsVerBasic; i++) {
+			//				DGPopUpDeleteItem(dialogID, i, DG_ALL_ITEMS);
+			//				for (int j = 0; j < sizeof(placingZone.euroformPresetHorizontal) / sizeof(int); j++) {
+			//					DGPopUpInsertItem(dialogID, i, DG_POPUP_BOTTOM);
+			//					_itoa(placingZone.euroformPresetHorizontal[j], numStr, 10);
+			//					DGPopUpSetItemText(dialogID, i, DG_POPUP_BOTTOM, numStr);
+			//				}
+			//				DGPopUpSelectItem(dialogID, i, DG_POPUP_TOP);
+			//			}
+			//		}
+			//		// 높이 팝업컨트롤 내용을 지웠다가 다시 채움 (높은쪽)
+			//		else {
+			//			for (int i = POPUP_OBJ_HEIGHT_START_INDEX; i <= POPUP_OBJ_HEIGHT_START_INDEX + placingZone.nCellsVerExtra; i++) {
+			//				for (int i = POPUP_OBJ_HEIGHT_START_INDEX; i <= POPUP_OBJ_HEIGHT_START_INDEX + placingZone.nCellsVerExtra; i++) {
+			//					DGPopUpDeleteItem(dialogID, i, DG_ALL_ITEMS);
+			//					for (int j = 0; j < sizeof(placingZone.euroformPresetHorizontal) / sizeof(int); j++) {
+			//						DGPopUpInsertItem(dialogID, i, DG_POPUP_BOTTOM);
+			//						_itoa(placingZone.euroformPresetHorizontal[j], numStr, 10);
+			//						DGPopUpSetItemText(dialogID, i, DG_POPUP_BOTTOM, numStr);
+			//					}
+			//					DGPopUpSelectItem(dialogID, i, DG_POPUP_TOP);
+			//				}
+			//			}
+			//		}
+				}
+				// 가로 방향으로 전환하면,
+				else {
+			//		// 너비 팝업컨트롤 내용을 지웠다가 다시 채움
+			//		for (int i = BUTTON_OBJ_TYPE_START_INDEX; i <= BUTTON_OBJ_TYPE_START_INDEX + placingZone.nCellsHor; i++) {
+			//			buttonName = DGGetItemText(dialogID, i);
+
+			//			// 테이블폼A, 테이블폼B, 테이블폼C인 경우,
+			//			if ((buttonName.Compare(L"테이블폼A") == 1) || (buttonName.Compare(L"테이블폼B") == 1) || (buttonName.Compare(L"테이블폼C") == 1)) {
+			//				targetIndex = POPUP_OBJ_WIDTH_START_INDEX + (i - BUTTON_OBJ_TYPE_START_INDEX);
+			//				DGPopUpDeleteItem(dialogID, targetIndex, DG_ALL_ITEMS);
+			//				for (int j = 0; j < sizeof(placingZone.tableformPresetHorizontal) / sizeof(int); j++) {
+			//					DGPopUpInsertItem(dialogID, targetIndex, DG_POPUP_BOTTOM);
+			//					_itoa(placingZone.tableformPresetHorizontal[j], numStr, 10);
+			//					DGPopUpSetItemText(dialogID, targetIndex, DG_POPUP_BOTTOM, numStr);
+			//				}
+			//				DGPopUpSelectItem(dialogID, targetIndex, DG_POPUP_TOP);
+			//			}
+
+			//			// 유로폼인 경우,
+			//			if (buttonName.Compare(L"유로폼") == 1) {
+			//				targetIndex = POPUP_OBJ_WIDTH_START_INDEX + (i - BUTTON_OBJ_TYPE_START_INDEX);
+			//				DGPopUpDeleteItem(dialogID, targetIndex, DG_ALL_ITEMS);
+			//				for (int j = 0; j < sizeof(placingZone.euroformPresetHorizontal) / sizeof(int); j++) {
+			//					DGPopUpInsertItem(dialogID, targetIndex, DG_POPUP_BOTTOM);
+			//					_itoa(placingZone.euroformPresetHorizontal[j], numStr, 10);
+			//					DGPopUpSetItemText(dialogID, targetIndex, DG_POPUP_BOTTOM, numStr);
+			//				}
+			//				DGPopUpSelectItem(dialogID, targetIndex, DG_POPUP_TOP);
+			//			}
+			//		}
+
+			//		// 높이 팝업컨트롤 내용을 지웠다가 다시 채움 (낮은쪽)
+			//		if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1) {
+			//			for (int i = POPUP_OBJ_HEIGHT_START_INDEX; i <= POPUP_OBJ_HEIGHT_START_INDEX + placingZone.nCellsVerBasic; i++) {
+			//				DGPopUpDeleteItem(dialogID, i, DG_ALL_ITEMS);
+			//				for (int j = 0; j < sizeof(placingZone.euroformPresetVertical) / sizeof(int); j++) {
+			//					DGPopUpInsertItem(dialogID, i, DG_POPUP_BOTTOM);
+			//					_itoa(placingZone.euroformPresetVertical[j], numStr, 10);
+			//					DGPopUpSetItemText(dialogID, i, DG_POPUP_BOTTOM, numStr);
+			//				}
+			//				DGPopUpSelectItem(dialogID, i, DG_POPUP_TOP);
+			//			}
+			//		}
+			//		// 높이 팝업컨트롤 내용을 지웠다가 다시 채움 (높은쪽)
+			//		else {
+			//			for (int i = POPUP_OBJ_HEIGHT_START_INDEX; i <= POPUP_OBJ_HEIGHT_START_INDEX + placingZone.nCellsVerExtra; i++) {
+			//				for (int i = POPUP_OBJ_HEIGHT_START_INDEX; i <= POPUP_OBJ_HEIGHT_START_INDEX + placingZone.nCellsVerExtra; i++) {
+			//					DGPopUpDeleteItem(dialogID, i, DG_ALL_ITEMS);
+			//					for (int j = 0; j < sizeof(placingZone.euroformPresetVertical) / sizeof(int); j++) {
+			//						DGPopUpInsertItem(dialogID, i, DG_POPUP_BOTTOM);
+			//						_itoa(placingZone.euroformPresetVertical[j], numStr, 10);
+			//						DGPopUpSetItemText(dialogID, i, DG_POPUP_BOTTOM, numStr);
+			//					}
+			//					DGPopUpSelectItem(dialogID, i, DG_POPUP_TOP);
+			//				}
+			//			}
+			//		}
+				}
+			}
+
+			// ... 앞면/뒷면 선택시
+				// ... 배치 정보 불러오기
 			
 			// ... 너비 팝업컨트롤
 			// ... 너비 Edit컨트롤
@@ -608,6 +723,10 @@ namespace namespaceWallTableform {
 			// ... 높이 팝업컨트롤
 			// ... 높이 Edit컨트롤
 				// ... 남은 높이 업데이트
+
+			// ... 버튼 이름에 따라 팝업컨트롤 또는 Edit컨트롤을 표시함
+
+			// ... 배치 정보 저장 (선택한 배치면 정보만 저장함)
 
 			break;
 
