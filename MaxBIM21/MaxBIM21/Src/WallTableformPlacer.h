@@ -332,94 +332,115 @@ namespace namespaceWallTableform {
 		case DG_MSG_INIT:
 			DGSetDialogTitle(dialogID, L"벽에 테이블폼 배치 - 셀 설정");
 
-				// 다음 버튼
-				DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 10, 15, 70, 25);
-				DGSetItemFont(dialogID, DG_OK, DG_IS_LARGE | DG_IS_PLAIN);
-				DGSetItemText(dialogID, DG_OK, L"다음");
-				DGShowItem(dialogID, DG_OK);
+			// 확인 버튼
+			DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 10, 15, 70, 25);
+			DGSetItemFont(dialogID, DG_OK, DG_IS_LARGE | DG_IS_PLAIN);
+			DGSetItemText(dialogID, DG_OK, L"확인");
+			DGShowItem(dialogID, DG_OK);
 
-				// 취소
-				DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 10, 45, 70, 25);
-				DGSetItemFont(dialogID, DG_CANCEL, DG_IS_LARGE | DG_IS_PLAIN);
-				DGSetItemText(dialogID, DG_CANCEL, L"취소");
-				DGShowItem(dialogID, DG_CANCEL);
+			// 취소
+			DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 10, 45, 70, 25);
+			DGSetItemFont(dialogID, DG_CANCEL, DG_IS_LARGE | DG_IS_PLAIN);
+			DGSetItemText(dialogID, DG_CANCEL, L"취소");
+			DGShowItem(dialogID, DG_CANCEL);
 			
-				// 객체 종류
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_STATICTEXT, DG_IS_LEFT, DG_FT_NONE, 100, 20, 55, 23);
+			// 객체 종류
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_STATICTEXT, DG_IS_LEFT, DG_FT_NONE, 100, 20, 55, 23);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			DGSetItemText(dialogID, itemIndex, L"객체 종류");
+			DGShowItem(dialogID, itemIndex);
+
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_POPUPCONTROL, 200, 0, 160, 15, 150, 25);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			for (int i = 1; i < 14; i++) {
+				DGPopUpInsertItem(dialogID, itemIndex, DG_POPUP_BOTTOM);
+				DGPopUpSetItemText(dialogID, itemIndex, DG_POPUP_BOTTOM, objTypeStr[i]);
+			}
+			DGShowItem(dialogID, itemIndex);
+
+			// 전체 너비
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_STATICTEXT, DG_IS_LEFT, DG_FT_NONE, 100, 50, 55, 23);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			DGSetItemText(dialogID, itemIndex, L"전체 너비");
+			DGShowItem(dialogID, itemIndex);
+
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, 160, 45, 85, 25);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			DGShowItem(dialogID, itemIndex);
+			DGDisableItem(dialogID, itemIndex);
+
+			// 안내 텍스트
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_STATICTEXT, DG_IS_LEFT, DG_FT_NONE, 100, 80, 300, 23);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			DGSetItemText(dialogID, itemIndex, L"안내 텍스트입니다.");
+			DGShowItem(dialogID, itemIndex);
+
+			// 셀 그리드 표시
+			posX = 100; posY = 115;
+			sizeX = 100; sizeY = 100;
+			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_SEPARATOR, 0, 0, posX + (i * sizeX), posY, sizeX, sizeY);
+				DGShowItem(dialogID, itemIndex);
+				if (i == 0)
+					BRANCH_GRID_START_INDEX = itemIndex;
+			}
+
+			// 셀 너비 (Edit컨트롤)
+			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX + (i * sizeX), posY + 100, sizeX, 25);
 				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-				DGSetItemText(dialogID, itemIndex, L"객체 종류");
 				DGShowItem(dialogID, itemIndex);
+				if (i == 0)
+					BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX = itemIndex;
+			}
 
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_POPUPCONTROL, 200, 0, 160, 15, 150, 25);
-				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-				for (int i = 1; i < 14; i++) {
-					DGPopUpInsertItem(dialogID, itemIndex, DG_POPUP_BOTTOM);
-					DGPopUpSetItemText(dialogID, itemIndex, DG_POPUP_BOTTOM, objTypeStr[i]);
-				}
-				DGShowItem(dialogID, itemIndex);
+			// 열 방향 객체 추가 버튼
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), posY + 100, 25, 25);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			DGSetItemText(dialogID, itemIndex, "+");
+			DGShowItem(dialogID, itemIndex);
+			BRANCH_BUTTON_ADD_COLUMN = itemIndex;
 
-				// 전체 너비
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_STATICTEXT, DG_IS_LEFT, DG_FT_NONE, 100, 50, 55, 23);
-				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-				DGSetItemText(dialogID, itemIndex, L"전체 너비");
-				DGShowItem(dialogID, itemIndex);
+			// 열 방향 객체 삭제 버튼
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX) + 25, posY + 100, 25, 25);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			DGSetItemText(dialogID, itemIndex, "-");
+			DGShowItem(dialogID, itemIndex);
+			BRANCH_BUTTON_DEL_COLUMN = itemIndex;
 
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, 160, 45, 85, 25);
-				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-				DGShowItem(dialogID, itemIndex);
-				DGDisableItem(dialogID, itemIndex);
+			// 다이얼로그 창 크기 조절
+			if (placingZone.cellsBasic[0][*x].nCellsHor > 3)
+				DGSetDialogSize(dialogID, DG_CLIENT, 500 + ((placingZone.cellsBasic[0][*x].nCellsHor - 3) * sizeX), 300, DG_TOPLEFT, true);
 
-				// 안내 텍스트
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_STATICTEXT, DG_IS_LEFT, DG_FT_NONE, 100, 80, 300, 23);
-				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-				DGSetItemText(dialogID, itemIndex, L"안내 텍스트입니다.");
-				DGShowItem(dialogID, itemIndex);
-
-				// 셀 그리드 표시
-				posX = 100; posY = 115;
-				sizeX = 100; sizeY = 100;
-				for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
-					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_SEPARATOR, 0, 0, posX + (i * sizeX), posY, sizeX, sizeY);
-					DGShowItem(dialogID, itemIndex);
-					if (i == 0)
-						BRANCH_GRID_START_INDEX = itemIndex;
-				}
-
-				// 셀 너비 (Edit컨트롤)
-				for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
-					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX + (i * sizeX), posY + 100, sizeX, 25);
-					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGShowItem(dialogID, itemIndex);
-					if (i == 0)
-						BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX = itemIndex;
-				}
-
-				// 열 방향 객체 추가 버튼
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), posY + 100, 25, 25);
-				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
-				DGSetItemText(dialogID, itemIndex, "+");
-				DGShowItem(dialogID, itemIndex);
-				BRANCH_BUTTON_ADD_COLUMN = itemIndex;
-
-				// 열 방향 객체 삭제 버튼
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX) + 25, posY + 100, 25, 25);
-				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
-				DGSetItemText(dialogID, itemIndex, "-");
-				DGShowItem(dialogID, itemIndex);
-				BRANCH_BUTTON_DEL_COLUMN = itemIndex;
-
-				// 다이얼로그 창 크기 조절
-				if (placingZone.cellsBasic[0][*x].nCellsHor > 3)
-					DGSetDialogSize(dialogID, DG_CLIENT, 500 + ((placingZone.cellsBasic[0][*x].nCellsHor - 3) * sizeX), 300, DG_TOPLEFT, true);
-
-				// 기본값 설정
-				DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[0][*x].objType);				// 팝업컨트롤
-				DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, placingZone.cellsBasic[0][*x].horLen);		// 전체 너비
-				for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {										// 셀 너비
-					DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][*x].cellHorLen[i]);
-				}
+			// 기본값 설정
+			DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[0][*x].objType);				// 팝업컨트롤
+			DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, placingZone.cellsBasic[0][*x].horLen);		// 전체 너비
+			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {										// 셀 너비
+				DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][*x].cellHorLen[i]);
+			}
 				
-				break;
+			// 테이블폼의 경우
+			if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_A) ||
+				(DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_B) ||
+				(DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_C)) {
+
+				totalWidth = 0.0;
+				for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+					DGEnableItem(dialogID, i);
+					totalWidth += DGGetItemValDouble(dialogID, i);
+				}
+				DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, totalWidth);
+				DGDisableItem(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+			}
+			// 그 외의 경우
+			else {
+				for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+					DGDisableItem(dialogID, i);
+				}
+				DGEnableItem(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+			}
+
+			break;
 
 		case DG_MSG_FOCUS:
 			if (item == BRANCH_EDITCONTROL_TOTAL_WIDTH) {
@@ -509,39 +530,93 @@ namespace namespaceWallTableform {
 			break;
 
 		case DG_MSG_CLICK:
-			// ... OK 버튼
-			// ... !!! cellsBasic을 바꾸면 cellsExtra의 너비도 같이 바뀜
+			if (item == DG_OK) {
+				for (int i = 0; i < MAX_ROW; i++) {
+					// 셀 너비
+					for (int j = 0; j < placingZone.cellsBasic[i][*x].nCellsHor; j++) {
+						placingZone.cellsBasic[i][*x].cellHorLen[j] = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + j);
+						placingZone.cellsExtra[i][*x].cellHorLen[j] = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + j);
+					}
 
-			// ... Cancel 버튼
-			// ...
+					// 전체 너비
+					placingZone.cellsBasic[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+					placingZone.cellsExtra[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+
+					// 객체 타입
+					placingZone.cellsBasic[i][*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
+					placingZone.cellsExtra[i][*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
+				}
+				break;
+			}
 
 			// 열 추가 버튼
-			//if (item == BUTTON_ADD_COLUMN) {
-			//	item = 0;
-			//	placingZone.nCellsHor++;
-			//}
+			if (item == BRANCH_BUTTON_ADD_COLUMN) {
+				item = 0;
+				for (int i = 0; i < MAX_ROW; i++) {
+					placingZone.cellsBasic[i][*x].nCellsHor++;
+					placingZone.cellsExtra[i][*x].nCellsHor++;
+				}
+				break;
+			}
 
 			// 열 삭제 버튼
-			//if (item == BUTTON_DEL_COLUMN) {
-			//	item = 0;
-			//	placingZone.nCellsHor--;
-			//}
+			if (item == BRANCH_BUTTON_DEL_COLUMN) {
+				item = 0;
+				for (int i = 0; i < MAX_ROW; i++) {
+					placingZone.cellsBasic[i][*x].nCellsHor--;
+					placingZone.cellsExtra[i][*x].nCellsHor--;
+				}
+				break;
+			}
 
-			// 동적 요소 새로 그리기
-			//{
-			//	// 동적 요소 모두 제거
-			//	DGRemoveDialogItems(dialogID, GRID_START_INDEX);
+			// ---------- 동적 요소 새로 그리기
+			// 동적 요소 모두 제거
+			DGRemoveDialogItems(dialogID, BRANCH_GRID_START_INDEX);
 
-			//	// 다이얼로그 창 크기 조절
-			//	DGSetDialogSize(dialogID, DG_CLIENT, 205 + (placingZone.nCellsHor * sizeX) + 100, 230 + (nCellsVer * sizeY) + 100, DG_TOPLEFT, true);
-			//}
+			// 셀 그리드 표시
+			posX = 100; posY = 115;
+			sizeX = 100; sizeY = 100;
+			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_SEPARATOR, 0, 0, posX + (i * sizeX), posY, sizeX, sizeY);
+				DGShowItem(dialogID, itemIndex);
+				if (i == 0)
+					BRANCH_GRID_START_INDEX = itemIndex;
+			}
 
-			//// 너비 관련 값 설정
-			//DGSetItemValDouble(dialogID, EDITCONTROL_TOTAL_WIDTH, placingZone.horLen);
-			//remainWidth = placingZone.horLen;
-			//for (int i = 0; i < placingZone.nCellsHor; i++)
-			//	remainWidth -= DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i);
-			//DGSetItemValDouble(dialogID, EDITCONTROL_REMAIN_WIDTH, remainWidth);
+			// 셀 너비 (Edit컨트롤)
+			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX + (i * sizeX), posY + 100, sizeX, 25);
+				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+				DGShowItem(dialogID, itemIndex);
+				if (i == 0)
+					BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX = itemIndex;
+			}
+
+			// 열 방향 객체 추가 버튼
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), posY + 100, 25, 25);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			DGSetItemText(dialogID, itemIndex, "+");
+			DGShowItem(dialogID, itemIndex);
+			BRANCH_BUTTON_ADD_COLUMN = itemIndex;
+
+			// 열 방향 객체 삭제 버튼
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX) + 25, posY + 100, 25, 25);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			DGSetItemText(dialogID, itemIndex, "-");
+			DGShowItem(dialogID, itemIndex);
+			BRANCH_BUTTON_DEL_COLUMN = itemIndex;
+
+			// 다이얼로그 창 크기 조절
+			if (placingZone.cellsBasic[0][*x].nCellsHor > 3)
+				DGSetDialogSize(dialogID, DG_CLIENT, 500 + ((placingZone.cellsBasic[0][*x].nCellsHor - 3) * sizeX), 300, DG_TOPLEFT, true);
+
+			// 기본값 설정
+			DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[0][*x].objType);				// 팝업컨트롤
+			DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, placingZone.cellsBasic[0][*x].horLen);		// 전체 너비
+			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {										// 셀 너비
+				DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][*x].cellHorLen[i]);
+			}
+			// ---------- 동적 요소 새로 그리기
 
 			break;
 
@@ -560,10 +635,8 @@ namespace namespaceWallTableform {
 		short	posX, posY;
 		short	sizeX, sizeY;
 
-		char	numStr[32];
 		double	remainHeight, remainWidth;
 		GS::UniString	buttonName;
-		short	targetIndex;
 
 		int		nCellsVer;
 		
@@ -736,7 +809,7 @@ namespace namespaceWallTableform {
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
 				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (i * sizeX), posY, sizeX, 25);
 				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-				DGSetItemText(dialogID, itemIndex, objTypeStr[OBJ_WALL_TABLEFORM_A]);
+				DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.cellsBasic[0][i].objType]);
 				DGShowItem(dialogID, itemIndex);
 				if (i == 0)
 					BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
@@ -907,6 +980,50 @@ namespace namespaceWallTableform {
 			else
 				nCellsVer = placingZone.nCellsVerExtra;
 
+			// 테이블폼의 경우, 전체 너비 변경시 내부 셀 정보도 자동 변경됨
+			for (int i = EDITCONTROL_OBJ_WIDTH_START_INDEX; i < EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.nCellsHor; i++) {
+				if (item == i) {
+					int clickedIndex = i - EDITCONTROL_OBJ_WIDTH_START_INDEX;
+					if ((placingZone.cellsBasic[0][clickedIndex].objType == OBJ_WALL_TABLEFORM_A) ||
+						(placingZone.cellsBasic[0][clickedIndex].objType == OBJ_WALL_TABLEFORM_B) ||
+						(placingZone.cellsBasic[0][clickedIndex].objType == OBJ_WALL_TABLEFORM_C)) {
+
+						int INPUT_VALUE = (int)floor(DGGetItemValDouble(dialogID, i) * 1000);
+
+						if (DGGetItemValLong(dialogID, RADIOBUTTON_VERTICAL) == 1) {
+							for (int k = 0; k < sizeof(placingZone.tableformPresetVertical) / sizeof(int); k++) {
+								if (INPUT_VALUE == placingZone.tableformPresetVertical[k]) {
+									for (int m = 0; m < MAX_ROW; m++) {
+										placingZone.cellsBasic[m][clickedIndex].nCellsHor = placingZone.tableformPresetVerticalConfig[k][1];
+										placingZone.cellsExtra[m][clickedIndex].nCellsHor = placingZone.tableformPresetVerticalConfig[k][1];
+
+										for (int n = 0; n < placingZone.cellsBasic[m][clickedIndex].nCellsHor; n++) {
+											placingZone.cellsBasic[m][clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetVerticalConfig[k][n + 2] / 1000.0;
+											placingZone.cellsExtra[m][clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetVerticalConfig[k][n + 2] / 1000.0;
+										}
+									}
+								}
+							}
+						}
+						else {
+							for (int k = 0; k < sizeof(placingZone.tableformPresetHorizontal) / sizeof(int); k++) {
+								if (INPUT_VALUE == placingZone.tableformPresetHorizontal[k]) {
+									for (int m = 0; m < MAX_ROW; m++) {
+										placingZone.cellsBasic[m][clickedIndex].nCellsHor = placingZone.tableformPresetHorizontalConfig[k][1];
+										placingZone.cellsExtra[m][clickedIndex].nCellsHor = placingZone.tableformPresetHorizontalConfig[k][1];
+
+										for (int n = 0; n < placingZone.cellsBasic[m][clickedIndex].nCellsHor; n++) {
+											placingZone.cellsBasic[m][clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetHorizontalConfig[k][n + 2] / 1000.0;
+											placingZone.cellsExtra[m][clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetHorizontalConfig[k][n + 2] / 1000.0;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
 			// 배치 정보 저장
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
 				for (int j = 0; j < MAX_ROW; j++) {
@@ -992,7 +1109,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nCellsHor; i++) {
 					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (i * sizeX), posY, sizeX, 25);
 					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemText(dialogID, itemIndex, objTypeStr[OBJ_WALL_TABLEFORM_A]);
+					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.cellsBasic[0][i].objType]);
 					DGShowItem(dialogID, itemIndex);
 					if (i == 0)
 						BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
@@ -1112,6 +1229,8 @@ namespace namespaceWallTableform {
 					placingZone.bInstallProps = true;
 				else
 					placingZone.bInstallProps = false;
+
+				break;
 			}
 									
 			// 셀 정보 복사 버튼
@@ -1123,6 +1242,8 @@ namespace namespaceWallTableform {
 						placingZone.cellsExtra[i][j] = placingZone.cellsBasic[i][j];
 					}
 				}
+
+				break;
 			}
 			
 			// 열 추가 버튼
@@ -1161,94 +1282,94 @@ namespace namespaceWallTableform {
 				nCellsVer--;
 			}
 			
-			// ... 객체 타입 버튼 (UI 창 표시)
+			// 객체 타입 버튼 (UI 창 표시)
 			for (int i = BUTTON_OBJ_TYPE_START_INDEX; i < BUTTON_OBJ_TYPE_START_INDEX + placingZone.nCellsHor; i++) {
 				if (item == i) {
 					item = 0;
-					result = DGBlankModalDialog(500, 300, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, handler1_branch, (DGUserData)&i);
+					int clickedIndex = i - BUTTON_OBJ_TYPE_START_INDEX;
+					result = DGBlankModalDialog(500, 300, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, handler1_branch, (DGUserData)&clickedIndex);
 				}
 			}
 			
-			// 동적 요소 새로 그리기
-			{
-				// 동적 요소 모두 제거
-				DGRemoveDialogItems(dialogID, GRID_START_INDEX);
+			// ---------- 동적 요소 새로 그리기
+			// 동적 요소 모두 제거
+			DGRemoveDialogItems(dialogID, GRID_START_INDEX);
 
-				// 셀 그리드 표시
-				posX = 205; posY = 230;
-				sizeX = 100; sizeY = 100;
-				for (int i = 0; i < nCellsVer; i++) {
-					for (short j = 0; j < placingZone.nCellsHor; j++) {
-						itemIndex = DGAppendDialogItem(dialogID, DG_ITM_SEPARATOR, 0, 0, posX + (j * sizeX), posY + (i * sizeY), sizeX, sizeY);
-						DGShowItem(dialogID, itemIndex);
-						if (i == 0 && j == 0)
-							GRID_START_INDEX = itemIndex;
-					}
-				}
-
-				// 객체 타입 선택 버튼 표시
-				posX = 205; posY = 230 + (nCellsVer * sizeY) + 5;
-				for (int i = 0; i < placingZone.nCellsHor; i++) {
-					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (i * sizeX), posY, sizeX, 25);
-					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemText(dialogID, itemIndex, objTypeStr[OBJ_WALL_TABLEFORM_A]);
+			// 셀 그리드 표시
+			posX = 205; posY = 230;
+			sizeX = 100; sizeY = 100;
+			for (int i = 0; i < nCellsVer; i++) {
+				for (short j = 0; j < placingZone.nCellsHor; j++) {
+					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_SEPARATOR, 0, 0, posX + (j * sizeX), posY + (i * sizeY), sizeX, sizeY);
 					DGShowItem(dialogID, itemIndex);
-					if (i == 0)
-						BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
+					if (i == 0 && j == 0)
+						GRID_START_INDEX = itemIndex;
 				}
-
-				// 객체 너비 (Edit컨트롤)
-				for (int i = 0; i < placingZone.nCellsHor; i++) {
-					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX + (i * sizeX), posY + 25, sizeX, 25);
-					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGShowItem(dialogID, itemIndex);
-					if (i == 0)
-						EDITCONTROL_OBJ_WIDTH_START_INDEX = itemIndex;
-				}
-
-				// 열 방향 객체 추가 버튼
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.nCellsHor * sizeX), posY, 25, 25);
-				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
-				DGSetItemText(dialogID, itemIndex, "+");
-				DGShowItem(dialogID, itemIndex);
-				BUTTON_ADD_COLUMN = itemIndex;
-
-				// 열 방향 객체 삭제 버튼
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.nCellsHor * sizeX) + 25, posY, 25, 25);
-				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
-				DGSetItemText(dialogID, itemIndex, "-");
-				DGShowItem(dialogID, itemIndex);
-				BUTTON_DEL_COLUMN = itemIndex;
-
-				// 객체 높이
-				posX = 100; posY = 230 + (nCellsVer * sizeY) - 63;
-				for (int i = 0; i < nCellsVer; i++) {
-					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX, posY - (i * sizeY), sizeX, 25);
-					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGShowItem(dialogID, itemIndex);
-					if (i == 0)
-						EDITCONTROL_OBJ_HEIGHT_START_INDEX = itemIndex;
-				}
-
-				// 행 방향 객체 추가 버튼
-				posX = 100; posY = 230;
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + 25, posY - 25, 25, 25);
-				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
-				DGSetItemText(dialogID, itemIndex, "+");
-				DGShowItem(dialogID, itemIndex);
-				BUTTON_ADD_ROW = itemIndex;
-
-				// 행 방향 객체 삭제 버튼
-				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + 50, posY - 25, 25, 25);
-				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
-				DGSetItemText(dialogID, itemIndex, "-");
-				DGShowItem(dialogID, itemIndex);
-				BUTTON_DEL_ROW = itemIndex;
-
-				// 다이얼로그 창 크기 조절
-				DGSetDialogSize(dialogID, DG_CLIENT, 205 + (placingZone.nCellsHor * sizeX) + 100, 230 + (nCellsVer * sizeY) + 100, DG_TOPLEFT, true);
 			}
 
+			// 객체 타입 선택 버튼 표시
+			posX = 205; posY = 230 + (nCellsVer * sizeY) + 5;
+			for (int i = 0; i < placingZone.nCellsHor; i++) {
+				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (i * sizeX), posY, sizeX, 25);
+				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+				DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.cellsBasic[0][i].objType]);
+				DGShowItem(dialogID, itemIndex);
+				if (i == 0)
+					BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
+			}
+
+			// 객체 너비 (Edit컨트롤)
+			for (int i = 0; i < placingZone.nCellsHor; i++) {
+				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX + (i * sizeX), posY + 25, sizeX, 25);
+				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+				DGShowItem(dialogID, itemIndex);
+				if (i == 0)
+					EDITCONTROL_OBJ_WIDTH_START_INDEX = itemIndex;
+			}
+
+			// 열 방향 객체 추가 버튼
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.nCellsHor * sizeX), posY, 25, 25);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			DGSetItemText(dialogID, itemIndex, "+");
+			DGShowItem(dialogID, itemIndex);
+			BUTTON_ADD_COLUMN = itemIndex;
+
+			// 열 방향 객체 삭제 버튼
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.nCellsHor * sizeX) + 25, posY, 25, 25);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			DGSetItemText(dialogID, itemIndex, "-");
+			DGShowItem(dialogID, itemIndex);
+			BUTTON_DEL_COLUMN = itemIndex;
+
+			// 객체 높이
+			posX = 100; posY = 230 + (nCellsVer * sizeY) - 63;
+			for (int i = 0; i < nCellsVer; i++) {
+				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX, posY - (i * sizeY), sizeX, 25);
+				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+				DGShowItem(dialogID, itemIndex);
+				if (i == 0)
+					EDITCONTROL_OBJ_HEIGHT_START_INDEX = itemIndex;
+			}
+
+			// 행 방향 객체 추가 버튼
+			posX = 100; posY = 230;
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + 25, posY - 25, 25, 25);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			DGSetItemText(dialogID, itemIndex, "+");
+			DGShowItem(dialogID, itemIndex);
+			BUTTON_ADD_ROW = itemIndex;
+
+			// 행 방향 객체 삭제 버튼
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + 50, posY - 25, 25, 25);
+			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			DGSetItemText(dialogID, itemIndex, "-");
+			DGShowItem(dialogID, itemIndex);
+			BUTTON_DEL_ROW = itemIndex;
+
+			// 다이얼로그 창 크기 조절
+			DGSetDialogSize(dialogID, DG_CLIENT, 205 + (placingZone.nCellsHor * sizeX) + 100, 230 + (nCellsVer * sizeY) + 100, DG_TOPLEFT, true);
+			// ---------- 동적 요소 새로 그리기
+			
 			// 기본값 설정: 셀 크기
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
 				DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][i].horLen);
@@ -1292,6 +1413,317 @@ namespace namespaceWallTableform {
 
 		return result;
 	}
+
+	short DGCALLBACK handler2(short message, short dialogID, short item, DGUserData userData, DGMessageData /* msgData */) {
+		//int* x = (int*)userData;
+
+		short	result;
+		short	itemIndex;
+		short	posX, posY;
+		short	sizeX, sizeY;
+		double	totalWidth;
+
+		switch (message) {
+		case DG_MSG_INIT:
+			//DGSetDialogTitle(dialogID, L"벽에 테이블폼 배치 - 셀 설정");
+
+			//// 확인 버튼
+			//DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 10, 15, 70, 25);
+			//DGSetItemFont(dialogID, DG_OK, DG_IS_LARGE | DG_IS_PLAIN);
+			//DGSetItemText(dialogID, DG_OK, L"확인");
+			//DGShowItem(dialogID, DG_OK);
+
+			//// 취소
+			//DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 10, 45, 70, 25);
+			//DGSetItemFont(dialogID, DG_CANCEL, DG_IS_LARGE | DG_IS_PLAIN);
+			//DGSetItemText(dialogID, DG_CANCEL, L"취소");
+			//DGShowItem(dialogID, DG_CANCEL);
+
+			//// 객체 종류
+			//itemIndex = DGAppendDialogItem(dialogID, DG_ITM_STATICTEXT, DG_IS_LEFT, DG_FT_NONE, 100, 20, 55, 23);
+			//DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			//DGSetItemText(dialogID, itemIndex, L"객체 종류");
+			//DGShowItem(dialogID, itemIndex);
+
+			//itemIndex = DGAppendDialogItem(dialogID, DG_ITM_POPUPCONTROL, 200, 0, 160, 15, 150, 25);
+			//DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			//for (int i = 1; i < 14; i++) {
+			//	DGPopUpInsertItem(dialogID, itemIndex, DG_POPUP_BOTTOM);
+			//	DGPopUpSetItemText(dialogID, itemIndex, DG_POPUP_BOTTOM, objTypeStr[i]);
+			//}
+			//DGShowItem(dialogID, itemIndex);
+
+			//// 전체 너비
+			//itemIndex = DGAppendDialogItem(dialogID, DG_ITM_STATICTEXT, DG_IS_LEFT, DG_FT_NONE, 100, 50, 55, 23);
+			//DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			//DGSetItemText(dialogID, itemIndex, L"전체 너비");
+			//DGShowItem(dialogID, itemIndex);
+
+			//itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, 160, 45, 85, 25);
+			//DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			//DGShowItem(dialogID, itemIndex);
+			//DGDisableItem(dialogID, itemIndex);
+
+			//// 안내 텍스트
+			//itemIndex = DGAppendDialogItem(dialogID, DG_ITM_STATICTEXT, DG_IS_LEFT, DG_FT_NONE, 100, 80, 300, 23);
+			//DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			//DGSetItemText(dialogID, itemIndex, L"안내 텍스트입니다.");
+			//DGShowItem(dialogID, itemIndex);
+
+			//// 셀 그리드 표시
+			//posX = 100; posY = 115;
+			//sizeX = 100; sizeY = 100;
+			//for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+			//	itemIndex = DGAppendDialogItem(dialogID, DG_ITM_SEPARATOR, 0, 0, posX + (i * sizeX), posY, sizeX, sizeY);
+			//	DGShowItem(dialogID, itemIndex);
+			//	if (i == 0)
+			//		BRANCH_GRID_START_INDEX = itemIndex;
+			//}
+
+			//// 셀 너비 (Edit컨트롤)
+			//for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+			//	itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX + (i * sizeX), posY + 100, sizeX, 25);
+			//	DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			//	DGShowItem(dialogID, itemIndex);
+			//	if (i == 0)
+			//		BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX = itemIndex;
+			//}
+
+			//// 열 방향 객체 추가 버튼
+			//itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), posY + 100, 25, 25);
+			//DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			//DGSetItemText(dialogID, itemIndex, "+");
+			//DGShowItem(dialogID, itemIndex);
+			//BRANCH_BUTTON_ADD_COLUMN = itemIndex;
+
+			//// 열 방향 객체 삭제 버튼
+			//itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX) + 25, posY + 100, 25, 25);
+			//DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			//DGSetItemText(dialogID, itemIndex, "-");
+			//DGShowItem(dialogID, itemIndex);
+			//BRANCH_BUTTON_DEL_COLUMN = itemIndex;
+
+			//// 다이얼로그 창 크기 조절
+			//if (placingZone.cellsBasic[0][*x].nCellsHor > 3)
+			//	DGSetDialogSize(dialogID, DG_CLIENT, 500 + ((placingZone.cellsBasic[0][*x].nCellsHor - 3) * sizeX), 300, DG_TOPLEFT, true);
+
+			//// 기본값 설정
+			//DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[0][*x].objType);				// 팝업컨트롤
+			//DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, placingZone.cellsBasic[0][*x].horLen);		// 전체 너비
+			//for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {										// 셀 너비
+			//	DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][*x].cellHorLen[i]);
+			//}
+
+			//// 테이블폼의 경우
+			//if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_A) ||
+			//	(DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_B) ||
+			//	(DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_C)) {
+
+			//	totalWidth = 0.0;
+			//	for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+			//		DGEnableItem(dialogID, i);
+			//		totalWidth += DGGetItemValDouble(dialogID, i);
+			//	}
+			//	DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, totalWidth);
+			//	DGDisableItem(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+			//}
+			//// 그 외의 경우
+			//else {
+			//	for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+			//		DGDisableItem(dialogID, i);
+			//	}
+			//	DGEnableItem(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+			//}
+
+			break;
+
+		case DG_MSG_FOCUS:
+			//if (item == BRANCH_EDITCONTROL_TOTAL_WIDTH) {
+			//	if (placingZone.bVertical == true) {
+			//		if (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_EUROFORM) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 600, 500, 450, 400, 300, 200");
+			//		}
+			//		else if (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_PLYWOOD) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 100 ~ 1220");
+			//		}
+			//		else if (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_TIMBER) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 5 ~ 1000");
+			//		}
+			//		else if (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_FILLERSPACER) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 10 ~ 50");
+			//		}
+			//		else if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_INCORNER_PANEL_L) || (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_INCORNER_PANEL_R)) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
+			//		}
+			//		else if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_PANEL_L) || (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_PANEL_R)) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
+			//		}
+			//		else if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_ANGLE_L) || (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_ANGLE_R)) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 63.5");
+			//		}
+			//	}
+			//	else {
+			//		if (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_EUROFORM) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 1200, 900, 600");
+			//		}
+			//		else if (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_PLYWOOD) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 100 ~ 2440");
+			//		}
+			//		else if (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_TIMBER) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 5 ~ 1000");
+			//		}
+			//		else if (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_FILLERSPACER) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 10 ~ 50");
+			//		}
+			//		else if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_INCORNER_PANEL_L) || (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_INCORNER_PANEL_R)) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
+			//		}
+			//		else if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_PANEL_L) || (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_PANEL_R)) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
+			//		}
+			//		else if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_ANGLE_L) || (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_ANGLE_R)) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 63.5");
+			//		}
+			//	}
+			//}
+
+			//for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+			//	if (item == i) {
+			//		if (placingZone.bVertical == true) {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 600, 500, 450, 400, 300, 200");
+			//		}
+			//		else {
+			//			DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 1200, 900, 600");
+			//		}
+			//	}
+			//}
+
+			break;
+
+		case DG_MSG_CHANGE:
+			//// 테이블폼의 경우
+			//if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_A) ||
+			//	(DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_B) ||
+			//	(DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_C)) {
+
+			//	totalWidth = 0.0;
+			//	for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+			//		DGEnableItem(dialogID, i);
+			//		totalWidth += DGGetItemValDouble(dialogID, i);
+			//	}
+			//	DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, totalWidth);
+			//	DGDisableItem(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+			//}
+			//// 그 외의 경우
+			//else {
+			//	for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+			//		DGDisableItem(dialogID, i);
+			//	}
+			//	DGEnableItem(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+			//}
+
+			break;
+
+		case DG_MSG_CLICK:
+			//if (item == DG_OK) {
+			//	for (int i = 0; i < MAX_ROW; i++) {
+			//		// 셀 너비
+			//		for (int j = 0; j < placingZone.cellsBasic[i][*x].nCellsHor; j++) {
+			//			placingZone.cellsBasic[i][*x].cellHorLen[j] = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + j);
+			//			placingZone.cellsExtra[i][*x].cellHorLen[j] = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + j);
+			//		}
+
+			//		// 전체 너비
+			//		placingZone.cellsBasic[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+			//		placingZone.cellsExtra[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+
+			//		// 객체 타입
+			//		placingZone.cellsBasic[i][*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
+			//		placingZone.cellsExtra[i][*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
+			//	}
+			//	break;
+			//}
+
+			//// 열 추가 버튼
+			//if (item == BRANCH_BUTTON_ADD_COLUMN) {
+			//	item = 0;
+			//	for (int i = 0; i < MAX_ROW; i++) {
+			//		placingZone.cellsBasic[i][*x].nCellsHor++;
+			//		placingZone.cellsExtra[i][*x].nCellsHor++;
+			//	}
+			//	break;
+			//}
+
+			//// 열 삭제 버튼
+			//if (item == BRANCH_BUTTON_DEL_COLUMN) {
+			//	item = 0;
+			//	for (int i = 0; i < MAX_ROW; i++) {
+			//		placingZone.cellsBasic[i][*x].nCellsHor--;
+			//		placingZone.cellsExtra[i][*x].nCellsHor--;
+			//	}
+			//	break;
+			//}
+
+			//// ---------- 동적 요소 새로 그리기
+			//// 동적 요소 모두 제거
+			//DGRemoveDialogItems(dialogID, BRANCH_GRID_START_INDEX);
+
+			//// 셀 그리드 표시
+			//posX = 100; posY = 115;
+			//sizeX = 100; sizeY = 100;
+			//for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+			//	itemIndex = DGAppendDialogItem(dialogID, DG_ITM_SEPARATOR, 0, 0, posX + (i * sizeX), posY, sizeX, sizeY);
+			//	DGShowItem(dialogID, itemIndex);
+			//	if (i == 0)
+			//		BRANCH_GRID_START_INDEX = itemIndex;
+			//}
+
+			//// 셀 너비 (Edit컨트롤)
+			//for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+			//	itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX + (i * sizeX), posY + 100, sizeX, 25);
+			//	DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
+			//	DGShowItem(dialogID, itemIndex);
+			//	if (i == 0)
+			//		BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX = itemIndex;
+			//}
+
+			//// 열 방향 객체 추가 버튼
+			//itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), posY + 100, 25, 25);
+			//DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			//DGSetItemText(dialogID, itemIndex, "+");
+			//DGShowItem(dialogID, itemIndex);
+			//BRANCH_BUTTON_ADD_COLUMN = itemIndex;
+
+			//// 열 방향 객체 삭제 버튼
+			//itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX) + 25, posY + 100, 25, 25);
+			//DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
+			//DGSetItemText(dialogID, itemIndex, "-");
+			//DGShowItem(dialogID, itemIndex);
+			//BRANCH_BUTTON_DEL_COLUMN = itemIndex;
+
+			//// 다이얼로그 창 크기 조절
+			//if (placingZone.cellsBasic[0][*x].nCellsHor > 3)
+			//	DGSetDialogSize(dialogID, DG_CLIENT, 500 + ((placingZone.cellsBasic[0][*x].nCellsHor - 3) * sizeX), 300, DG_TOPLEFT, true);
+
+			//// 기본값 설정
+			//DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[0][*x].objType);				// 팝업컨트롤
+			//DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, placingZone.cellsBasic[0][*x].horLen);		// 전체 너비
+			//for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {										// 셀 너비
+			//	DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][*x].cellHorLen[i]);
+			//}
+			//// ---------- 동적 요소 새로 그리기
+
+			break;
+
+		case DG_MSG_CLOSE:
+			break;
+		}
+
+		result = item;
+
+		return result;
+	}
+
 }
 
 using namespace namespaceWallTableform;
@@ -1493,16 +1925,24 @@ GSErrCode	placeWallTableform(void)
 		if (nSteps == 1) {
 			// 1번 다이얼로그: 폼 설정
 			result = DGBlankModalDialog(550, 500, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, handler1, 0);
-			// -> DG_OK이면 nSteps = 2
-			// -> DG_CANCEL이면 nSteps = 0, exitCondition = true
-			exitCondition = true;
+			if (result == DG_OK) {
+				nSteps = 2;
+				exitCondition = false;
+			}
+			else {
+				nSteps = 0;
+				exitCondition = true;
+			}
 		}
 
 		if (nSteps == 2) {
 			// 2번 다이얼로그: 상단 여백 채우기 (낮은쪽)
+			//result = DGBlankModalDialog(500, 300, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, handler2, 0);
+			
 			// -> DG_OK이면 nSteps = 3, exitCondition = false
 			// -> DG_CANCEL이면 nSteps = 3, exitCondition = false
 			// -> 이전 버튼을 누르면 nSteps = 1, exitCondition = false
+			exitCondition = true;
 		}
 
 		if (nSteps == 3) {
