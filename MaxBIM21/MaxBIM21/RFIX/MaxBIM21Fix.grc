@@ -22,3 +22,58 @@
 'GICN' ID_MENU_ICON "This icon will appear on the menu" {
 	"MenuIcon"
 }
+
+/* Layer assignment (22) */
+'GDLG'	32501	Modal | grow	  0		  0		300		810		"Layer assignment" {
+/* [  1] */		Button			 70		770		 70		 25		LargePlain		"OK"
+/* [  2] */		Button			160		770		 70		 25		LargePlain		"Cancel"
+
+/* [  3] */		LeftText		120		 15		200		 23		LargePlain		"Layer Settings"
+/* [  4] */		CheckBox		120		 45		100		 23		LargePlain		"Coupling"
+
+/* [  5] */		RightText		 10		 75		100		 23		LargePlain		"Layer 1"
+/* [  6] */		RightText		 10		105		100		 23		LargePlain		"Layer 2"
+/* [  7] */		RightText		 10		135		100		 23		LargePlain		"Layer 3"
+/* [  8] */		RightText		 10		165		100		 23		LargePlain		"Layer 4"
+/* [  9] */		RightText		 10		195		100		 23		LargePlain		"Layer 5"
+/* [ 10] */		RightText		 10		225		100		 23		LargePlain		"Layer 6"
+/* [ 11] */		RightText		 10		255		100		 23		LargePlain		"Layer 7"
+/* [ 12] */		RightText		 10		285		100		 23		LargePlain		"Layer 8"
+/* [ 13] */		RightText		 10		315		100		 23		LargePlain		"Layer 9"
+/* [ 14] */		RightText		 10		345		100		 23		LargePlain		"Layer 10"
+/* [ 15] */		RightText		 10		375		100		 23		LargePlain		"Layer 11"
+/* [ 16] */		RightText		 10		405		100		 23		LargePlain		"Layer 12"
+/* [ 17] */		RightText		 10		435		100		 23		LargePlain		"Layer 13"
+/* [ 18] */		RightText		 10		465		100		 23		LargePlain		"Layer 14"
+/* [ 19] */		RightText		 10		495		100		 23		LargePlain		"Layer 15"
+/* [ 20] */		RightText		 10		525		100		 23		LargePlain		"Layer 16"
+/* [ 21] */		RightText		 10		555		100		 23		LargePlain		"Layer 17"
+/* [ 22] */		RightText		 10		585		100		 23		LargePlain		"Layer 18"
+/* [ 23] */		RightText		 10		615		100		 23		LargePlain		"Layer 19"
+/* [ 24] */		RightText		 10		645		100		 23		LargePlain		"Layer 20"
+/* [ 25] */		RightText		 10		675		100		 23		LargePlain		"Layer 21"
+/* [ 26] */		RightText		 10		705		100		 23		LargePlain		"Layer 22"
+
+/* [ 27] */		UserControl		120		 69		160		 25		257	0x0006 0x0000 0		/* Layer Control - 1	*/
+/* [ 28] */		UserControl		120		 99		160		 25		257	0x0006 0x0000 0		/* Layer Control - 2	*/
+/* [ 29] */		UserControl		120		129		160		 25		257	0x0006 0x0000 0		/* Layer Control - 3	*/
+/* [ 30] */		UserControl		120		159		160		 25		257	0x0006 0x0000 0		/* Layer Control - 4	*/
+/* [ 31] */		UserControl		120		189		160		 25		257	0x0006 0x0000 0		/* Layer Control - 5	*/
+/* [ 32] */		UserControl		120		219		160		 25		257	0x0006 0x0000 0		/* Layer Control - 6	*/
+/* [ 33] */		UserControl		120		249		160		 25		257	0x0006 0x0000 0		/* Layer Control - 7	*/
+/* [ 34] */		UserControl		120		279		160		 25		257	0x0006 0x0000 0		/* Layer Control - 8	*/
+/* [ 35] */		UserControl		120		309		160		 25		257	0x0006 0x0000 0		/* Layer Control - 9	*/
+/* [ 36] */		UserControl		120		339		160		 25		257	0x0006 0x0000 0		/* Layer Control - 10	*/
+/* [ 37] */		UserControl		120		369		160		 25		257	0x0006 0x0000 0		/* Layer Control - 11	*/
+/* [ 38] */		UserControl		120		399		160		 25		257	0x0006 0x0000 0		/* Layer Control - 12	*/
+/* [ 39] */		UserControl		120		429		160		 25		257	0x0006 0x0000 0		/* Layer Control - 13	*/
+/* [ 40] */		UserControl		120		459		160		 25		257	0x0006 0x0000 0		/* Layer Control - 14	*/
+/* [ 41] */		UserControl		120		489		160		 25		257	0x0006 0x0000 0		/* Layer Control - 15	*/
+/* [ 42] */		UserControl		120		519		160		 25		257	0x0006 0x0000 0		/* Layer Control - 16	*/
+/* [ 43] */		UserControl		120		549		160		 25		257	0x0006 0x0000 0		/* Layer Control - 17	*/
+/* [ 44] */		UserControl		120		579		160		 25		257	0x0006 0x0000 0		/* Layer Control - 18	*/
+/* [ 45] */		UserControl		120		609		160		 25		257	0x0006 0x0000 0		/* Layer Control - 19	*/
+/* [ 46] */		UserControl		120		639		160		 25		257	0x0006 0x0000 0		/* Layer Control - 20	*/
+/* [ 47] */		UserControl		120		669		160		 25		257	0x0006 0x0000 0		/* Layer Control - 21	*/
+/* [ 48] */		UserControl		120		699		160		 25		257	0x0006 0x0000 0		/* Layer Control - 22	*/
+}
