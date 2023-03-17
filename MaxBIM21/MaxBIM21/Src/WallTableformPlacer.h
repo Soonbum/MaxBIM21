@@ -58,6 +58,72 @@ namespace namespaceWallTableform {
 		DG2_LABEL_GUIDE					// 라벨: 안내 텍스트
 	};
 
+	enum layer_itemIndex {
+		CHECKBOX_LAYER_COUPLING = 3,
+
+		LABEL_LAYER_EUROFORM,
+		LABEL_LAYER_PLYWOOD,
+		LABEL_LAYER_TIMBER,
+		LABEL_LAYER_FILLERSPACER,
+		LABEL_LAYER_INCORNER_PANEL,
+		LABEL_LAYER_OUTCORNER_PANEL,
+		LABEL_LAYER_OUTCORNER_ANGLE,
+		LABEL_LAYER_BLUE_CLAMP,
+		LABEL_LAYER_BLUE_TIMBER_RAIL,
+		LABEL_LAYER_RECTPIPE,
+		LABEL_LAYER_PINBOLT,
+		LABEL_LAYER_HEADPIECE,
+		LABEL_LAYER_PROPS,
+		LABEL_LAYER_JOIN,
+		LABEL_LAYER_CROSS_JOINT_BAR,
+		LABEL_LAYER_16,
+		LABEL_LAYER_17,
+		LABEL_LAYER_18,
+		LABEL_LAYER_19,
+		LABEL_LAYER_20,
+
+		USERCONTROL_LAYER_EUROFORM,
+		USERCONTROL_LAYER_PLYWOOD,
+		USERCONTROL_LAYER_TIMBER,
+		USERCONTROL_LAYER_FILLERSPACER,
+		USERCONTROL_LAYER_INCORNER_PANEL,
+		USERCONTROL_LAYER_OUTCORNER_PANEL,
+		USERCONTROL_LAYER_OUTCORNER_ANGLE,
+		USERCONTROL_LAYER_BLUE_CLAMP,
+		USERCONTROL_LAYER_BLUE_TIMBER_RAIL,
+		USERCONTROL_LAYER_RECTPIPE,
+		USERCONTROL_LAYER_PINBOLT,
+		USERCONTROL_LAYER_HEADPIECE,
+		USERCONTROL_LAYER_PROPS,
+		USERCONTROL_LAYER_JOIN,
+		USERCONTROL_LAYER_CROSS_JOINT_BAR,
+		USERCONTROL_LAYER_16,
+		USERCONTROL_LAYER_17,
+		USERCONTROL_LAYER_18,
+		USERCONTROL_LAYER_19,
+		USERCONTROL_LAYER_20,
+
+		BUTTON_AUTOSET
+	};
+
+	enum insulationDialog {
+		LABEL_EXPLANATION_INS = 3,
+		USERCONTROL_INSULATION_LAYER,
+		LABEL_INSULATION_THK,
+		EDITCONTROL_INSULATION_THK,
+		CHECKBOX_INS_LIMIT_SIZE,
+		LABEL_INS_HORLEN,
+		EDITCONTROL_INS_HORLEN,
+		LABEL_INS_VERLEN,
+		EDITCONTROL_INS_VERLEN,
+	};
+
+	double DEFAULT_TABLEFORM_WIDTH = 2.250;
+	double DEFAULT_EUROFORM_HEIGHT = 1.200;
+
+	int MAX_ROW = 10;
+	int MAX_COL = 50;
+
 	struct Cell
 	{
 		double	leftBottomX;	// 좌하단 좌표 X
@@ -196,6 +262,39 @@ namespace namespaceWallTableform {
 			{ 1500, 2,  900,  600,    0,    0,    0 }
 		};
 
+		// 레이어 지정 변수
+		short	layerInd_Euroform;			// 유로폼
+		short	layerInd_Plywood;			// 합판
+		short	layerInd_Timber;			// 각재
+		short	layerInd_Fillerspacer;		// 휠러스페이서
+		short	layerInd_IncornerPanel;		// 인코너판넬
+		short	layerInd_OutcornerPanel;	// 아웃코너판넬
+		short	layerInd_OutcornerAngle;	// 아웃코너앵글
+		short	layerInd_BlueClamp;			// 블루클램프
+		short	layerInd_BlueTimberRail;	// 블루목심
+		short	layerInd_Rectpipe;			// 각파이프
+		short	layerInd_Pinbolt;			// 핀볼트
+		short	layerInd_Headpiece;			// 헤드피스
+		short	layerInd_Props;				// 푸시풀프롭스
+		short	layerInd_Join;				// 결합철물
+		short	layerInd_CrossJointBar;		// 십자조인트바
+
+		bool	bLayerInd_Euroform;			// 유로폼
+		bool	bLayerInd_Plywood;			// 합판
+		bool	bLayerInd_Timber;			// 각재
+		bool	bLayerInd_Fillerspacer;		// 휠러스페이서
+		bool	bLayerInd_IncornerPanel;	// 인코너판넬
+		bool	bLayerInd_OutcornerPanel;	// 아웃코너판넬
+		bool	bLayerInd_OutcornerAngle;	// 아웃코너앵글
+		bool	bLayerInd_BlueClamp;		// 블루클램프
+		bool	bLayerInd_BlueTimberRail;	// 블루목심
+		bool	bLayerInd_Rectpipe;			// 각파이프
+		bool	bLayerInd_Pinbolt;			// 핀볼트
+		bool	bLayerInd_Headpiece;		// 헤드피스
+		bool	bLayerInd_Props;			// 푸시풀프롭스
+		bool	bLayerInd_Join;				// 결합철물
+		bool	bLayerInd_CrossJointBar;	// 십자조인트바
+		
 		// 생성자
 		PlacingZone()
 		{
@@ -268,6 +367,38 @@ namespace namespaceWallTableform {
 					this->marginCellsExtra[i][j].objType = OBJ_NONE;
 				}
 			}
+
+			this->bLayerInd_Euroform = false;
+			this->bLayerInd_Plywood = false;
+			this->bLayerInd_Timber = false;
+			this->bLayerInd_Fillerspacer = false;
+			this->bLayerInd_IncornerPanel = false;
+			this->bLayerInd_OutcornerPanel = false;
+			this->bLayerInd_OutcornerAngle = false;
+			this->bLayerInd_BlueClamp = false;
+			this->bLayerInd_BlueTimberRail = false;
+			this->bLayerInd_Rectpipe = false;
+			this->bLayerInd_Pinbolt = false;
+			this->bLayerInd_Headpiece = false;
+			this->bLayerInd_Props = false;
+			this->bLayerInd_Join = false;
+			this->bLayerInd_CrossJointBar = false;
+
+			this->layerInd_Euroform = 1;
+			this->layerInd_Plywood = 1;
+			this->layerInd_Timber = 1;
+			this->layerInd_Fillerspacer = 1;
+			this->layerInd_IncornerPanel = 1;
+			this->layerInd_OutcornerPanel = 1;
+			this->layerInd_OutcornerAngle = 1;
+			this->layerInd_BlueClamp = 1;
+			this->layerInd_BlueTimberRail = 1;
+			this->layerInd_Rectpipe = 1;
+			this->layerInd_Pinbolt = 1;
+			this->layerInd_Headpiece = 1;
+			this->layerInd_Props = 1;
+			this->layerInd_Join = 1;
+			this->layerInd_CrossJointBar = 1;
 		}
 
 		// 배치 정보 구축
@@ -277,8 +408,8 @@ namespace namespaceWallTableform {
 			for (int i = 0; i < 10; i++) {
 				for (int j = 0; j < 50; j++) {
 					// 앞면
-					this->cellsBasic[i][j].horLen = 2.250;
-					this->cellsBasic[i][j].verLen = 1.200;
+					this->cellsBasic[i][j].horLen = DEFAULT_TABLEFORM_WIDTH;
+					this->cellsBasic[i][j].verLen = DEFAULT_EUROFORM_HEIGHT;
 					this->cellsBasic[i][j].objType = OBJ_WALL_TABLEFORM_A;
 					this->cellsBasic[i][j].nCellsHor = 4;
 
@@ -288,8 +419,8 @@ namespace namespaceWallTableform {
 					this->cellsBasic[i][j].cellHorLen[3] = 0.600;
 
 					// 뒷면
-					this->cellsExtra[i][j].horLen = 2.250;
-					this->cellsExtra[i][j].verLen = 1.200;
+					this->cellsExtra[i][j].horLen = DEFAULT_TABLEFORM_WIDTH;
+					this->cellsExtra[i][j].verLen = DEFAULT_EUROFORM_HEIGHT;
 					this->cellsExtra[i][j].objType = OBJ_WALL_TABLEFORM_A;
 					this->cellsExtra[i][j].nCellsHor = 4;
 
@@ -300,27 +431,32 @@ namespace namespaceWallTableform {
 
 					// 앞면 여백
 					this->marginCellsBasic[i][j].objType = OBJ_EUROFORM;
-					this->marginCellsBasic[i][j].horLen = 1.200;
+					this->marginCellsBasic[i][j].horLen = DEFAULT_TABLEFORM_WIDTH;
 					this->marginCellsBasic[i][j].verLen = 0.600;
 
 					// 뒷면 여백
 					this->marginCellsExtra[i][j].objType = OBJ_EUROFORM;
-					this->marginCellsExtra[i][j].horLen = 1.200;
+					this->marginCellsExtra[i][j].horLen = DEFAULT_TABLEFORM_WIDTH;
 					this->marginCellsExtra[i][j].verLen = 0.600;
 				}
 			}
 		}
 	};
 
-	PlacingZone	placingZone;			// 배치 정보
-	InfoWall	infoWall;				// 벽 객체 정보
-	API_Guid	structuralObject;		// 구조 객체의 GUID
+	// 단열재
+	struct insulationElement
+	{
+		short	layerInd;		// 레이어 인덱스
+		double	thk;			// 두께
+		bool	bLimitSize;		// 가로/세로 크기 제한
+		double	maxHorLen;		// 가로 최대 길이
+		double	maxVerLen;		// 세로 최대 길이
+	};
 
-	double DEFAULT_TABLEFORM_WIDTH = 2.250;
-	double DEFAULT_EUROFORM_HEIGHT = 1.200;
-
-	int MAX_ROW = 10;
-	int MAX_COL = 50;
+	PlacingZone placingZone;		// 배치 정보
+	InfoWall infoWall;				// 벽 객체 정보
+	insulationElement insulElem;	// 단열재 정보
+	API_Guid structuralObject;		// 구조 객체의 GUID
 
 	// 항목 인덱스 (1차 다이얼로그)
 	short GRID_START_INDEX;						// 그리드
@@ -441,8 +577,7 @@ namespace namespaceWallTableform {
 			BRANCH_BUTTON_DEL_COLUMN = itemIndex;
 
 			// 다이얼로그 창 크기 조절
-			if (placingZone.cellsBasic[0][*x].nCellsHor > 3)
-				DGSetDialogSize(dialogID, DG_CLIENT, 500 + ((placingZone.cellsBasic[0][*x].nCellsHor - 3) * sizeX), 300, DG_TOPLEFT, true);
+			DGSetDialogSize(dialogID, DG_CLIENT, 205 + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), 300, DG_TOPLEFT, true);
 
 			// 기본값 설정
 			DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[0][*x].objType);				// 팝업컨트롤
@@ -574,6 +709,9 @@ namespace namespaceWallTableform {
 					placingZone.cellsBasic[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
 					placingZone.cellsExtra[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
 
+					placingZone.marginCellsBasic[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+					placingZone.marginCellsExtra[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+
 					// 객체 타입
 					placingZone.cellsBasic[i][*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
 					placingZone.cellsExtra[i][*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
@@ -639,8 +777,7 @@ namespace namespaceWallTableform {
 			BRANCH_BUTTON_DEL_COLUMN = itemIndex;
 
 			// 다이얼로그 창 크기 조절
-			if (placingZone.cellsBasic[0][*x].nCellsHor > 3)
-				DGSetDialogSize(dialogID, DG_CLIENT, 500 + ((placingZone.cellsBasic[0][*x].nCellsHor - 3) * sizeX), 300, DG_TOPLEFT, true);
+			DGSetDialogSize(dialogID, DG_CLIENT, 205 + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), 300, DG_TOPLEFT, true);
 
 			// 기본값 설정
 			DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[0][*x].objType);				// 팝업컨트롤
@@ -1966,6 +2103,473 @@ namespace namespaceWallTableform {
 		return result;
 	}
 
+	short DGCALLBACK layer_handler(short message, short dialogID, short item, DGUserData /* userData */, DGMessageData /* msgData */) {
+		short	result;
+		API_UCCallbackType	ucb;
+
+		switch (message) {
+		case DG_MSG_INIT:
+			DGSetDialogTitle(dialogID, L"레이어 선택하기");
+
+			DGSetItemText(dialogID, DG_OK, L"확인");
+			DGSetItemText(dialogID, DG_CANCEL, L"취소");
+
+			DGSetItemText(dialogID, CHECKBOX_LAYER_COUPLING, L"레이어 묶음");
+			DGSetItemValLong(dialogID, CHECKBOX_LAYER_COUPLING, true);
+
+			DGSetItemText(dialogID, LABEL_LAYER_EUROFORM, L"유로폼");
+			DGSetItemText(dialogID, LABEL_LAYER_PLYWOOD, L"합판");
+			DGSetItemText(dialogID, LABEL_LAYER_TIMBER, L"각재");
+			DGSetItemText(dialogID, LABEL_LAYER_FILLERSPACER, L"휠러스페이서");
+			DGSetItemText(dialogID, LABEL_LAYER_INCORNER_PANEL, L"인코너판넬");
+			DGSetItemText(dialogID, LABEL_LAYER_OUTCORNER_PANEL, L"아웃코너판넬");
+			DGSetItemText(dialogID, LABEL_LAYER_OUTCORNER_ANGLE, L"아웃코너앵글");
+			DGSetItemText(dialogID, LABEL_LAYER_BLUE_CLAMP, L"블루클램프");
+			DGSetItemText(dialogID, LABEL_LAYER_BLUE_TIMBER_RAIL, L"블루목심");
+			DGSetItemText(dialogID, LABEL_LAYER_RECTPIPE, L"각파이프");
+			DGSetItemText(dialogID, LABEL_LAYER_PINBOLT, L"핀볼트");
+			DGSetItemText(dialogID, LABEL_LAYER_HEADPIECE, L"헤드피스");
+			DGSetItemText(dialogID, LABEL_LAYER_PROPS, L"푸시풀프롭스");
+			DGSetItemText(dialogID, LABEL_LAYER_JOIN, L"결합철물");
+			DGSetItemText(dialogID, LABEL_LAYER_CROSS_JOINT_BAR, L"십자조인트바");
+
+			DGHideItem(dialogID, LABEL_LAYER_16);
+			DGHideItem(dialogID, LABEL_LAYER_17);
+			DGHideItem(dialogID, LABEL_LAYER_18);
+			DGHideItem(dialogID, LABEL_LAYER_19);
+			DGHideItem(dialogID, LABEL_LAYER_20);
+			DGHideItem(dialogID, USERCONTROL_LAYER_16);
+			DGHideItem(dialogID, USERCONTROL_LAYER_17);
+			DGHideItem(dialogID, USERCONTROL_LAYER_18);
+			DGHideItem(dialogID, USERCONTROL_LAYER_19);
+			DGHideItem(dialogID, USERCONTROL_LAYER_20);
+
+			DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 120, 540, 160, 25);
+			DGSetItemFont(dialogID, BUTTON_AUTOSET, DG_IS_LARGE | DG_IS_PLAIN);
+			DGSetItemText(dialogID, BUTTON_AUTOSET, L"레이어 자동 설정");
+			DGShowItem(dialogID, BUTTON_AUTOSET);
+
+			DGSetDialogSize(dialogID, DG_CLIENT, 300, 580, DG_TOPLEFT, true);
+
+			// 객체 종류를 조사하여 필요한 레이어만 켜기
+			for (int i = 0; i < placingZone.nCellsHor; i++) {
+				for (int j = 0; j < placingZone.nCellsVerBasic; j++) {
+					if (placingZone.cellsBasic[j][i].objType == OBJ_EUROFORM)
+						placingZone.bLayerInd_Euroform = true;
+					if (placingZone.cellsBasic[j][i].objType == OBJ_FILLERSPACER)
+						placingZone.bLayerInd_Fillerspacer = true;
+					if ((placingZone.cellsBasic[j][i].objType == OBJ_INCORNER_PANEL_L) || (placingZone.cellsBasic[j][i].objType == OBJ_INCORNER_PANEL_R))
+						placingZone.bLayerInd_IncornerPanel = true;
+					if ((placingZone.cellsBasic[j][i].objType == OBJ_OUTCORNER_PANEL_L) || (placingZone.cellsBasic[j][i].objType == OBJ_OUTCORNER_PANEL_R))
+						placingZone.bLayerInd_OutcornerPanel = true;
+					if ((placingZone.cellsBasic[j][i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsBasic[j][i].objType == OBJ_OUTCORNER_ANGLE_R))
+						placingZone.bLayerInd_OutcornerAngle = true;
+					if (placingZone.cellsBasic[j][i].objType == OBJ_WALL_TABLEFORM_A) {
+						placingZone.bLayerInd_Euroform = true;
+						placingZone.bLayerInd_Rectpipe = true;
+						placingZone.bLayerInd_Pinbolt = true;
+						placingZone.bLayerInd_Headpiece = true;
+						placingZone.bLayerInd_Props = true;
+						placingZone.bLayerInd_Join = true;
+					}
+					if (placingZone.cellsBasic[j][i].objType == OBJ_WALL_TABLEFORM_B) {
+						placingZone.bLayerInd_Euroform = true;
+						placingZone.bLayerInd_Rectpipe = true;
+						placingZone.bLayerInd_Pinbolt = true;
+						placingZone.bLayerInd_Headpiece = true;
+						placingZone.bLayerInd_Props = true;
+						placingZone.bLayerInd_Join = true;
+					}
+					if (placingZone.cellsBasic[j][i].objType == OBJ_WALL_TABLEFORM_C) {
+						placingZone.bLayerInd_Euroform = true;
+						placingZone.bLayerInd_Rectpipe = true;
+						placingZone.bLayerInd_Pinbolt = true;
+						placingZone.bLayerInd_Headpiece = true;
+						placingZone.bLayerInd_Props = true;
+						placingZone.bLayerInd_Join = true;
+						placingZone.bLayerInd_CrossJointBar = true;
+					}
+				}
+
+				for (int j = 0; j < placingZone.nCellsVerExtra; j++) {
+					if (placingZone.cellsExtra[j][i].objType == OBJ_EUROFORM)
+						placingZone.bLayerInd_Euroform = true;
+					if (placingZone.cellsExtra[j][i].objType == OBJ_FILLERSPACER)
+						placingZone.bLayerInd_Fillerspacer = true;
+					if ((placingZone.cellsExtra[j][i].objType == OBJ_INCORNER_PANEL_L) || (placingZone.cellsExtra[j][i].objType == OBJ_INCORNER_PANEL_R))
+						placingZone.bLayerInd_IncornerPanel = true;
+					if ((placingZone.cellsExtra[j][i].objType == OBJ_OUTCORNER_PANEL_L) || (placingZone.cellsExtra[j][i].objType == OBJ_OUTCORNER_PANEL_R))
+						placingZone.bLayerInd_OutcornerPanel = true;
+					if ((placingZone.cellsExtra[j][i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsExtra[j][i].objType == OBJ_OUTCORNER_ANGLE_R))
+						placingZone.bLayerInd_OutcornerAngle = true;
+					if (placingZone.cellsExtra[j][i].objType == OBJ_WALL_TABLEFORM_A) {
+						placingZone.bLayerInd_Euroform = true;
+						placingZone.bLayerInd_Rectpipe = true;
+						placingZone.bLayerInd_Pinbolt = true;
+						placingZone.bLayerInd_Headpiece = true;
+						placingZone.bLayerInd_Props = true;
+						placingZone.bLayerInd_Join = true;
+					}
+					if (placingZone.cellsExtra[j][i].objType == OBJ_WALL_TABLEFORM_B) {
+						placingZone.bLayerInd_Euroform = true;
+						placingZone.bLayerInd_Rectpipe = true;
+						placingZone.bLayerInd_Pinbolt = true;
+						placingZone.bLayerInd_Headpiece = true;
+						placingZone.bLayerInd_Props = true;
+						placingZone.bLayerInd_Join = true;
+					}
+					if (placingZone.cellsExtra[j][i].objType == OBJ_WALL_TABLEFORM_C) {
+						placingZone.bLayerInd_Euroform = true;
+						placingZone.bLayerInd_Rectpipe = true;
+						placingZone.bLayerInd_Pinbolt = true;
+						placingZone.bLayerInd_Headpiece = true;
+						placingZone.bLayerInd_Props = true;
+						placingZone.bLayerInd_Join = true;
+						placingZone.bLayerInd_CrossJointBar = true;
+					}
+				}
+			}
+
+			placingZone.bLayerInd_Plywood = true;
+			placingZone.bLayerInd_Timber = true;
+			placingZone.bLayerInd_BlueClamp = true;
+			placingZone.bLayerInd_BlueTimberRail = true;
+
+			// 유저 컨트롤 초기화
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_EUROFORM;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_EUROFORM, true);
+			if (placingZone.bLayerInd_Euroform == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_EUROFORM);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_EUROFORM);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_PLYWOOD;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_PLYWOOD, true);
+			if (placingZone.bLayerInd_Plywood == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_PLYWOOD);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_PLYWOOD);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_TIMBER;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_TIMBER, true);
+			if (placingZone.bLayerInd_Timber == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_TIMBER);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_TIMBER);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_FILLERSPACER;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_FILLERSPACER, true);
+			if (placingZone.bLayerInd_Fillerspacer == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_FILLERSPACER);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_FILLERSPACER);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_INCORNER_PANEL;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_INCORNER_PANEL, true);
+			if (placingZone.bLayerInd_IncornerPanel == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_INCORNER_PANEL);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_INCORNER_PANEL);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_OUTCORNER_PANEL;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_OUTCORNER_PANEL, true);
+			if (placingZone.bLayerInd_OutcornerPanel == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_OUTCORNER_PANEL);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_OUTCORNER_PANEL);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_OUTCORNER_ANGLE;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_OUTCORNER_ANGLE, true);
+			if (placingZone.bLayerInd_OutcornerAngle == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_OUTCORNER_ANGLE);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_OUTCORNER_ANGLE);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_BLUE_CLAMP;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_BLUE_CLAMP, true);
+			if (placingZone.bLayerInd_BlueClamp == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_BLUE_CLAMP);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_BLUE_CLAMP);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_BLUE_TIMBER_RAIL;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_BLUE_TIMBER_RAIL, true);
+			if (placingZone.bLayerInd_BlueTimberRail == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_BLUE_TIMBER_RAIL);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_BLUE_TIMBER_RAIL);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_RECTPIPE;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_RECTPIPE, true);
+			if (placingZone.bLayerInd_Rectpipe == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_RECTPIPE);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_RECTPIPE);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_PINBOLT;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_PINBOLT, true);
+			if (placingZone.bLayerInd_Pinbolt == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_PINBOLT);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_PINBOLT);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_HEADPIECE;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_HEADPIECE, true);
+			if (placingZone.bLayerInd_Headpiece == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_HEADPIECE);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_HEADPIECE);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_PROPS;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_PROPS, true);
+			if (placingZone.bLayerInd_Props == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_PROPS);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_PROPS);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_JOIN;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_JOIN, true);
+			if (placingZone.bLayerInd_Join == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_JOIN);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_JOIN);
+			}
+
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_LAYER_CROSS_JOINT_BAR;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_LAYER_CROSS_JOINT_BAR, true);
+			if (placingZone.bLayerInd_CrossJointBar == false) {
+				DGDisableItem(dialogID, LABEL_LAYER_CROSS_JOINT_BAR);
+				DGDisableItem(dialogID, USERCONTROL_LAYER_CROSS_JOINT_BAR);
+			}
+
+			break;
+
+		case DG_MSG_CHANGE:
+			if (DGGetItemValLong(dialogID, CHECKBOX_LAYER_COUPLING) == true) {
+				long selectedLayer = DGGetItemValLong(dialogID, item);
+
+				for (short i = USERCONTROL_LAYER_EUROFORM; i <= USERCONTROL_LAYER_CROSS_JOINT_BAR; i++)
+					DGSetItemValLong(dialogID, i, selectedLayer);
+			}
+
+			break;
+
+		case DG_MSG_CLICK:
+			switch (item) {
+			case DG_OK:
+				if (placingZone.bLayerInd_Euroform == true)			placingZone.layerInd_Euroform			= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_EUROFORM);
+				if (placingZone.bLayerInd_Plywood == true)			placingZone.layerInd_Plywood			= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_PLYWOOD);
+				if (placingZone.bLayerInd_Timber == true)			placingZone.layerInd_Timber				= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_TIMBER);
+				if (placingZone.bLayerInd_Fillerspacer == true)		placingZone.layerInd_Fillerspacer		= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_FILLERSPACER);
+				if (placingZone.bLayerInd_IncornerPanel == true)	placingZone.layerInd_IncornerPanel		= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_INCORNER_PANEL);
+				if (placingZone.bLayerInd_OutcornerPanel == true)	placingZone.layerInd_OutcornerPanel		= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_OUTCORNER_PANEL);
+				if (placingZone.bLayerInd_OutcornerAngle == true)	placingZone.layerInd_OutcornerAngle		= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_OUTCORNER_ANGLE);
+				if (placingZone.bLayerInd_BlueClamp == true)		placingZone.layerInd_BlueClamp			= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_BLUE_CLAMP);
+				if (placingZone.bLayerInd_BlueTimberRail == true)	placingZone.layerInd_BlueTimberRail		= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_BLUE_TIMBER_RAIL);
+				if (placingZone.bLayerInd_Rectpipe == true)			placingZone.layerInd_Rectpipe			= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_RECTPIPE);
+				if (placingZone.bLayerInd_Pinbolt == true)			placingZone.layerInd_Pinbolt			= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_PINBOLT);
+				if (placingZone.bLayerInd_Headpiece == true)		placingZone.layerInd_Headpiece			= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_HEADPIECE);
+				if (placingZone.bLayerInd_Props == true)			placingZone.layerInd_Props				= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_PROPS);
+				if (placingZone.bLayerInd_Join == true)				placingZone.layerInd_Join				= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_JOIN);
+				if (placingZone.bLayerInd_CrossJointBar == true)	placingZone.layerInd_CrossJointBar		= (short)DGGetItemValLong(dialogID, USERCONTROL_LAYER_CROSS_JOINT_BAR);
+
+				break;
+
+			case BUTTON_AUTOSET:
+				item = 0;
+
+				DGSetItemValLong(dialogID, CHECKBOX_LAYER_COUPLING, false);
+
+				placingZone.layerInd_Euroform			= makeTemporaryLayer(structuralObject, "UFOM", NULL);
+				placingZone.layerInd_Plywood			= makeTemporaryLayer(structuralObject, "PLYW", NULL);
+				placingZone.layerInd_Timber				= makeTemporaryLayer(structuralObject, "TIMB", NULL);
+				placingZone.layerInd_Fillerspacer		= makeTemporaryLayer(structuralObject, "FISP", NULL);
+				placingZone.layerInd_IncornerPanel		= makeTemporaryLayer(structuralObject, "INCO", NULL);
+				placingZone.layerInd_OutcornerPanel		= makeTemporaryLayer(structuralObject, "OUTP", NULL);
+				placingZone.layerInd_OutcornerAngle		= makeTemporaryLayer(structuralObject, "OUTA", NULL);
+				placingZone.layerInd_BlueClamp			= makeTemporaryLayer(structuralObject, "UFCL", NULL);
+				placingZone.layerInd_BlueTimberRail		= makeTemporaryLayer(structuralObject, "RAIL", NULL);
+				placingZone.layerInd_Rectpipe			= makeTemporaryLayer(structuralObject, "SPIP", NULL);
+				placingZone.layerInd_Pinbolt			= makeTemporaryLayer(structuralObject, "PINB", NULL);
+				placingZone.layerInd_Headpiece			= makeTemporaryLayer(structuralObject, "HEAD", NULL);
+				placingZone.layerInd_Props				= makeTemporaryLayer(structuralObject, "PUSH", NULL);
+				placingZone.layerInd_Join				= makeTemporaryLayer(structuralObject, "CLAM", NULL);
+				placingZone.layerInd_CrossJointBar		= makeTemporaryLayer(structuralObject, "CROS", NULL);
+
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_EUROFORM, placingZone.layerInd_Euroform);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_PLYWOOD, placingZone.layerInd_Plywood);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_TIMBER, placingZone.layerInd_Timber);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_FILLERSPACER, placingZone.layerInd_Fillerspacer);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_INCORNER_PANEL, placingZone.layerInd_IncornerPanel);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_OUTCORNER_PANEL, placingZone.layerInd_OutcornerPanel);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_OUTCORNER_ANGLE, placingZone.layerInd_OutcornerAngle);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_BLUE_CLAMP, placingZone.layerInd_BlueClamp);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_BLUE_TIMBER_RAIL, placingZone.layerInd_BlueTimberRail);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_RECTPIPE, placingZone.layerInd_Rectpipe);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_PINBOLT, placingZone.layerInd_Pinbolt);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_HEADPIECE, placingZone.layerInd_Headpiece);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_PROPS, placingZone.layerInd_Props);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_JOIN, placingZone.layerInd_Join);
+				DGSetItemValLong(dialogID, USERCONTROL_LAYER_CROSS_JOINT_BAR, placingZone.layerInd_CrossJointBar);
+
+				break;
+			}
+			break;
+
+		case DG_MSG_CLOSE:
+			break;
+		}
+
+		result = item;
+
+		return result;
+	}
+
+	short DGCALLBACK insulation_handler(short message, short dialogID, short item, DGUserData /* userData */, DGMessageData /* msgData */) {
+		short	result;
+		API_UCCallbackType	ucb;
+
+		switch (message) {
+		case DG_MSG_INIT:
+			// 타이틀
+			DGSetDialogTitle(dialogID, L"단열재 배치");
+
+			// 라벨
+			DGSetItemText(dialogID, LABEL_EXPLANATION_INS, L"단열재 규격을 입력하십시오.");
+			DGSetItemText(dialogID, LABEL_INSULATION_THK, L"두께");
+			DGSetItemText(dialogID, LABEL_INS_HORLEN, L"가로");
+			DGSetItemText(dialogID, LABEL_INS_VERLEN, L"세로");
+
+			// 체크박스
+			DGSetItemText(dialogID, CHECKBOX_INS_LIMIT_SIZE, L"가로/세로 크기 제한");
+			DGSetItemValLong(dialogID, CHECKBOX_INS_LIMIT_SIZE, true);
+
+			// Edit 컨트롤
+			DGSetItemValDouble(dialogID, EDITCONTROL_INS_HORLEN, 0.900);
+			DGSetItemValDouble(dialogID, EDITCONTROL_INS_VERLEN, 1.800);
+
+			// 레이어
+			BNZeroMemory(&ucb, sizeof(ucb));
+			ucb.dialogID = dialogID;
+			ucb.type = APIUserControlType_Layer;
+			ucb.itemID = USERCONTROL_INSULATION_LAYER;
+			ACAPI_Interface(APIIo_SetUserControlCallbackID, &ucb, NULL);
+			DGSetItemValLong(dialogID, USERCONTROL_INSULATION_LAYER, 1);
+
+			// 버튼
+			DGSetItemText(dialogID, DG_OK, L"확인");
+			DGSetItemText(dialogID, DG_CANCEL, L"취소");
+
+			// 두께는 자동
+			DGSetItemValDouble(dialogID, EDITCONTROL_INSULATION_THK, placingZone.gap);
+			DGDisableItem(dialogID, EDITCONTROL_INSULATION_THK);
+
+			break;
+
+		case DG_MSG_CHANGE:
+			switch (item) {
+			case CHECKBOX_INS_LIMIT_SIZE:
+				if (DGGetItemValLong(dialogID, CHECKBOX_INS_LIMIT_SIZE) == TRUE) {
+					DGEnableItem(dialogID, EDITCONTROL_INS_HORLEN);
+					DGEnableItem(dialogID, EDITCONTROL_INS_VERLEN);
+				}
+				else {
+					DGDisableItem(dialogID, EDITCONTROL_INS_HORLEN);
+					DGDisableItem(dialogID, EDITCONTROL_INS_VERLEN);
+				}
+				break;
+			}
+
+			break;
+
+		case DG_MSG_CLICK:
+			switch (item) {
+			case DG_OK:
+				// 레이어 정보 저장
+				insulElem.layerInd = (short)DGGetItemValLong(dialogID, USERCONTROL_INSULATION_LAYER);
+
+				// 두께, 가로, 세로 저장
+				insulElem.thk = DGGetItemValDouble(dialogID, EDITCONTROL_INSULATION_THK);
+				insulElem.maxHorLen = DGGetItemValDouble(dialogID, EDITCONTROL_INS_HORLEN);
+				insulElem.maxVerLen = DGGetItemValDouble(dialogID, EDITCONTROL_INS_VERLEN);
+				if (DGGetItemValLong(dialogID, CHECKBOX_INS_LIMIT_SIZE) == TRUE)
+					insulElem.bLimitSize = true;
+				else
+					insulElem.bLimitSize = false;
+
+				break;
+			case DG_CANCEL:
+				break;
+			}
+			break;
+
+		case DG_MSG_CLOSE:
+			break;
+		}
+
+		result = item;
+
+		return	result;
+	}
 }
 
 using namespace namespaceWallTableform;
@@ -2218,39 +2822,41 @@ GSErrCode	placeWallTableform(void)
 		}
 
 		if (nSteps == 4) {
-			// 3번 다이얼로그: 레이어 설정
-			//result = DGModalDialog (ACAPI_GetOwnResModule (), 32501, ACAPI_GetOwnResModule (), layer_handler, 0);
-			// -> DG_OK이면 nSteps = 5, exitCondition = false
-			// -> DG_CANCEL이면 nSteps = 5, exitCondition = false
-			// -> 이전 버튼을 누르면 nSteps  = 2, exitCondition = false
+			// 레이어 설정 다이얼로그
+			result = DGModalDialog (ACAPI_GetOwnResModule (), 32501, ACAPI_GetOwnResModule (), layer_handler, 0);
 			
-			exitCondition = true;
+			if (result == DG_OK) {
+				nSteps = 5;
+				exitCondition = false;
+			}
+			else if (result == DG_CANCEL) {
+				nSteps = 5;
+				exitCondition = false;
+			}
 		}
 
-		//if (nSteps == 5) {
-		//	// 4번 다이얼로그: 단열재 채우기 [gap > EPS일때]
-		//	if (placingZone.gap > EPS) {
-		//		result = ...
+		if (nSteps == 5) {
+			// 단열재 채우기 다이얼로그
+			if (placingZone.gap > EPS) {
+				result = DGModalDialog(ACAPI_GetOwnResModule(), 32502, ACAPI_GetOwnResModule(), insulation_handler, 0);
 
-		//		if (result == DG_OK) {
-		//			nSteps = 6;
-		//			exitCondition = true;
-		//		}
-		//		else if (result == DG_CANCEL) {
-		//			nSteps = 6;
-		//			exitCondition = true;
-		//		}
-		//		else if (result == DG4_BUTTON_PREV) {
-		//			nSteps = 4;
-		//			exitCondition = false;
-		//		}
-		//	}
-		//	else {
-		//		nSteps = 6;
-		//		exitCondition = true;
-		//	}
-		//}
+				if (result == DG_OK) {
+					nSteps = 6;
+					exitCondition = true;
+				}
+				else if (result == DG_CANCEL) {
+					nSteps = 6;
+					exitCondition = true;
+				}
+			}
+			else {
+				nSteps = 6;
+				exitCondition = true;
+			}
+		}
 	}
+
+	// !!!
 
 	return err;
 }
