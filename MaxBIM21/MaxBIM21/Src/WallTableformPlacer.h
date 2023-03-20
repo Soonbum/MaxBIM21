@@ -42,11 +42,11 @@ namespace namespaceWallTableform {
 	};
 
 	enum DG1_branch_itemIndex {
-		BRANCH_LABEL_OBJ_TYPE = 3,			// 라벨: 객체 종류
-		BRANCH_POPUP_OBJ_TYPE,				// 객체 종류
-		BRANCH_LABEL_TOTAL_WIDTH,			// 전체 너비
-		BRANCH_EDITCONTROL_TOTAL_WIDTH,		// 전체 너비
-		BRANCH_LABEL_GUIDE					// 라벨: 안내 텍스트
+		BRANCH_LABEL_OBJ_TYPE = 3,		// 라벨: 객체 종류
+		BRANCH_POPUP_OBJ_TYPE,			// 객체 종류
+		BRANCH_LABEL_TOTAL_WIDTH,		// 전체 너비
+		BRANCH_EDITCONTROL_TOTAL_WIDTH,	// 전체 너비
+		BRANCH_LABEL_GUIDE				// 라벨: 안내 텍스트
 	};
 
 	enum DG2_itemIndex {
@@ -161,6 +161,8 @@ namespace namespaceWallTableform {
 		double	leftBottomY;	// 좌하단 좌표 Y
 		double	leftBottomZ;	// 좌하단 좌표 Z
 		double	ang;			// 회전 각도 (단위: Radian, 회전축: Z축)
+
+		double	wallThk;		// 벽 두께
 
 		double	horLen;			// 가로 길이
 		double	verLenBasic;	// 세로 길이 (낮은쪽)
@@ -303,6 +305,8 @@ namespace namespaceWallTableform {
 			this->leftBottomZ = 0.0;
 			this->ang = 0.0;
 
+			this->wallThk = 0.0;
+
 			this->horLen = 0.0;
 			this->verLenBasic = 0.0;
 			this->verLenExtra = 0.0;
@@ -440,6 +444,126 @@ namespace namespaceWallTableform {
 					this->marginCellsExtra[i][j].verLen = 0.600;
 				}
 			}
+		}
+
+		// 특정 셀의 원점 X 좌표를 알아냄
+		double getCellPositionLeftBottomX(int index) {
+			double distance = 0.0;
+
+			for (int i = 0; i < index; i++)
+				distance += this->cellsBasic[0][i].horLen;
+
+			return distance;
+		}
+
+		// 배치 정보 위치 정렬
+		void alignPositions() {
+			for (int i = 0; i < this->nCellsVerBasic; i++) {
+				for (int j = 0; j < this->nCellsHor; j++) {
+					this->cellsBasic[i][j].ang = this->ang;
+					this->cellsBasic[i][j].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(j) * cos(this->ang));
+					this->cellsBasic[i][j].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(j) * sin(this->ang));
+					if (i > 0) {
+						this->cellsBasic[i][j].leftBottomZ = this->cellsBasic[i - 1][j].leftBottomZ + this->cellsBasic[i - 1][j].verLen;
+					}
+					else {
+						this->cellsBasic[i][j].leftBottomZ = this->leftBottomZ;
+					}
+				}
+			}
+
+			for (int i = 0; i < this->nCellsVerExtra; i++) {
+				for (int j = 0; j < this->nCellsHor; j++) {
+					this->cellsExtra[i][j].ang = this->ang;
+					this->cellsExtra[i][j].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(j) * cos(this->ang));
+					this->cellsExtra[i][j].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(j) * sin(this->ang));
+					if (i > 0) {
+						this->cellsExtra[i][j].leftBottomZ = this->cellsExtra[i - 1][j].leftBottomZ + this->cellsExtra[i - 1][j].verLen;
+					}
+					else {
+						this->cellsExtra[i][j].leftBottomZ = this->leftBottomZ;
+					}
+					moveIn2D('y', this->ang, this->wallThk + this->gap * 2, &this->cellsExtra[i][j].leftBottomX, &this->cellsExtra[i][j].leftBottomY);
+				}
+			}
+
+			for (int i = 0; i < this->nMarginCellsVerBasic; i++) {
+				for (int j = 0; j < this->nCellsHor; j++) {
+					this->marginCellsBasic[i][j].ang = this->ang;
+					this->marginCellsBasic[i][j].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(j) * cos(this->ang));
+					this->marginCellsBasic[i][j].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(j) * sin(this->ang));
+					if (i > 0) {
+						this->marginCellsBasic[i][j].leftBottomZ = this->marginCellsBasic[i - 1][j].leftBottomZ + this->marginCellsBasic[i - 1][j].verLen;
+					}
+					else {
+						this->marginCellsBasic[i][j].leftBottomZ = this->cellsBasic[nCellsVerBasic - 1][j].leftBottomZ + this->cellsBasic[nCellsVerBasic - 1][j].verLen;
+					}
+				}
+			}
+
+			for (int i = 0; i < this->nMarginCellsVerExtra; i++) {
+				for (int j = 0; j < this->nCellsHor; j++) {
+					this->marginCellsExtra[i][j].ang = this->ang;
+					this->marginCellsExtra[i][j].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(j) * cos(this->ang));
+					this->marginCellsExtra[i][j].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(j) * sin(this->ang));
+					if (i > 0) {
+						this->marginCellsExtra[i][j].leftBottomZ = this->marginCellsExtra[i - 1][j].leftBottomZ + this->marginCellsExtra[i - 1][j].verLen;
+					}
+					else {
+						this->marginCellsExtra[i][j].leftBottomZ = this->cellsExtra[nCellsVerExtra - 1][j].leftBottomZ + this->cellsExtra[nCellsVerExtra - 1][j].verLen;
+					}
+					moveIn2D('y', this->ang, this->wallThk + this->gap * 2, &this->marginCellsExtra[i][j].leftBottomX, &this->marginCellsExtra[i][j].leftBottomY);
+				}
+			}
+		}
+
+		// 테이블폼 타입A 배치 (각파이프 2줄)
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 테이블폼 타입B 배치 (각파이프 1줄)
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 테이블폼 타입C 배치 (각파이프 1줄, 십자 조인트 바 활용)
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 유로폼 배치
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 합판 배치
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 각재 배치
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 휠러스페이서 배치
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 인코너판넬(L) 배치
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 아웃코너판넬(L) 배치
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 아웃코너앵글(L) 배치
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 인코너판넬(R) 배치
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 아웃코너판넬(R) 배치
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 아웃코너앵글(R) 배치
+		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+
+		// 기본 셀 배치하기
+		void placeCells() {
+			// !!!
+		}
+
+		// 여백 셀 배치하기
+		void placeMarginCells() {
+			// !!!
 		}
 	};
 
@@ -2748,6 +2872,7 @@ GSErrCode	placeWallTableform(void)
 	placingZone.verLenBasic = infoMorph_Basic.verLen;
 	placingZone.verLenExtra = infoMorph_Extra.verLen;
 	placingZone.ang = DegreeToRad(infoMorph_Basic.ang);
+	placingZone.wallThk = infoWall.wallThk;
 
 	// 작업 층 높이 가져오기
 	workLevel_wall = getWorkLevel(infoWall.floorInd);
@@ -2768,6 +2893,10 @@ GSErrCode	placeWallTableform(void)
 	bool exitCondition = false;
 	int nSteps = 1;
 	short result;
+
+	bool bFrontTopMarginFill = false;
+	bool bBackTopMarginFill = false;
+	bool bInsulationFill = false;
 
 	while (exitCondition == false) {
 		if (nSteps == 1) {
@@ -2791,10 +2920,12 @@ GSErrCode	placeWallTableform(void)
 			if (result == DG_OK) {
 				nSteps = 3;
 				exitCondition = false;
+				bFrontTopMarginFill = true;
 			}
 			else if (result == DG_CANCEL) {
 				nSteps = 3;
 				exitCondition = false;
+				bFrontTopMarginFill = false;
 			}
 			else if (result == DG2_BUTTON_PREV) {
 				nSteps = 1;
@@ -2810,10 +2941,12 @@ GSErrCode	placeWallTableform(void)
 			if (result == DG_OK) {
 				nSteps = 4;
 				exitCondition = false;
+				bBackTopMarginFill = true;
 			}
 			else if (result == DG_CANCEL) {
 				nSteps = 4;
 				exitCondition = false;
+				bBackTopMarginFill = false;
 			}
 			else if (result == DG2_BUTTON_PREV) {
 				nSteps = 1;
@@ -2843,10 +2976,12 @@ GSErrCode	placeWallTableform(void)
 				if (result == DG_OK) {
 					nSteps = 6;
 					exitCondition = true;
+					bInsulationFill = true;
 				}
 				else if (result == DG_CANCEL) {
 					nSteps = 6;
 					exitCondition = true;
+					bInsulationFill = false;
 				}
 			}
 			else {
@@ -2856,7 +2991,14 @@ GSErrCode	placeWallTableform(void)
 		}
 	}
 
+	// 배치 정보 위치 정렬
+	placingZone.alignPositions();
+
 	// !!!
+	// 1단계 다이얼로그 기반으로 객체 배치
+	// 상단 여백 채우기 (낮은쪽) bFrontTopMarginFill
+	// 상단 여백 채우기 (높은쪽) bBackTopMarginFill
+	// 단열재 채우기 bInsulationFill
 
 	return err;
 }
