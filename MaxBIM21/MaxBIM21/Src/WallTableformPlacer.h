@@ -163,6 +163,7 @@ namespace namespaceWallTableform {
 		double	ang;			// 회전 각도 (단위: Radian, 회전축: Z축)
 
 		double	wallThk;		// 벽 두께
+		short	floorInd;		// 벽 레이어 인덱스
 
 		double	horLen;			// 가로 길이
 		double	verLenBasic;	// 세로 길이 (낮은쪽)
@@ -306,6 +307,7 @@ namespace namespaceWallTableform {
 			this->ang = 0.0;
 
 			this->wallThk = 0.0;
+			this->floorInd = 0;
 
 			this->horLen = 0.0;
 			this->verLenBasic = 0.0;
@@ -458,6 +460,8 @@ namespace namespaceWallTableform {
 
 		// 배치 정보 위치 정렬
 		void alignPositions() {
+			moveIn2D('y', this->ang, -this->gap, &this->leftBottomX, &this->leftBottomY);
+
 			for (int i = 0; i < this->nCellsVerBasic; i++) {
 				for (int j = 0; j < this->nCellsHor; j++) {
 					this->cellsBasic[i][j].ang = this->ang;
@@ -483,6 +487,7 @@ namespace namespaceWallTableform {
 					else {
 						this->cellsExtra[i][j].leftBottomZ = this->leftBottomZ;
 					}
+					moveIn2D('x', this->ang, this->cellsExtra[i][j].leftBottomX, &this->cellsExtra[i][j].leftBottomX, &this->cellsExtra[i][j].leftBottomY);
 					moveIn2D('y', this->ang, this->wallThk + this->gap * 2, &this->cellsExtra[i][j].leftBottomX, &this->cellsExtra[i][j].leftBottomY);
 				}
 			}
@@ -512,58 +517,147 @@ namespace namespaceWallTableform {
 					else {
 						this->marginCellsExtra[i][j].leftBottomZ = this->cellsExtra[nCellsVerExtra - 1][j].leftBottomZ + this->cellsExtra[nCellsVerExtra - 1][j].verLen;
 					}
+					moveIn2D('x', this->ang, this->marginCellsExtra[i][j].leftBottomX, &this->marginCellsExtra[i][j].leftBottomX, &this->marginCellsExtra[i][j].leftBottomY);
 					moveIn2D('y', this->ang, this->wallThk + this->gap * 2, &this->marginCellsExtra[i][j].leftBottomX, &this->marginCellsExtra[i][j].leftBottomY);
 				}
 			}
 		}
 
 		// 테이블폼 타입A 배치 (각파이프 2줄)
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeWallTableformA(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bFront) {
+			// 유로폼 배치
+
+			// 각파이프(수평) 배치
+
+			// 각파이프(수직) 배치
+
+			// 핀볼트 배치
+
+			// 결합철물 배치
+
+			// 헤드피스 배치
+
+			// Push-Pull Props 배치
+		}
 
 		// 테이블폼 타입B 배치 (각파이프 1줄)
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeWallTableformB(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bFront) {
+			// 유로폼 배치
+
+			// 각파이프(수평) 배치
+
+			// 각파이프(수직) 배치
+
+			// 핀볼트 배치
+
+			// 결합철물 배치
+
+			// 헤드피스 배치
+
+			// Push-Pull Props 배치
+		}
 
 		// 테이블폼 타입C 배치 (각파이프 1줄, 십자 조인트 바 활용)
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeWallTableformC(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bFront) {
+			// 유로폼 배치
+
+			// 십자 조인트 바 배치
+
+			// 각파이프(수평) 배치
+
+			// 각파이프(수직) 배치
+
+			// 핀볼트 배치
+
+			// 결합철물 배치
+
+			// 헤드피스 배치
+
+			// Push-Pull Props 배치
+		}
 
 		// 유로폼 배치
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeEuroform(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
+			GS::Array<API_Guid> elemList;
+			EasyObjectPlacement euroform;
+
+			euroform.init(L"유로폼v2.0.gsm", layerInd_Euroform, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			// ...
+			// 규격폼인가, 비규격폼인가?
+			// 수직인가? 수평인가?
+
+			//elemList_Front.Push(euroform.placeObject(5,
+			//	"eu_stan_onoff", APIParT_Boolean, "1.0",
+			//	"eu_wid", APIParT_CString, format_string("%d", (int)floor(horLen * 1000)),
+			//	"eu_hei", APIParT_CString, format_string("%d", (int)floor(verLen * 1000)),
+			//	"u_ins", APIParT_CString, "벽세우기",
+			//	"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str()));
+		}
 
 		// 합판 배치
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placePlywood(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
+			// ...
+		}
 
 		// 각재 배치
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeTimber(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
+			// ...
+		}
 
 		// 휠러스페이서 배치
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeFillerspacer(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
+			// ...
+		}
 
 		// 인코너판넬(L) 배치
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeIncornerPanel_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
+			// ...
+		}
 
 		// 아웃코너판넬(L) 배치
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeOutcornerPanel_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
+			// ...
+		}
 
 		// 아웃코너앵글(L) 배치
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeOutcornerAngle_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
+			// ...
+		}
 
 		// 인코너판넬(R) 배치
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeIncornerPanel_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
+			// ...
+		}
 
 		// 아웃코너판넬(R) 배치
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeOutcornerPanel_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
+			// ...
+		}
 
 		// 아웃코너앵글(R) 배치
-		// !!! 파라미터: 세로 길이, 가로 길이, 방향(세로, 가로)
+		GS::Array<API_Guid> placeOutcornerAngle_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
+			// ...
+		}
 
 		// 기본 셀 배치하기
 		void placeCells() {
-			// !!!
+			// !!! 모든 셀 순회하기 (양면이면 앞뒤로 순회, 단면이면 앞면만 순회)
+
+			for (int i = 0; i < this->nCellsHor; i++) {
+				// ... 테이블폼은 위의 셀까지 한꺼번에 설치해야 함
+			}
+
+			if (this->bSingleSide == false) {
+				for (int i = 0; i < this->nCellsHor; i++) {
+					// ... 테이블폼은 위의 셀까지 한꺼번에 설치해야 함
+				}
+			}
 		}
 
 		// 여백 셀 배치하기
 		void placeMarginCells() {
-			// !!!
+			// !!! 모든 여백 셀 순회하기 (양면이면 앞뒤로 순회, 단면이면 앞면만 순회)
 		}
 	};
 
@@ -581,6 +675,11 @@ namespace namespaceWallTableform {
 	InfoWall infoWall;				// 벽 객체 정보
 	insulationElement insulElem;	// 단열재 정보
 	API_Guid structuralObject;		// 구조 객체의 GUID
+
+	GS::Array<API_Guid> elemList_Front;
+	GS::Array<API_Guid> elemList_Back;
+	GS::Array<API_Guid> elemList_Margin_Front;
+	GS::Array<API_Guid> elemList_Margin_Back;
 
 	// 항목 인덱스 (1차 다이얼로그)
 	short GRID_START_INDEX;						// 그리드
@@ -2528,7 +2627,7 @@ namespace namespaceWallTableform {
 			break;
 
 		case DG_MSG_CHANGE:
-			if (DGGetItemValLong(dialogID, CHECKBOX_LAYER_COUPLING) == true) {
+			if ((bool)DGGetItemValLong(dialogID, CHECKBOX_LAYER_COUPLING) == true) {
 				long selectedLayer = DGGetItemValLong(dialogID, item);
 
 				for (short i = USERCONTROL_LAYER_EUROFORM; i <= USERCONTROL_LAYER_CROSS_JOINT_BAR; i++)
@@ -2873,6 +2972,7 @@ GSErrCode	placeWallTableform(void)
 	placingZone.verLenExtra = infoMorph_Extra.verLen;
 	placingZone.ang = DegreeToRad(infoMorph_Basic.ang);
 	placingZone.wallThk = infoWall.wallThk;
+	placingZone.floorInd = infoWall.floorInd;
 
 	// 작업 층 높이 가져오기
 	workLevel_wall = getWorkLevel(infoWall.floorInd);
