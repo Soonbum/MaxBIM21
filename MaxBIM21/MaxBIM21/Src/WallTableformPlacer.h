@@ -523,6 +523,321 @@ namespace namespaceWallTableform {
 			}
 		}
 
+		// 유로폼 배치
+		API_Guid placeEuroform(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bForCeil) {
+			API_Guid guid;
+			EasyObjectPlacement euroform;
+
+			euroform.init(L"유로폼v2.0.gsm", layerInd_Euroform, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			// 규격폼 여부 확인
+			bool	bStandard = false;
+			if (((abs(horLen - 0.600) < EPS) || (abs(horLen - 0.500) < EPS) || (abs(horLen - 0.450) < EPS) || (abs(horLen - 0.400) < EPS) || (abs(horLen - 0.300) < EPS) || (abs(horLen - 0.200) < EPS)) &&
+				((abs(verLen - 1.200) < EPS) || (abs(verLen - 0.900) < EPS) || (abs(verLen - 0.600) < EPS)))
+				bStandard = true;
+
+			// 유로폼이 세로 방향인지, 가로 방향인지?
+			char insDir[20];
+			double xOffset = 0.0;
+
+			if (bVertical == true) {
+				strcpy(insDir, "벽세우기");
+				xOffset = 0.0;
+			}
+			else {
+				strcpy(insDir, "벽눕히기");
+				xOffset = verLen;
+			}
+			
+			// 벽에 붙이나? 천장에 붙이나?
+			double angX;
+			double yOffset = 0.0;
+
+			if (bForCeil == true) {
+				angX = 0.0;
+				if (bVertical == true)
+					yOffset = verLen;
+				else
+					yOffset = horLen;
+			}
+			else {
+				angX = DegreeToRad(90.0);
+				yOffset = 0.0;
+			}
+
+			if (bStandard == true) {
+				moveIn3D('x', euroform.radAng, xOffset, &euroform.posX, &euroform.posY, &euroform.posZ);
+				moveIn3D('y', euroform.radAng, yOffset, &euroform.posX, &euroform.posY, &euroform.posZ);
+				guid = euroform.placeObject(6,
+					"eu_stan_onoff", APIParT_Boolean, "1.0",
+					"eu_wid", APIParT_CString, format_string("%d", (int)(horLen * 1000)).c_str(),
+					"eu_hei", APIParT_CString, format_string("%d", (int)(verLen * 1000)).c_str(),
+					"u_ins", APIParT_CString, insDir,
+					"ang_x", APIParT_Angle, format_string("%f", angX).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str());
+			}
+			else {
+				moveIn3D('x', euroform.radAng, xOffset, &euroform.posX, &euroform.posY, &euroform.posZ);
+				moveIn3D('y', euroform.radAng, yOffset, &euroform.posX, &euroform.posY, &euroform.posZ);
+				guid = euroform.placeObject(6,
+					"eu_stan_onoff", APIParT_Boolean, "0.0",
+					"eu_wid2", APIParT_Length, format_string("%f", horLen).c_str(),
+					"eu_hei2", APIParT_Length, format_string("%f", verLen).c_str(),
+					"u_ins", APIParT_CString, insDir,
+					"ang_x", APIParT_Angle, format_string("%f", angX).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str());
+			}
+
+			return guid;
+		}
+
+		// 합판 배치
+		API_Guid placePlywood(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bForCeil) {
+			API_Guid guid;
+			EasyObjectPlacement plywood;
+
+			plywood.init(L"합판v1.0.gsm", layerInd_Plywood, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			char insDir[20];
+
+			if (bVertical == true) {
+				strcpy(insDir, "벽세우기");
+			}
+			else {
+				strcpy(insDir, "벽눕히기");
+			}
+
+			if (bForCeil == true) {
+				if (bVertical == true) {
+					strcpy(insDir, "바닥깔기");
+					plywood.radAng += DegreeToRad(90.0);
+					moveIn3D('y', plywood.radAng, -horLen, &plywood.posX, &plywood.posY, &plywood.posZ);
+				}
+				else {
+					strcpy(insDir, "바닥깔기");
+				}
+			}
+
+			guid = plywood.placeObject(23,
+				"p_stan", APIParT_CString, "비규격",
+				"w_dir", APIParT_CString, insDir,
+				"p_thk", APIParT_CString, "11.5T",
+				"p_wid", APIParT_Length, format_string("%f", horLen).c_str(),
+				"p_leng", APIParT_Length, format_string("%f", verLen).c_str(),
+				"p_ang", APIParT_Angle, format_string("%f", 0.0).c_str(),
+				"p_ang_alter", APIParT_Angle, format_string("%f", 0.0).c_str(),
+				"p_rot", APIParT_Angle, format_string("%f", 0.0).c_str(),
+				"bCornerCutLT", APIParT_Boolean, "0.0",
+				"bCornerCutLB", APIParT_Boolean, "0.0",
+				"bCornerCutRT", APIParT_Boolean, "0.0",
+				"bCornerCutRB", APIParT_Boolean, "0.0",
+				"sogak", APIParT_Boolean, "1.0",
+				"bInverseSogak", APIParT_Boolean, "1.0",
+				"prof", APIParT_CString, "소각",
+				"gap_a", APIParT_Length, format_string("%f", 0.0).c_str(),
+				"gap_b", APIParT_Length, format_string("%f", 0.0).c_str(),
+				"gap_c", APIParT_Length, format_string("%f", 0.0).c_str(),
+				"gap_d", APIParT_Length, format_string("%f", 0.0).c_str(),
+				"bTimber_a", APIParT_Boolean, "1.0",
+				"bTimber_b", APIParT_Boolean, "1.0",
+				"bTimber_c", APIParT_Boolean, "1.0",
+				"bTimber_d", APIParT_Boolean, "1.0");
+
+			return guid;
+		}
+
+		// 각재 배치
+		API_Guid placeTimber(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bForCeil) {
+			API_Guid guid;
+			EasyObjectPlacement timber;
+
+			timber.init(L"목재v1.0.gsm", layerInd_Timber, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			char insDir[20];
+			double w_ang;
+
+			if (bForCeil == true) {
+				if (bVertical == true) {
+					strcpy(insDir, "바닥눕히기");
+					w_ang = DegreeToRad(0.0);
+					timber.radAng += DegreeToRad(90.0);
+				}
+				else {
+					strcpy(insDir, "바닥눕히기");
+					w_ang = DegreeToRad(0.0);
+					moveIn3D('y', timber.radAng, horLen, &timber.posX, &timber.posY, &timber.posZ);
+				}
+			}
+			else {
+				if (bVertical == true) {
+					strcpy(insDir, "벽세우기");
+					w_ang = DegreeToRad(90.0);
+					moveIn3D('x', timber.radAng, horLen, &timber.posX, &timber.posY, &timber.posZ);
+				}
+				else {
+					strcpy(insDir, "벽세우기");
+					w_ang = DegreeToRad(0.0);
+				}
+			}
+
+			guid = timber.placeObject(6,
+				"w_ins", APIParT_CString, insDir,
+				"w_w", APIParT_Length, format_string("%f", 0.050).c_str(),
+				"w_h", APIParT_Length, format_string("%f", horLen).c_str(),
+				"w_leng", APIParT_Length, format_string("%f", verLen).c_str(),
+				"w_ang", APIParT_Angle, format_string("%f", w_ang).c_str(),
+				"torsion_ang", APIParT_Angle, format_string("%f", 0.0).c_str());
+
+			return guid;
+		}
+
+		// 휠러스페이서 배치
+		API_Guid placeFillerspacer(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bForCeil) {
+			API_Guid guid;
+			EasyObjectPlacement fillersp;
+
+			fillersp.init(L"휠러스페이서v1.0.gsm", layerInd_Fillerspacer, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			double f_ang;
+			double f_rota;
+
+			if (bForCeil == true) {
+				if (bVertical == true) {
+					fillersp.radAng += DegreeToRad(90.0);
+					f_ang = DegreeToRad(0.0);
+					f_rota = DegreeToRad(90.0);
+				}
+				else {
+					moveIn3D('y', fillersp.radAng, horLen, &fillersp.posX, &fillersp.posY, &fillersp.posZ);
+					f_ang = DegreeToRad(0.0);
+					f_rota = DegreeToRad(90.0);
+				}
+			}
+			else {
+				if (bVertical == true) {
+					moveIn3D('x', fillersp.radAng, horLen, &fillersp.posX, &fillersp.posY, &fillersp.posZ);
+					f_ang = DegreeToRad(90.0);
+					f_rota = DegreeToRad(0.0);
+				}
+				else {
+					f_ang = DegreeToRad(0.0);
+					f_rota = DegreeToRad(0.0);
+				}
+			}
+
+			guid = fillersp.placeObject(4,
+				"f_thk", APIParT_Length, format_string("%f", horLen).c_str(),
+				"f_leng", APIParT_Length, format_string("%f", verLen).c_str(),
+				"f_ang", APIParT_Angle, format_string("%f", f_ang).c_str(),
+				"f_rota", APIParT_Angle, format_string("%f", f_rota).c_str());
+
+			return guid;
+		}
+
+		// 인코너판넬(L) 배치
+		API_Guid placeIncornerPanel_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double horLen2, double verLen) {
+			API_Guid guid;
+			EasyObjectPlacement incornerPanel;
+
+			incornerPanel.init(L"인코너판넬v1.0.gsm", layerInd_IncornerPanel, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			incornerPanel.radAng += DegreeToRad(270.0);
+
+			guid = incornerPanel.placeObject(5,
+				"in_comp", APIParT_CString, "인코너판넬",
+				"wid_s", APIParT_Length, format_string("%f", horLen2).c_str(),
+				"leng_s", APIParT_Length, format_string("%f", horLen).c_str(),
+				"hei_s", APIParT_Length, format_string("%f", verLen).c_str(),
+				"dir_s", APIParT_CString, "세우기");
+
+			return guid;
+		}
+
+		// 아웃코너판넬(L) 배치
+		API_Guid placeOutcornerPanel_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double horLen2, double verLen) {
+			API_Guid guid;
+			EasyObjectPlacement outcornerPanel;
+
+			outcornerPanel.init(L"아웃코너판넬v1.0.gsm", layerInd_OutcornerPanel, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			guid = outcornerPanel.placeObject(4,
+				"wid_s", APIParT_Length, format_string("%f", horLen).c_str(),
+				"leng_s", APIParT_Length, format_string("%f", horLen2).c_str(),
+				"hei_s", APIParT_Length, format_string("%f", verLen).c_str(),
+				"dir_s", APIParT_CString, "세우기");
+
+			return guid;
+		}
+
+		// 아웃코너앵글(L) 배치
+		API_Guid placeOutcornerAngle_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double verLen) {
+			API_Guid guid;
+			EasyObjectPlacement outcornerAngle;
+
+			outcornerAngle.init(L"아웃코너앵글v1.0.gsm", layerInd_OutcornerAngle, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			outcornerAngle.radAng += DegreeToRad(180.0);
+			guid = outcornerAngle.placeObject(2,
+				"a_leng", APIParT_Length, format_string("%f", verLen).c_str(),
+				"a_ang", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str());
+
+			return guid;
+		}
+
+		// 인코너판넬(R) 배치
+		API_Guid placeIncornerPanel_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double horLen2, double verLen) {
+			API_Guid guid;
+			EasyObjectPlacement incornerPanel;
+
+			incornerPanel.init(L"인코너판넬v1.0.gsm", layerInd_IncornerPanel, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', incornerPanel.radAng, horLen, &incornerPanel.posX, &incornerPanel.posY, &incornerPanel.posZ);
+			incornerPanel.radAng += DegreeToRad(180.0);
+
+			guid = incornerPanel.placeObject(5,
+				"in_comp", APIParT_CString, "인코너판넬",
+				"wid_s", APIParT_Length, format_string("%f", horLen).c_str(),
+				"leng_s", APIParT_Length, format_string("%f", horLen2).c_str(),
+				"hei_s", APIParT_Length, format_string("%f", verLen).c_str(),
+				"dir_s", APIParT_CString, "세우기");
+
+			return guid;
+		}
+
+		// 아웃코너판넬(R) 배치
+		API_Guid placeOutcornerPanel_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen2, double verLen) {
+			API_Guid guid;
+			EasyObjectPlacement outcornerPanel;
+
+			outcornerPanel.init(L"아웃코너판넬v1.0.gsm", layerInd_OutcornerPanel, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', outcornerPanel.radAng, horLen, &outcornerPanel.posX, &outcornerPanel.posY, &outcornerPanel.posZ);
+			outcornerPanel.radAng += DegreeToRad(90.0);
+
+			guid = outcornerPanel.placeObject(4,
+				"wid_s", APIParT_Length, format_string("%f", horLen2).c_str(),
+				"leng_s", APIParT_Length, format_string("%f", horLen).c_str(),
+				"hei_s", APIParT_Length, format_string("%f", verLen).c_str(),
+				"dir_s", APIParT_CString, "세우기");
+
+			return guid;
+		}
+
+		// 아웃코너앵글(R) 배치
+		API_Guid placeOutcornerAngle_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double verLen) {
+			API_Guid guid;
+			EasyObjectPlacement outcornerAngle;
+
+			outcornerAngle.init(L"아웃코너앵글v1.0.gsm", layerInd_OutcornerAngle, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			outcornerAngle.radAng += DegreeToRad(270.0);
+			guid = outcornerAngle.placeObject(2,
+				"a_leng", APIParT_Length, format_string("%f", verLen).c_str(),
+				"a_ang", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str());
+
+			return guid;
+		}
+
 		// 테이블폼 타입A 배치 (각파이프 2줄)
 		GS::Array<API_Guid> placeWallTableformA(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bFront) {
 			// 유로폼 배치
@@ -576,73 +891,10 @@ namespace namespaceWallTableform {
 			// Push-Pull Props 배치
 		}
 
-		// 유로폼 배치
-		GS::Array<API_Guid> placeEuroform(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
-			GS::Array<API_Guid> elemList;
-			EasyObjectPlacement euroform;
-
-			euroform.init(L"유로폼v2.0.gsm", layerInd_Euroform, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
-
-			// ...
-			// 규격폼인가, 비규격폼인가?
-			// 수직인가? 수평인가?
-
-			//elemList_Front.Push(euroform.placeObject(5,
-			//	"eu_stan_onoff", APIParT_Boolean, "1.0",
-			//	"eu_wid", APIParT_CString, format_string("%d", (int)floor(horLen * 1000)),
-			//	"eu_hei", APIParT_CString, format_string("%d", (int)floor(verLen * 1000)),
-			//	"u_ins", APIParT_CString, "벽세우기",
-			//	"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str()));
-		}
-
-		// 합판 배치
-		GS::Array<API_Guid> placePlywood(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
-			// ...
-		}
-
-		// 각재 배치
-		GS::Array<API_Guid> placeTimber(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
-			// ...
-		}
-
-		// 휠러스페이서 배치
-		GS::Array<API_Guid> placeFillerspacer(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
-			// ...
-		}
-
-		// 인코너판넬(L) 배치
-		GS::Array<API_Guid> placeIncornerPanel_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
-			// ...
-		}
-
-		// 아웃코너판넬(L) 배치
-		GS::Array<API_Guid> placeOutcornerPanel_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
-			// ...
-		}
-
-		// 아웃코너앵글(L) 배치
-		GS::Array<API_Guid> placeOutcornerAngle_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
-			// ...
-		}
-
-		// 인코너판넬(R) 배치
-		GS::Array<API_Guid> placeIncornerPanel_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
-			// ...
-		}
-
-		// 아웃코너판넬(R) 배치
-		GS::Array<API_Guid> placeOutcornerPanel_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
-			// ...
-		}
-
-		// 아웃코너앵글(R) 배치
-		GS::Array<API_Guid> placeOutcornerAngle_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical) {
-			// ...
-		}
-
 		// 기본 셀 배치하기
 		void placeCells() {
 			// !!! 모든 셀 순회하기 (양면이면 앞뒤로 순회, 단면이면 앞면만 순회)
+			placeOutcornerAngle_R(this->leftBottomX, this->leftBottomY, this->leftBottomZ, this->ang, 1.200);
 
 			for (int i = 0; i < this->nCellsHor; i++) {
 				// ... 테이블폼은 위의 셀까지 한꺼번에 설치해야 함
@@ -854,7 +1106,7 @@ namespace namespaceWallTableform {
 						DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
 					}
 					else if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_ANGLE_L) || (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_ANGLE_R)) {
-						DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 63.5");
+						DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 0");
 					}
 				}
 				else {
@@ -877,7 +1129,7 @@ namespace namespaceWallTableform {
 						DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
 					}
 					else if ((DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_ANGLE_L) || (DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_OUTCORNER_ANGLE_R)) {
-						DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 63.5");
+						DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 0");
 					}
 				}
 			}
@@ -1326,7 +1578,7 @@ namespace namespaceWallTableform {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
 						}
 						else if ((placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_ANGLE_R)) {
-							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 63.5");
+							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 0");
 						}
 					}
 					else {
@@ -1352,7 +1604,7 @@ namespace namespaceWallTableform {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
 						}
 						else if ((placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_ANGLE_R)) {
-							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 63.5");
+							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 0");
 						}
 					}
 				}
@@ -3095,6 +3347,7 @@ GSErrCode	placeWallTableform(void)
 	placingZone.alignPositions();
 
 	// !!!
+	placingZone.placeCells();
 	// 1단계 다이얼로그 기반으로 객체 배치
 	// 상단 여백 채우기 (낮은쪽) bFrontTopMarginFill
 	// 상단 여백 채우기 (높은쪽) bBackTopMarginFill
