@@ -20,6 +20,7 @@ namespace namespaceWallTableform {
 		OBJ_OUTCORNER_PANEL_R,	// 아웃코너판넬(R)
 		OBJ_OUTCORNER_ANGLE_R	// 아웃코너앵글(R)
 	};
+
 	GS::UniString objTypeStr[14] = { L"없음", L"유로폼", L"합판", L"각재", L"휠러스페이서", L"테이블폼A", L"테이블폼B", L"테이블폼C", L"인코너판넬(L)", L"아웃코너판넬(L)", L"아웃코너앵글(L)", L"인코너판넬(R)", L"아웃코너판넬(R)", L"아웃코너앵글(R)" };
 
 	enum DG1_itemIndex {
@@ -138,20 +139,9 @@ namespace namespaceWallTableform {
 
 		// 테이블폼 변수
 		int		nCellsHor;		// 수평 방향 셀 개수
+		int		nCellsVer;		// 수직 방향 셀 개수
 		double	cellHorLen[5];	// 셀 길이 (가로)
-	};
-
-	struct MarginCell
-	{
-		double	leftBottomX;	// 좌하단 좌표 X
-		double	leftBottomY;	// 좌하단 좌표 Y
-		double	leftBottomZ;	// 좌하단 좌표 Z
-		double	ang;			// 회전 각도 (단위: Radian, 회전축: Z축)
-
-		short	objType;		// 객체 타입
-
-		double	horLen;			// 가로 길이
-		double	verLen;			// 세로 길이
+		double	cellVerLen[10];	// 셀 길이 (세로)
 	};
 
 	class PlacingZone
@@ -183,10 +173,10 @@ namespace namespaceWallTableform {
 		int		nMarginCellsVerBasic;	// 수직 방향 여백 셀 개수 (낮은쪽)
 		int		nMarginCellsVerExtra;	// 수직 방향 여백 셀 개수 (높은쪽)
 
-		Cell	cellsBasic[10][50];				// 셀 배열 (낮은쪽)
-		Cell	cellsExtra[10][50];				// 셀 배열 (높은쪽)
-		MarginCell	marginCellsBasic[10][50];	// 여백 셀 배열 (낮은쪽)
-		MarginCell	marginCellsExtra[10][50];	// 여백 셀 배열 (높은쪽)
+		Cell	cellsBasic[50];			// 셀 배열 (낮은쪽) - 가로 방향 배열
+		Cell	cellsExtra[50];			// 셀 배열 (높은쪽) - 가로 방향 배열
+		Cell	marginCellsBasic[10];	// 여백 셀 배열 (낮은쪽) - 세로 방향 배열
+		Cell	marginCellsExtra[10];	// 여백 셀 배열 (높은쪽) - 세로 방향 배열
 
 		double	marginTopBasic;	// 상단 여백 (낮은쪽)
 		double	marginTopExtra;	// 상단 여백 (높은쪽)
@@ -330,48 +320,68 @@ namespace namespaceWallTableform {
 			this->marginTopBasic = 0.0;
 			this->marginTopExtra = 0.0;
 
-			for (int i = 0; i < 10; i++) {
-				for (int j = 0; j < 50; j++) {
-					this->cellsBasic[i][j].leftBottomX = 0.0;
-					this->cellsBasic[i][j].leftBottomY = 0.0;
-					this->cellsBasic[i][j].leftBottomZ = 0.0;
-					this->cellsBasic[i][j].ang = 0.0;
-					this->cellsBasic[i][j].horLen = 0.0;
-					this->cellsBasic[i][j].verLen = 0.0;
-					this->cellsBasic[i][j].objType = OBJ_NONE;
-					this->cellsBasic[i][j].nCellsHor = 0;
-					for (int m = 0; m < 10; m++) {
-						this->cellsBasic[i][j].cellHorLen[m] = 0.0;
-					}
+			for (int i = 0; i < MAX_COL; i++) {
+				this->cellsBasic[i].leftBottomX = 0.0;
+				this->cellsBasic[i].leftBottomY = 0.0;
+				this->cellsBasic[i].leftBottomZ = 0.0;
+				this->cellsBasic[i].ang = 0.0;
 
-					this->cellsExtra[i][j].leftBottomX = 0.0;
-					this->cellsExtra[i][j].leftBottomY = 0.0;
-					this->cellsExtra[i][j].leftBottomZ = 0.0;
-					this->cellsExtra[i][j].ang = 0.0;
-					this->cellsExtra[i][j].horLen = 0.0;
-					this->cellsExtra[i][j].verLen = 0.0;
-					this->cellsExtra[i][j].objType = OBJ_NONE;
-					this->cellsExtra[i][j].nCellsHor = 0;
-					for (int m = 0; m < 10; m++) {
-						this->cellsExtra[i][j].cellHorLen[m] = 0.0;
-					}
+				this->cellsBasic[i].objType = OBJ_NONE;
+				this->cellsBasic[i].horLen = 0.0;
+				this->cellsBasic[i].verLen = 0.0;
+				this->cellsBasic[i].nCellsHor = 0;
+				this->cellsBasic[i].nCellsVer = 0;
+				for (int m = 0; m < 5; m++)
+					this->cellsBasic[i].cellHorLen[m] = 0.0;
+				for (int m = 0; m < MAX_ROW; m++)
+					this->cellsBasic[i].cellVerLen[m] = 0.0;
 
-					this->marginCellsBasic[i][j].leftBottomX = 0.0;
-					this->marginCellsBasic[i][j].leftBottomY = 0.0;
-					this->marginCellsBasic[i][j].leftBottomZ = 0.0;
-					this->marginCellsBasic[i][j].ang = 0.0;
-					this->marginCellsBasic[i][j].horLen = 0.0;
-					this->marginCellsBasic[i][j].verLen = 0.0;
-					this->marginCellsBasic[i][j].objType = OBJ_NONE;
+				this->cellsExtra[i].leftBottomX = 0.0;
+				this->cellsExtra[i].leftBottomY = 0.0;
+				this->cellsExtra[i].leftBottomZ = 0.0;
+				this->cellsExtra[i].ang = 0.0;
 
-					this->marginCellsExtra[i][j].leftBottomX = 0.0;
-					this->marginCellsExtra[i][j].leftBottomY = 0.0;
-					this->marginCellsExtra[i][j].leftBottomZ = 0.0;
-					this->marginCellsExtra[i][j].ang = 0.0;
-					this->marginCellsExtra[i][j].horLen = 0.0;
-					this->marginCellsExtra[i][j].verLen = 0.0;
-					this->marginCellsExtra[i][j].objType = OBJ_NONE;
-				}
+				this->cellsExtra[i].objType = OBJ_NONE;
+				this->cellsExtra[i].horLen = 0.0;
+				this->cellsExtra[i].verLen = 0.0;
+				this->cellsExtra[i].nCellsHor = 0;
+				this->cellsExtra[i].nCellsVer = 0;
+				for (int m = 0; m < 5; m++)
+					this->cellsExtra[i].cellHorLen[m] = 0.0;
+				for (int m = 0; m < MAX_ROW; m++)
+					this->cellsExtra[i].cellVerLen[m] = 0.0;
+			}
+
+			for (int i = 0; i < MAX_ROW; i++) {
+				this->marginCellsBasic[i].leftBottomX = 0.0;
+				this->marginCellsBasic[i].leftBottomY = 0.0;
+				this->marginCellsBasic[i].leftBottomZ = 0.0;
+				this->marginCellsBasic[i].ang = 0.0;
+
+				this->marginCellsBasic[i].objType = OBJ_NONE;
+				this->marginCellsBasic[i].horLen = 0.0;
+				this->marginCellsBasic[i].verLen = 0.0;
+				this->marginCellsBasic[i].nCellsHor = 0;
+				this->marginCellsBasic[i].nCellsVer = 0;
+				for (int m = 0; m < 5; m++)
+					this->marginCellsBasic[i].cellHorLen[m] = 0.0;
+				for (int m = 0; m < MAX_ROW; m++)
+					this->marginCellsBasic[i].cellVerLen[m] = 0.0;
+
+				this->marginCellsExtra[i].leftBottomX = 0.0;
+				this->marginCellsExtra[i].leftBottomY = 0.0;
+				this->marginCellsExtra[i].leftBottomZ = 0.0;
+				this->marginCellsExtra[i].ang = 0.0;
+
+				this->marginCellsExtra[i].objType = OBJ_NONE;
+				this->marginCellsExtra[i].horLen = 0.0;
+				this->marginCellsExtra[i].verLen = 0.0;
+				this->marginCellsExtra[i].nCellsHor = 0;
+				this->marginCellsExtra[i].nCellsVer = 0;
+				for (int m = 0; m < 5; m++)
+					this->marginCellsExtra[i].cellHorLen[m] = 0.0;
+				for (int m = 0; m < MAX_ROW; m++)
+					this->marginCellsExtra[i].cellVerLen[m] = 0.0;
 			}
 
 			this->bLayerInd_Euroform = false;
@@ -411,40 +421,66 @@ namespace namespaceWallTableform {
 		void initCells()
 		{
 			// 모든 셀을 테이블폼A로 초기화
-			for (int i = 0; i < 10; i++) {
-				for (int j = 0; j < 50; j++) {
-					// 앞면
-					this->cellsBasic[i][j].horLen = DEFAULT_TABLEFORM_WIDTH;
-					this->cellsBasic[i][j].verLen = DEFAULT_EUROFORM_HEIGHT;
-					this->cellsBasic[i][j].objType = OBJ_WALL_TABLEFORM_A;
-					this->cellsBasic[i][j].nCellsHor = 4;
+			for (int i = 0; i < MAX_COL; i++) {
+				// 앞면
+				this->cellsBasic[i].horLen = DEFAULT_TABLEFORM_WIDTH;
+				this->cellsBasic[i].verLen = DEFAULT_EUROFORM_HEIGHT;
+				this->cellsBasic[i].objType = OBJ_WALL_TABLEFORM_A;
+				this->cellsBasic[i].nCellsHor = 4;
+				this->cellsBasic[i].nCellsVer = this->nCellsVerBasic;
 
-					this->cellsBasic[i][j].cellHorLen[0] = 0.600;
-					this->cellsBasic[i][j].cellHorLen[1] = 0.600;
-					this->cellsBasic[i][j].cellHorLen[2] = 0.450;
-					this->cellsBasic[i][j].cellHorLen[3] = 0.600;
+				this->cellsBasic[i].cellHorLen[0] = 0.600;
+				this->cellsBasic[i].cellHorLen[1] = 0.600;
+				this->cellsBasic[i].cellHorLen[2] = 0.450;
+				this->cellsBasic[i].cellHorLen[3] = 0.600;
 
-					// 뒷면
-					this->cellsExtra[i][j].horLen = DEFAULT_TABLEFORM_WIDTH;
-					this->cellsExtra[i][j].verLen = DEFAULT_EUROFORM_HEIGHT;
-					this->cellsExtra[i][j].objType = OBJ_WALL_TABLEFORM_A;
-					this->cellsExtra[i][j].nCellsHor = 4;
+				for (int j = 0; j < this->cellsBasic[i].nCellsVer; j++)
+					this->cellsBasic[i].cellVerLen[j] = 1.200;
 
-					this->cellsExtra[i][j].cellHorLen[0] = 0.600;
-					this->cellsExtra[i][j].cellHorLen[1] = 0.600;
-					this->cellsExtra[i][j].cellHorLen[2] = 0.450;
-					this->cellsExtra[i][j].cellHorLen[3] = 0.600;
+				// 뒷면
+				this->cellsExtra[i].horLen = DEFAULT_TABLEFORM_WIDTH;
+				this->cellsExtra[i].verLen = DEFAULT_EUROFORM_HEIGHT;
+				this->cellsExtra[i].objType = OBJ_WALL_TABLEFORM_A;
+				this->cellsExtra[i].nCellsHor = 4;
+				this->cellsExtra[i].nCellsVer = this->nCellsVerBasic;
 
-					// 앞면 여백
-					this->marginCellsBasic[i][j].objType = OBJ_EUROFORM;
-					this->marginCellsBasic[i][j].horLen = DEFAULT_TABLEFORM_WIDTH;
-					this->marginCellsBasic[i][j].verLen = 0.600;
+				this->cellsExtra[i].cellHorLen[0] = 0.600;
+				this->cellsExtra[i].cellHorLen[1] = 0.600;
+				this->cellsExtra[i].cellHorLen[2] = 0.450;
+				this->cellsExtra[i].cellHorLen[3] = 0.600;
 
-					// 뒷면 여백
-					this->marginCellsExtra[i][j].objType = OBJ_EUROFORM;
-					this->marginCellsExtra[i][j].horLen = DEFAULT_TABLEFORM_WIDTH;
-					this->marginCellsExtra[i][j].verLen = 0.600;
-				}
+				for (int j = 0; j < this->cellsExtra[i].nCellsVer; j++)
+					this->cellsExtra[i].cellVerLen[j] = 1.200;
+			}
+
+			for (int i = 0; i < MAX_ROW; i++) {
+				// 앞면 여백
+				this->marginCellsBasic[i].horLen = DEFAULT_TABLEFORM_WIDTH;
+				this->marginCellsBasic[i].verLen = 0.600;
+				this->marginCellsBasic[i].objType = OBJ_EUROFORM;
+				this->marginCellsBasic[i].nCellsHor = 4;
+				this->marginCellsBasic[i].nCellsVer = 1;
+
+				this->marginCellsBasic[i].cellHorLen[0] = 0.600;
+				this->marginCellsBasic[i].cellHorLen[1] = 0.600;
+				this->marginCellsBasic[i].cellHorLen[2] = 0.450;
+				this->marginCellsBasic[i].cellHorLen[3] = 0.600;
+
+				this->marginCellsBasic[i].cellVerLen[0] = 0.600;
+
+				// 뒷면 여백
+				this->marginCellsExtra[i].horLen = DEFAULT_TABLEFORM_WIDTH;
+				this->marginCellsExtra[i].verLen = 0.600;
+				this->marginCellsExtra[i].objType = OBJ_EUROFORM;
+				this->marginCellsExtra[i].nCellsHor = 4;
+				this->marginCellsExtra[i].nCellsVer = 1;
+
+				this->marginCellsExtra[i].cellHorLen[0] = 0.600;
+				this->marginCellsExtra[i].cellHorLen[1] = 0.600;
+				this->marginCellsExtra[i].cellHorLen[2] = 0.450;
+				this->marginCellsExtra[i].cellHorLen[3] = 0.600;
+
+				this->marginCellsExtra[i].cellVerLen[0] = 0.600;
 			}
 		}
 
@@ -453,73 +489,44 @@ namespace namespaceWallTableform {
 			double distance = 0.0;
 
 			for (int i = 0; i < index; i++)
-				distance += this->cellsBasic[0][i].horLen;
+				distance += this->cellsBasic[i].horLen;
 
 			return distance;
 		}
 
 		// 배치 정보 위치 정렬
 		void alignPositions() {
+			double totalLength;
 			moveIn2D('y', this->ang, -this->gap, &this->leftBottomX, &this->leftBottomY);
 
-			for (int i = 0; i < this->nCellsVerBasic; i++) {
-				for (int j = 0; j < this->nCellsHor; j++) {
-					this->cellsBasic[i][j].ang = this->ang;
-					this->cellsBasic[i][j].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(j) * cos(this->ang));
-					this->cellsBasic[i][j].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(j) * sin(this->ang));
-					if (i > 0) {
-						this->cellsBasic[i][j].leftBottomZ = this->cellsBasic[i - 1][j].leftBottomZ + this->cellsBasic[i - 1][j].verLen;
-					}
-					else {
-						this->cellsBasic[i][j].leftBottomZ = this->leftBottomZ;
-					}
-				}
-			}
+			for (int i = 0; i < this->nCellsHor; i++) {
+				this->cellsBasic[i].ang = this->ang;
+				this->cellsBasic[i].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(i) * cos(this->ang));
+				this->cellsBasic[i].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(i) * sin(this->ang));
+				this->cellsBasic[i].leftBottomZ = this->leftBottomZ;
 
-			for (int i = 0; i < this->nCellsVerExtra; i++) {
-				for (int j = 0; j < this->nCellsHor; j++) {
-					this->cellsExtra[i][j].ang = this->ang;
-					this->cellsExtra[i][j].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(j) * cos(this->ang));
-					this->cellsExtra[i][j].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(j) * sin(this->ang));
-					if (i > 0) {
-						this->cellsExtra[i][j].leftBottomZ = this->cellsExtra[i - 1][j].leftBottomZ + this->cellsExtra[i - 1][j].verLen;
-					}
-					else {
-						this->cellsExtra[i][j].leftBottomZ = this->leftBottomZ;
-					}
-					moveIn2D('x', this->ang, this->cellsExtra[i][j].leftBottomX, &this->cellsExtra[i][j].leftBottomX, &this->cellsExtra[i][j].leftBottomY);
-					moveIn2D('y', this->ang, this->wallThk + this->gap * 2, &this->cellsExtra[i][j].leftBottomX, &this->cellsExtra[i][j].leftBottomY);
-				}
-			}
+				this->cellsExtra[i].ang = this->ang;
+				this->cellsExtra[i].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(i) * cos(this->ang));
+				this->cellsExtra[i].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(i) * sin(this->ang));
+				this->cellsExtra[i].leftBottomZ = this->leftBottomZ;
+				moveIn2D('x', this->ang, this->cellsExtra[i].leftBottomX, &this->cellsExtra[i].leftBottomX, &this->cellsExtra[i].leftBottomY);
+				moveIn2D('y', this->ang, this->wallThk + this->gap * 2, &this->cellsExtra[i].leftBottomX, &this->cellsExtra[i].leftBottomY);
 
-			for (int i = 0; i < this->nMarginCellsVerBasic; i++) {
-				for (int j = 0; j < this->nCellsHor; j++) {
-					this->marginCellsBasic[i][j].ang = this->ang;
-					this->marginCellsBasic[i][j].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(j) * cos(this->ang));
-					this->marginCellsBasic[i][j].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(j) * sin(this->ang));
-					if (i > 0) {
-						this->marginCellsBasic[i][j].leftBottomZ = this->marginCellsBasic[i - 1][j].leftBottomZ + this->marginCellsBasic[i - 1][j].verLen;
-					}
-					else {
-						this->marginCellsBasic[i][j].leftBottomZ = this->cellsBasic[nCellsVerBasic - 1][j].leftBottomZ + this->cellsBasic[nCellsVerBasic - 1][j].verLen;
-					}
-				}
-			}
+				totalLength = 0.0;
+				for (int j = 0; j < this->nCellsVerBasic; j++)
+					totalLength += this->cellsBasic[i].cellVerLen[j];
+				this->marginCellsBasic[i].ang = this->ang;
+				this->marginCellsBasic[i].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(i) * cos(this->ang));
+				this->marginCellsBasic[i].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(i) * sin(this->ang));
+				this->marginCellsBasic[i].leftBottomZ = this->leftBottomZ + totalLength;
 
-			for (int i = 0; i < this->nMarginCellsVerExtra; i++) {
-				for (int j = 0; j < this->nCellsHor; j++) {
-					this->marginCellsExtra[i][j].ang = this->ang;
-					this->marginCellsExtra[i][j].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(j) * cos(this->ang));
-					this->marginCellsExtra[i][j].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(j) * sin(this->ang));
-					if (i > 0) {
-						this->marginCellsExtra[i][j].leftBottomZ = this->marginCellsExtra[i - 1][j].leftBottomZ + this->marginCellsExtra[i - 1][j].verLen;
-					}
-					else {
-						this->marginCellsExtra[i][j].leftBottomZ = this->cellsExtra[nCellsVerExtra - 1][j].leftBottomZ + this->cellsExtra[nCellsVerExtra - 1][j].verLen;
-					}
-					moveIn2D('x', this->ang, this->marginCellsExtra[i][j].leftBottomX, &this->marginCellsExtra[i][j].leftBottomX, &this->marginCellsExtra[i][j].leftBottomY);
-					moveIn2D('y', this->ang, this->wallThk + this->gap * 2, &this->marginCellsExtra[i][j].leftBottomX, &this->marginCellsExtra[i][j].leftBottomY);
-				}
+				totalLength = 0.0;
+				for (int j = 0; j < this->nCellsVerExtra; j++)
+					totalLength += this->cellsExtra[i].cellVerLen[j];
+				this->marginCellsExtra[i].ang = this->ang;
+				this->marginCellsExtra[i].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(i) * cos(this->ang));
+				this->marginCellsExtra[i].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(i) * sin(this->ang));
+				this->marginCellsExtra[i].leftBottomZ = this->leftBottomZ + totalLength;
 			}
 		}
 
@@ -839,8 +846,15 @@ namespace namespaceWallTableform {
 		}
 
 		// 테이블폼 타입A 배치 (각파이프 2줄)
-		GS::Array<API_Guid> placeWallTableformA(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bFront) {
-			// 유로폼 배치
+		GS::Array<API_Guid> placeWallTableformA(Cell cell, bool bVertical, bool bFront) {
+			GS::Array<API_Guid> elemList;
+
+			// 유로폼 배치 !!!
+			for (int i = 0; i < cell.nCellsVer; i++) {
+				for (int j = 0; j < cell.nCellsHor; j++) {
+					elemList.Push(placeEuroform(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, cell.cellHorLen[j], cell.cellVerLen[i], bVertical, false));
+				}
+			}
 
 			// 각파이프(수평) 배치
 
@@ -853,10 +867,12 @@ namespace namespaceWallTableform {
 			// 헤드피스 배치
 
 			// Push-Pull Props 배치
+
+			return elemList;
 		}
 
 		// 테이블폼 타입B 배치 (각파이프 1줄)
-		GS::Array<API_Guid> placeWallTableformB(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bFront) {
+		GS::Array<API_Guid> placeWallTableformB(Cell cell, bool bVertical, bool bFront) {
 			// 유로폼 배치
 
 			// 각파이프(수평) 배치
@@ -873,7 +889,7 @@ namespace namespaceWallTableform {
 		}
 
 		// 테이블폼 타입C 배치 (각파이프 1줄, 십자 조인트 바 활용)
-		GS::Array<API_Guid> placeWallTableformC(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bFront) {
+		GS::Array<API_Guid> placeWallTableformC(Cell cell, bool bVertical, bool bFront) {
 			// 유로폼 배치
 
 			// 십자 조인트 바 배치
@@ -893,23 +909,12 @@ namespace namespaceWallTableform {
 
 		// 기본 셀 배치하기
 		void placeCells() {
-			// !!! 모든 셀 순회하기 (양면이면 앞뒤로 순회, 단면이면 앞면만 순회)
-			placeOutcornerAngle_R(this->leftBottomX, this->leftBottomY, this->leftBottomZ, this->ang, 1.200);
-
-			for (int i = 0; i < this->nCellsHor; i++) {
-				// ... 테이블폼은 위의 셀까지 한꺼번에 설치해야 함
-			}
-
-			if (this->bSingleSide == false) {
-				for (int i = 0; i < this->nCellsHor; i++) {
-					// ... 테이블폼은 위의 셀까지 한꺼번에 설치해야 함
-				}
-			}
+			// ... 모든 셀 순회하기 (양면이면 앞뒤로 순회, 단면이면 앞면만 순회)
 		}
 
 		// 여백 셀 배치하기
 		void placeMarginCells() {
-			// !!! 모든 여백 셀 순회하기 (양면이면 앞뒤로 순회, 단면이면 앞면만 순회)
+			// ... 모든 여백 셀 순회하기 (양면이면 앞뒤로 순회, 단면이면 앞면만 순회)
 		}
 	};
 
@@ -1021,7 +1026,7 @@ namespace namespaceWallTableform {
 			// 셀 그리드 표시
 			posX = 100; posY = 115;
 			sizeX = 100; sizeY = 100;
-			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+			for (int i = 0; i < placingZone.cellsBasic[*x].nCellsHor; i++) {
 				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_SEPARATOR, 0, 0, posX + (i * sizeX), posY, sizeX, sizeY);
 				DGShowItem(dialogID, itemIndex);
 				if (i == 0)
@@ -1029,7 +1034,7 @@ namespace namespaceWallTableform {
 			}
 
 			// 셀 너비 (Edit컨트롤)
-			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+			for (int i = 0; i < placingZone.cellsBasic[*x].nCellsHor; i++) {
 				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX + (i * sizeX), posY + 100, sizeX, 25);
 				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
 				DGShowItem(dialogID, itemIndex);
@@ -1038,27 +1043,27 @@ namespace namespaceWallTableform {
 			}
 
 			// 열 방향 객체 추가 버튼
-			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), posY + 100, 25, 25);
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[*x].nCellsHor * sizeX), posY + 100, 25, 25);
 			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
 			DGSetItemText(dialogID, itemIndex, "+");
 			DGShowItem(dialogID, itemIndex);
 			BRANCH_BUTTON_ADD_COLUMN = itemIndex;
 
 			// 열 방향 객체 삭제 버튼
-			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX) + 25, posY + 100, 25, 25);
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[*x].nCellsHor * sizeX) + 25, posY + 100, 25, 25);
 			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
 			DGSetItemText(dialogID, itemIndex, "-");
 			DGShowItem(dialogID, itemIndex);
 			BRANCH_BUTTON_DEL_COLUMN = itemIndex;
 
 			// 다이얼로그 창 크기 조절
-			DGSetDialogSize(dialogID, DG_CLIENT, 205 + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), 300, DG_TOPLEFT, true);
+			DGSetDialogSize(dialogID, DG_CLIENT, 205 + (placingZone.cellsBasic[*x].nCellsHor * sizeX), 300, DG_TOPLEFT, true);
 
 			// 기본값 설정
-			DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[0][*x].objType);				// 팝업컨트롤
-			DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, placingZone.cellsBasic[0][*x].horLen);		// 전체 너비
-			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {										// 셀 너비
-				DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][*x].cellHorLen[i]);
+			DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[*x].objType);				// 팝업컨트롤
+			DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, placingZone.cellsBasic[*x].horLen);	// 전체 너비
+			for (int i = 0; i < placingZone.cellsBasic[*x].nCellsHor; i++) {									// 셀 너비
+				DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[*x].cellHorLen[i]);
 			}
 				
 			// 테이블폼의 경우
@@ -1067,7 +1072,7 @@ namespace namespaceWallTableform {
 				(DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_C)) {
 
 				totalWidth = 0.0;
-				for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+				for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[*x].nCellsHor); i++) {
 					DGEnableItem(dialogID, i);
 					totalWidth += DGGetItemValDouble(dialogID, i);
 				}
@@ -1076,7 +1081,7 @@ namespace namespaceWallTableform {
 			}
 			// 그 외의 경우
 			else {
-				for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+				for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[*x].nCellsHor); i++) {
 					DGDisableItem(dialogID, i);
 				}
 				DGEnableItem(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
@@ -1134,7 +1139,7 @@ namespace namespaceWallTableform {
 				}
 			}
 
-			for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+			for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[*x].nCellsHor); i++) {
 				if (item == i) {
 					if (placingZone.bVertical == true) {
 						DGSetItemText(dialogID, BRANCH_LABEL_GUIDE, L"입력 가능 치수: 600, 500, 450, 400, 300, 200");
@@ -1154,7 +1159,7 @@ namespace namespaceWallTableform {
 				(DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE) == OBJ_WALL_TABLEFORM_C)) {
 
 				totalWidth = 0.0;
-				for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+				for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[*x].nCellsHor); i++) {
 					DGEnableItem(dialogID, i);
 					totalWidth += DGGetItemValDouble(dialogID, i);
 				}
@@ -1163,7 +1168,7 @@ namespace namespaceWallTableform {
 			}
 			// 그 외의 경우
 			else {
-				for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[0][*x].nCellsHor); i++) {
+				for (int i = BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX; i < (BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.cellsBasic[*x].nCellsHor); i++) {
 					DGDisableItem(dialogID, i);
 				}
 				DGEnableItem(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
@@ -1175,21 +1180,21 @@ namespace namespaceWallTableform {
 			if (item == DG_OK) {
 				for (int i = 0; i < MAX_ROW; i++) {
 					// 셀 너비
-					for (int j = 0; j < placingZone.cellsBasic[i][*x].nCellsHor; j++) {
-						placingZone.cellsBasic[i][*x].cellHorLen[j] = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + j);
-						placingZone.cellsExtra[i][*x].cellHorLen[j] = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + j);
+					for (int j = 0; j < placingZone.cellsBasic[*x].nCellsHor; j++) {
+						placingZone.cellsBasic[*x].cellHorLen[j] = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + j);
+						placingZone.cellsExtra[*x].cellHorLen[j] = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + j);
 					}
 
 					// 전체 너비
-					placingZone.cellsBasic[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
-					placingZone.cellsExtra[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+					placingZone.cellsBasic[*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+					placingZone.cellsExtra[*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
 
-					placingZone.marginCellsBasic[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
-					placingZone.marginCellsExtra[i][*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+					placingZone.marginCellsBasic[*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
+					placingZone.marginCellsExtra[*x].horLen = DGGetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH);
 
 					// 객체 타입
-					placingZone.cellsBasic[i][*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
-					placingZone.cellsExtra[i][*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
+					placingZone.cellsBasic[*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
+					placingZone.cellsExtra[*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
 				}
 				break;
 			}
@@ -1198,8 +1203,8 @@ namespace namespaceWallTableform {
 			if (item == BRANCH_BUTTON_ADD_COLUMN) {
 				item = 0;
 				for (int i = 0; i < MAX_ROW; i++) {
-					placingZone.cellsBasic[i][*x].nCellsHor++;
-					placingZone.cellsExtra[i][*x].nCellsHor++;
+					placingZone.cellsBasic[*x].nCellsHor++;
+					placingZone.cellsExtra[*x].nCellsHor++;
 				}
 				break;
 			}
@@ -1208,8 +1213,8 @@ namespace namespaceWallTableform {
 			if (item == BRANCH_BUTTON_DEL_COLUMN) {
 				item = 0;
 				for (int i = 0; i < MAX_ROW; i++) {
-					placingZone.cellsBasic[i][*x].nCellsHor--;
-					placingZone.cellsExtra[i][*x].nCellsHor--;
+					placingZone.cellsBasic[*x].nCellsHor--;
+					placingZone.cellsExtra[*x].nCellsHor--;
 				}
 				break;
 			}
@@ -1221,7 +1226,7 @@ namespace namespaceWallTableform {
 			// 셀 그리드 표시
 			posX = 100; posY = 115;
 			sizeX = 100; sizeY = 100;
-			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+			for (int i = 0; i < placingZone.cellsBasic[*x].nCellsHor; i++) {
 				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_SEPARATOR, 0, 0, posX + (i * sizeX), posY, sizeX, sizeY);
 				DGShowItem(dialogID, itemIndex);
 				if (i == 0)
@@ -1229,7 +1234,7 @@ namespace namespaceWallTableform {
 			}
 
 			// 셀 너비 (Edit컨트롤)
-			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {
+			for (int i = 0; i < placingZone.cellsBasic[*x].nCellsHor; i++) {
 				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX + (i * sizeX), posY + 100, sizeX, 25);
 				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
 				DGShowItem(dialogID, itemIndex);
@@ -1238,27 +1243,27 @@ namespace namespaceWallTableform {
 			}
 
 			// 열 방향 객체 추가 버튼
-			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), posY + 100, 25, 25);
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[*x].nCellsHor * sizeX), posY + 100, 25, 25);
 			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
 			DGSetItemText(dialogID, itemIndex, "+");
 			DGShowItem(dialogID, itemIndex);
 			BRANCH_BUTTON_ADD_COLUMN = itemIndex;
 
 			// 열 방향 객체 삭제 버튼
-			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX) + 25, posY + 100, 25, 25);
+			itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (placingZone.cellsBasic[*x].nCellsHor * sizeX) + 25, posY + 100, 25, 25);
 			DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_BOLD);
 			DGSetItemText(dialogID, itemIndex, "-");
 			DGShowItem(dialogID, itemIndex);
 			BRANCH_BUTTON_DEL_COLUMN = itemIndex;
 
 			// 다이얼로그 창 크기 조절
-			DGSetDialogSize(dialogID, DG_CLIENT, 205 + (placingZone.cellsBasic[0][*x].nCellsHor * sizeX), 300, DG_TOPLEFT, true);
+			DGSetDialogSize(dialogID, DG_CLIENT, 205 + (placingZone.cellsBasic[*x].nCellsHor * sizeX), 300, DG_TOPLEFT, true);
 
 			// 기본값 설정
-			DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[0][*x].objType);				// 팝업컨트롤
-			DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, placingZone.cellsBasic[0][*x].horLen);		// 전체 너비
-			for (int i = 0; i < placingZone.cellsBasic[0][*x].nCellsHor; i++) {										// 셀 너비
-				DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][*x].cellHorLen[i]);
+			DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.cellsBasic[*x].objType);				// 팝업컨트롤
+			DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_TOTAL_WIDTH, placingZone.cellsBasic[*x].horLen);	// 전체 너비
+			for (int i = 0; i < placingZone.cellsBasic[*x].nCellsHor; i++) {									// 셀 너비
+				DGSetItemValDouble(dialogID, BRANCH_EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[*x].cellHorLen[i]);
 			}
 			// ---------- 동적 요소 새로 그리기
 
@@ -1453,7 +1458,7 @@ namespace namespaceWallTableform {
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
 				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (i * sizeX), posY, sizeX, 25);
 				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-				DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.cellsBasic[0][i].objType]);
+				DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.cellsBasic[i].objType]);
 				DGShowItem(dialogID, itemIndex);
 				if (i == 0)
 					BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
@@ -1518,11 +1523,11 @@ namespace namespaceWallTableform {
 
 			// 기본값 설정: 셀 크기
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
-				DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][i].horLen);
+				DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[i].horLen);
 			}
 
 			for (int i = 0; i < placingZone.nCellsVerBasic; i++) {
-				DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i, placingZone.cellsBasic[i][0].verLen);
+				DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i, placingZone.cellsBasic[0].cellVerLen[i]);
 			}
 
 			// 너비 관련 값 설정
@@ -1556,54 +1561,54 @@ namespace namespaceWallTableform {
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
 				if (item == EDITCONTROL_OBJ_WIDTH_START_INDEX + i) {
 					if (DGGetItemValLong(dialogID, RADIOBUTTON_VERTICAL)) {
-						if (placingZone.cellsBasic[0][i].objType == OBJ_EUROFORM) {
+						if (placingZone.cellsBasic[i].objType == OBJ_EUROFORM) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 600, 500, 450, 400, 300, 200");
 						}
-						else if ((placingZone.cellsBasic[0][i].objType == OBJ_WALL_TABLEFORM_A) || (placingZone.cellsBasic[0][i].objType == OBJ_WALL_TABLEFORM_B) || (placingZone.cellsBasic[0][i].objType == OBJ_WALL_TABLEFORM_C)) {
+						else if ((placingZone.cellsBasic[i].objType == OBJ_WALL_TABLEFORM_A) || (placingZone.cellsBasic[i].objType == OBJ_WALL_TABLEFORM_B) || (placingZone.cellsBasic[i].objType == OBJ_WALL_TABLEFORM_C)) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 2300, 2250, 2200, 2150, 2100, 2050, 2000, 1950, 1900, \n1850, 1800, 1750, 1700, 1650, 1600, 1550, 1500, 1450, 1400, 1350, \n1300, 1250, 1200, 1150, 1100, 1050, 1000, 950, 900, 850, \n800, 750, 700, 650, 600, 500, 450, 400, 300, 200");
 						}
-						else if (placingZone.cellsBasic[0][i].objType == OBJ_PLYWOOD) {
+						else if (placingZone.cellsBasic[i].objType == OBJ_PLYWOOD) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 100 ~ 1220");
 						}
-						else if (placingZone.cellsBasic[0][i].objType == OBJ_TIMBER) {
+						else if (placingZone.cellsBasic[i].objType == OBJ_TIMBER) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 5 ~ 1000");
 						}
-						else if (placingZone.cellsBasic[0][i].objType == OBJ_FILLERSPACER) {
+						else if (placingZone.cellsBasic[i].objType == OBJ_FILLERSPACER) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 10 ~ 50");
 						}
-						else if ((placingZone.cellsBasic[0][i].objType == OBJ_INCORNER_PANEL_L) || (placingZone.cellsBasic[0][i].objType == OBJ_INCORNER_PANEL_R)) {
+						else if ((placingZone.cellsBasic[i].objType == OBJ_INCORNER_PANEL_L) || (placingZone.cellsBasic[i].objType == OBJ_INCORNER_PANEL_R)) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
 						}
-						else if ((placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_PANEL_L) || (placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_PANEL_R)) {
+						else if ((placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_PANEL_L) || (placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_PANEL_R)) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
 						}
-						else if ((placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_ANGLE_R)) {
+						else if ((placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_ANGLE_R)) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 0");
 						}
 					}
 					else {
-						if (placingZone.cellsBasic[0][i].objType == OBJ_EUROFORM) {
+						if (placingZone.cellsBasic[i].objType == OBJ_EUROFORM) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 1200, 900, 600");
 						}
-						else if ((placingZone.cellsBasic[0][i].objType == OBJ_WALL_TABLEFORM_A) || (placingZone.cellsBasic[0][i].objType == OBJ_WALL_TABLEFORM_B) || (placingZone.cellsBasic[0][i].objType == OBJ_WALL_TABLEFORM_C)) {
+						else if ((placingZone.cellsBasic[i].objType == OBJ_WALL_TABLEFORM_A) || (placingZone.cellsBasic[i].objType == OBJ_WALL_TABLEFORM_B) || (placingZone.cellsBasic[i].objType == OBJ_WALL_TABLEFORM_C)) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 6000, 5700, 5400, 5100, 4800, 4500, 4200, \n3900, 3600, 3300, 3000, 2700, 2400, 2100, 1800, 1500");
 						}
-						else if (placingZone.cellsBasic[0][i].objType == OBJ_PLYWOOD) {
+						else if (placingZone.cellsBasic[i].objType == OBJ_PLYWOOD) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 100 ~ 2440");
 						}
-						else if (placingZone.cellsBasic[0][i].objType == OBJ_TIMBER) {
+						else if (placingZone.cellsBasic[i].objType == OBJ_TIMBER) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 5 ~ 1000");
 						}
-						else if (placingZone.cellsBasic[0][i].objType == OBJ_FILLERSPACER) {
+						else if (placingZone.cellsBasic[i].objType == OBJ_FILLERSPACER) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 10 ~ 50");
 						}
-						else if ((placingZone.cellsBasic[0][i].objType == OBJ_INCORNER_PANEL_L) || (placingZone.cellsBasic[0][i].objType == OBJ_INCORNER_PANEL_R)) {
+						else if ((placingZone.cellsBasic[i].objType == OBJ_INCORNER_PANEL_L) || (placingZone.cellsBasic[i].objType == OBJ_INCORNER_PANEL_R)) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
 						}
-						else if ((placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_PANEL_L) || (placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_PANEL_R)) {
+						else if ((placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_PANEL_L) || (placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_PANEL_R)) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 80 ~ 500");
 						}
-						else if ((placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsBasic[0][i].objType == OBJ_OUTCORNER_ANGLE_R)) {
+						else if ((placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_ANGLE_R)) {
 							DGSetItemText(dialogID, LABEL_GUIDE, L"입력 가능 치수: 0");
 						}
 					}
@@ -1631,23 +1636,21 @@ namespace namespaceWallTableform {
 			for (int i = EDITCONTROL_OBJ_WIDTH_START_INDEX; i < EDITCONTROL_OBJ_WIDTH_START_INDEX + placingZone.nCellsHor; i++) {
 				if (item == i) {
 					int clickedIndex = i - EDITCONTROL_OBJ_WIDTH_START_INDEX;
-					if ((placingZone.cellsBasic[0][clickedIndex].objType == OBJ_WALL_TABLEFORM_A) ||
-						(placingZone.cellsBasic[0][clickedIndex].objType == OBJ_WALL_TABLEFORM_B) ||
-						(placingZone.cellsBasic[0][clickedIndex].objType == OBJ_WALL_TABLEFORM_C)) {
+					if ((placingZone.cellsBasic[clickedIndex].objType == OBJ_WALL_TABLEFORM_A) ||
+						(placingZone.cellsBasic[clickedIndex].objType == OBJ_WALL_TABLEFORM_B) ||
+						(placingZone.cellsBasic[clickedIndex].objType == OBJ_WALL_TABLEFORM_C)) {
 
 						int INPUT_VALUE = (int)floor(DGGetItemValDouble(dialogID, i) * 1000);
 
 						if (DGGetItemValLong(dialogID, RADIOBUTTON_VERTICAL) == 1) {
 							for (int k = 0; k < sizeof(placingZone.tableformPresetVertical) / sizeof(int); k++) {
 								if (INPUT_VALUE == placingZone.tableformPresetVertical[k]) {
-									for (int m = 0; m < MAX_ROW; m++) {
-										placingZone.cellsBasic[m][clickedIndex].nCellsHor = placingZone.tableformPresetVerticalConfig[k][1];
-										placingZone.cellsExtra[m][clickedIndex].nCellsHor = placingZone.tableformPresetVerticalConfig[k][1];
+									placingZone.cellsBasic[clickedIndex].nCellsHor = placingZone.tableformPresetVerticalConfig[k][1];
+									placingZone.cellsExtra[clickedIndex].nCellsHor = placingZone.tableformPresetVerticalConfig[k][1];
 
-										for (int n = 0; n < placingZone.cellsBasic[m][clickedIndex].nCellsHor; n++) {
-											placingZone.cellsBasic[m][clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetVerticalConfig[k][n + 2] / 1000.0;
-											placingZone.cellsExtra[m][clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetVerticalConfig[k][n + 2] / 1000.0;
-										}
+									for (int n = 0; n < placingZone.cellsBasic[clickedIndex].nCellsHor; n++) {
+										placingZone.cellsBasic[clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetVerticalConfig[k][n + 2] / 1000.0;
+										placingZone.cellsExtra[clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetVerticalConfig[k][n + 2] / 1000.0;
 									}
 								}
 							}
@@ -1655,14 +1658,12 @@ namespace namespaceWallTableform {
 						else {
 							for (int k = 0; k < sizeof(placingZone.tableformPresetHorizontal) / sizeof(int); k++) {
 								if (INPUT_VALUE == placingZone.tableformPresetHorizontal[k]) {
-									for (int m = 0; m < MAX_ROW; m++) {
-										placingZone.cellsBasic[m][clickedIndex].nCellsHor = placingZone.tableformPresetHorizontalConfig[k][1];
-										placingZone.cellsExtra[m][clickedIndex].nCellsHor = placingZone.tableformPresetHorizontalConfig[k][1];
+									placingZone.cellsBasic[clickedIndex].nCellsHor = placingZone.tableformPresetHorizontalConfig[k][1];
+									placingZone.cellsExtra[clickedIndex].nCellsHor = placingZone.tableformPresetHorizontalConfig[k][1];
 
-										for (int n = 0; n < placingZone.cellsBasic[m][clickedIndex].nCellsHor; n++) {
-											placingZone.cellsBasic[m][clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetHorizontalConfig[k][n + 2] / 1000.0;
-											placingZone.cellsExtra[m][clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetHorizontalConfig[k][n + 2] / 1000.0;
-										}
+									for (int n = 0; n < placingZone.cellsBasic[clickedIndex].nCellsHor; n++) {
+										placingZone.cellsBasic[clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetHorizontalConfig[k][n + 2] / 1000.0;
+										placingZone.cellsExtra[clickedIndex].cellHorLen[n] = (double)placingZone.tableformPresetHorizontalConfig[k][n + 2] / 1000.0;
 									}
 								}
 							}
@@ -1673,42 +1674,32 @@ namespace namespaceWallTableform {
 
 			// 배치 정보 저장
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
-				for (int j = 0; j < MAX_ROW; j++) {
-					placingZone.cellsBasic[j][i].horLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i);
-				}
+				placingZone.cellsBasic[i].horLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i);
 			}
 
 			if (item == RADIOBUTTON_SHOW_FRONT || item == RADIOBUTTON_SHOW_BACK) {
 				// 앞면/뒷면을 선택하는 순간
 				if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1) {
-					for (int i = 0; i < placingZone.nCellsVerExtra; i++) {
-						for (int j = 0; j < MAX_COL; j++) {
-							placingZone.cellsExtra[i][j].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
-						}
+					for (int i = 0; i < MAX_COL; i++) {
+						placingZone.cellsExtra[i].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
 					}
 				}
 				else {
-					for (int i = 0; i < placingZone.nCellsVerBasic; i++) {
-						for (int j = 0; j < MAX_COL; j++) {
-							placingZone.cellsBasic[i][j].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
-						}
+					for (int i = 0; i < MAX_COL; i++) {
+						placingZone.cellsBasic[i].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
 					}
 				}
 			}
 			else {
 				// 그 외의 경우
 				if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1) {
-					for (int i = 0; i < placingZone.nCellsVerBasic; i++) {
-						for (int j = 0; j < MAX_COL; j++) {
-							placingZone.cellsBasic[i][j].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
-						}
+					for (int i = 0; i < MAX_COL; i++) {
+						placingZone.cellsBasic[i].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
 					}
 				}
 				else {
-					for (int i = 0; i < placingZone.nCellsVerExtra; i++) {
-						for (int j = 0; j < MAX_COL; j++) {
-							placingZone.cellsExtra[i][j].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
-						}
+					for (int i = 0; i < MAX_COL; i++) {
+						placingZone.cellsExtra[i].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
 					}
 				}
 			}
@@ -1756,7 +1747,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nCellsHor; i++) {
 					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (i * sizeX), posY, sizeX, 25);
 					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.cellsBasic[0][i].objType]);
+					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.cellsBasic[i].objType]);
 					DGShowItem(dialogID, itemIndex);
 					if (i == 0)
 						BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
@@ -1816,17 +1807,17 @@ namespace namespaceWallTableform {
 
 			// 기본값 설정: 셀 크기
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
-				DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][i].horLen);
+				DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[i].horLen);
 			}
 
 			if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1) {
 				for (int i = 0; i < placingZone.nCellsVerBasic; i++) {
-					DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i, placingZone.cellsBasic[i][0].verLen);
+					DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i, placingZone.cellsBasic[0].cellVerLen[i]);
 				}
 			}
 			else {
 				for (int i = 0; i < placingZone.nCellsVerExtra; i++) {
-					DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i, placingZone.cellsBasic[i][0].verLen);
+					DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i, placingZone.cellsExtra[0].cellVerLen[i]);
 				}
 			}
 
@@ -1885,12 +1876,12 @@ namespace namespaceWallTableform {
 
 				remainHeight = placingZone.verLenBasic;
 				for (int i = 0; i < placingZone.nCellsVerBasic; i++)
-					remainHeight -= placingZone.cellsBasic[i][0].verLen;
+					remainHeight -= placingZone.cellsBasic[0].cellVerLen[i];
 				placingZone.marginTopBasic = remainHeight;
 
 				remainHeight = placingZone.verLenExtra;
 				for (int i = 0; i < placingZone.nCellsVerExtra; i++)
-					remainHeight -= placingZone.cellsExtra[i][0].verLen;
+					remainHeight -= placingZone.cellsExtra[0].cellVerLen[i];
 				placingZone.marginTopExtra = remainHeight;
 
 				break;
@@ -1900,10 +1891,8 @@ namespace namespaceWallTableform {
 			if (item == PUSHBUTTON_INFO_COPY) {
 				item = 0;
 				placingZone.nCellsVerExtra = placingZone.nCellsVerBasic;
-				for (int i = 0; i < MAX_ROW; i++) {
-					for (int j = 0; j < MAX_COL; j++) {
-						placingZone.cellsExtra[i][j] = placingZone.cellsBasic[i][j];
-					}
+				for (int i = 0; i < MAX_COL; i++) {
+						placingZone.cellsExtra[i] = placingZone.cellsBasic[i];
 				}
 
 				break;
@@ -1975,7 +1964,7 @@ namespace namespaceWallTableform {
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
 				itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX + (i * sizeX), posY, sizeX, 25);
 				DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-				DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.cellsBasic[0][i].objType]);
+				DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.cellsBasic[i].objType]);
 				DGShowItem(dialogID, itemIndex);
 				if (i == 0)
 					BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
@@ -2035,17 +2024,17 @@ namespace namespaceWallTableform {
 			
 			// 기본값 설정: 셀 크기
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
-				DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[0][i].horLen);
+				DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i, placingZone.cellsBasic[i].horLen);
 			}
 
 			if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1) {
 				for (int i = 0; i < placingZone.nCellsVerBasic; i++) {
-					DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i, placingZone.cellsBasic[i][0].verLen);
+					DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i, placingZone.cellsBasic[0].cellVerLen[i]);
 				}
 			}
 			else {
 				for (int i = 0; i < placingZone.nCellsVerExtra; i++) {
-					DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i, placingZone.cellsBasic[i][0].verLen);
+					DGSetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i, placingZone.cellsBasic[0].cellVerLen[i]);
 				}
 			}
 
@@ -2114,16 +2103,15 @@ namespace namespaceWallTableform {
 			DGShowItem(dialogID, itemIndex);
 
 			// 기본값 설정
-			DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.marginCellsBasic[*x][0].objType);	// 팝업컨트롤
+			DGPopUpSelectItem(dialogID, BRANCH_POPUP_OBJ_TYPE, placingZone.marginCellsBasic[*x].objType);	// 팝업컨트롤
 
 			break;
 
 		case DG_MSG_CLICK:
 			if (item == DG_OK) {
-				for (int i = 0; i < MAX_COL; i++) {
+				for (int i = 0; i < MAX_ROW; i++) {
 					// 객체 타입
-					placingZone.marginCellsBasic[*x][i].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
-					placingZone.marginCellsBasic[*x][i].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
+					placingZone.marginCellsBasic[*x].objType = DGPopUpGetSelected(dialogID, BRANCH_POPUP_OBJ_TYPE);
 				}
 				break;
 			}
@@ -2203,14 +2191,14 @@ namespace namespaceWallTableform {
 			if (*bFront == true) {
 				remainHeight = placingZone.marginTopBasic;
 				for (int i = 0; i < placingZone.nMarginCellsVerBasic; i++) {
-					remainHeight -= placingZone.marginCellsBasic[i][0].verLen;
+					remainHeight -= placingZone.marginCellsBasic[i].verLen;
 				}
 				DGSetItemValDouble(dialogID, DG2_EDITCONTROL_REMAIN_HEIGHT, remainHeight);
 			}
 			else {
 				remainHeight = placingZone.marginTopExtra;
 				for (int i = 0; i < placingZone.nMarginCellsVerExtra; i++) {
-					remainHeight -= placingZone.marginCellsExtra[i][0].verLen;
+					remainHeight -= placingZone.marginCellsExtra[i].verLen;
 				}
 				DGSetItemValDouble(dialogID, DG2_EDITCONTROL_REMAIN_HEIGHT, remainHeight);
 			}
@@ -2252,7 +2240,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nMarginCellsVerBasic; i++) {
 					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX - sizeX - 5, posY + 50 + (sizeY * i), 100, 25);
 					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.marginCellsBasic[i][0].objType]);
+					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.marginCellsBasic[i].objType]);
 					DGShowItem(dialogID, itemIndex);
 					if (i == 0)
 						DG2_BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
@@ -2262,7 +2250,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nMarginCellsVerExtra; i++) {
 					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX - sizeX - 5, posY + 50 + (sizeY * i), 100, 25);
 					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.marginCellsExtra[i][0].objType]);
+					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.marginCellsExtra[i].objType]);
 					DGShowItem(dialogID, itemIndex);
 					if (i == 0)
 						DG2_BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
@@ -2274,7 +2262,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nMarginCellsVerBasic; i++) {
 					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX - sizeX - 5, posY + 25 + (sizeY * i), 100, 25);
 					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemValDouble(dialogID, itemIndex, placingZone.marginCellsBasic[i][0].verLen);
+					DGSetItemValDouble(dialogID, itemIndex, placingZone.marginCellsBasic[i].verLen);
 					DGShowItem(dialogID, itemIndex);
 					if (i == 0)
 						DG2_EDITCONTROL_OBJ_HEIGHT_START_INDEX = itemIndex;
@@ -2284,7 +2272,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nMarginCellsVerExtra; i++) {
 					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX - sizeX - 5, posY + 25 + (sizeY * i), 100, 25);
 					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemValDouble(dialogID, itemIndex, placingZone.marginCellsExtra[i][0].verLen);
+					DGSetItemValDouble(dialogID, itemIndex, placingZone.marginCellsExtra[i].verLen);
 					DGShowItem(dialogID, itemIndex);
 					if (i == 0)
 						DG2_EDITCONTROL_OBJ_HEIGHT_START_INDEX = itemIndex;
@@ -2309,14 +2297,14 @@ namespace namespaceWallTableform {
 			if (*bFront == true) {
 				remainHeight = placingZone.marginTopBasic;
 				for (int i = 0; i < placingZone.nMarginCellsVerBasic; i++) {
-					remainHeight -= placingZone.marginCellsBasic[i][0].verLen;
+					remainHeight -= placingZone.marginCellsBasic[i].verLen;
 				}
 				DGSetItemValDouble(dialogID, DG2_EDITCONTROL_REMAIN_HEIGHT, remainHeight);
 			}
 			else {
 				remainHeight = placingZone.marginTopExtra;
 				for (int i = 0; i < placingZone.nMarginCellsVerExtra; i++) {
-					remainHeight -= placingZone.marginCellsExtra[i][0].verLen;
+					remainHeight -= placingZone.marginCellsExtra[i].verLen;
 				}
 				DGSetItemValDouble(dialogID, DG2_EDITCONTROL_REMAIN_HEIGHT, remainHeight);
 			}
@@ -2335,10 +2323,10 @@ namespace namespaceWallTableform {
 					buttonItemIndex = DG2_BUTTON_OBJ_TYPE_START_INDEX + i;
 					
 					if (item == focusedItemIndex) {
-						if (placingZone.marginCellsBasic[i][0].objType == OBJ_EUROFORM) {
+						if (placingZone.marginCellsBasic[i].objType == OBJ_EUROFORM) {
 							DGSetItemText(dialogID, DG2_LABEL_GUIDE, L"입력 가능 치수: 600, 500, 450, 400, 300, 200");
 						}
-						else if (placingZone.marginCellsBasic[i][0].objType == OBJ_PLYWOOD) {
+						else if (placingZone.marginCellsBasic[i].objType == OBJ_PLYWOOD) {
 							DGSetItemText(dialogID, DG2_LABEL_GUIDE, L"입력 가능 치수: 100 ~ 1220");
 						}
 					}
@@ -2350,10 +2338,10 @@ namespace namespaceWallTableform {
 					buttonItemIndex = DG2_BUTTON_OBJ_TYPE_START_INDEX + i;
 
 					if (item == focusedItemIndex) {
-						if (placingZone.marginCellsExtra[i][0].objType == OBJ_EUROFORM) {
+						if (placingZone.marginCellsExtra[i].objType == OBJ_EUROFORM) {
 							DGSetItemText(dialogID, DG2_LABEL_GUIDE, L"입력 가능 치수: 600, 500, 450, 400, 300, 200");
 						}
-						else if (placingZone.marginCellsExtra[i][0].objType == OBJ_PLYWOOD) {
+						else if (placingZone.marginCellsExtra[i].objType == OBJ_PLYWOOD) {
 							DGSetItemText(dialogID, DG2_LABEL_GUIDE, L"입력 가능 치수: 100 ~ 1220");
 						}
 					}
@@ -2368,7 +2356,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nMarginCellsVerBasic; i++) {
 					focusedItemIndex = DG2_EDITCONTROL_OBJ_HEIGHT_START_INDEX + i;
 					for (int j = 0; j < placingZone.nCellsHor; j++) {
-						placingZone.marginCellsBasic[i][0].verLen = DGGetItemValDouble(dialogID, focusedItemIndex);
+						placingZone.marginCellsBasic[i].verLen = DGGetItemValDouble(dialogID, focusedItemIndex);
 					}
 				}
 			}
@@ -2376,7 +2364,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nMarginCellsVerExtra; i++) {
 					focusedItemIndex = DG2_EDITCONTROL_OBJ_HEIGHT_START_INDEX + i;
 					for (int j = 0; j < placingZone.nCellsHor; j++) {
-						placingZone.marginCellsExtra[i][0].verLen = DGGetItemValDouble(dialogID, focusedItemIndex);
+						placingZone.marginCellsExtra[i].verLen = DGGetItemValDouble(dialogID, focusedItemIndex);
 					}
 				}
 			}
@@ -2385,14 +2373,14 @@ namespace namespaceWallTableform {
 			if (*bFront == true) {
 				remainHeight = placingZone.marginTopBasic;
 				for (int i = 0; i < placingZone.nMarginCellsVerBasic; i++) {
-					remainHeight -= placingZone.marginCellsBasic[i][0].verLen;
+					remainHeight -= placingZone.marginCellsBasic[i].verLen;
 				}
 				DGSetItemValDouble(dialogID, DG2_EDITCONTROL_REMAIN_HEIGHT, remainHeight);
 			}
 			else {
 				remainHeight = placingZone.marginTopExtra;
 				for (int i = 0; i < placingZone.nMarginCellsVerExtra; i++) {
-					remainHeight -= placingZone.marginCellsExtra[i][0].verLen;
+					remainHeight -= placingZone.marginCellsExtra[i].verLen;
 				}
 				DGSetItemValDouble(dialogID, DG2_EDITCONTROL_REMAIN_HEIGHT, remainHeight);
 			}
@@ -2403,15 +2391,13 @@ namespace namespaceWallTableform {
 
 		case DG_MSG_CLICK:
 			if (item == DG_OK) {
-				for (int i = 0; i < MAX_ROW; i++) {
-					for (int j = 0; j < placingZone.nMarginCellsVerBasic; j++) {
-						// 셀 높이
-						if (*bFront == true) {
-							placingZone.marginCellsBasic[i][j].verLen = DGGetItemValDouble(dialogID, DG2_EDITCONTROL_OBJ_HEIGHT_START_INDEX + j);
-						}
-						else {
-							placingZone.marginCellsExtra[i][j].verLen = DGGetItemValDouble(dialogID, DG2_EDITCONTROL_OBJ_HEIGHT_START_INDEX + j);
-						}
+				for (int i = 0; i < placingZone.nMarginCellsVerBasic; i++) {
+					// 셀 높이
+					if (*bFront == true) {
+						placingZone.marginCellsBasic[i].verLen = DGGetItemValDouble(dialogID, DG2_EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
+					}
+					else {
+						placingZone.marginCellsExtra[i].verLen = DGGetItemValDouble(dialogID, DG2_EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
 					}
 				}
 				break;
@@ -2492,7 +2478,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nMarginCellsVerBasic; i++) {
 					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX - sizeX - 5, posY + 50 + (sizeY * i), 100, 25);
 					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.marginCellsBasic[i][0].objType]);
+					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.marginCellsBasic[i].objType]);
 					DGShowItem(dialogID, itemIndex);
 					if (i == 0)
 						DG2_BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
@@ -2502,7 +2488,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nMarginCellsVerExtra; i++) {
 					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, posX - sizeX - 5, posY + 50 + (sizeY * i), 100, 25);
 					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.marginCellsExtra[i][0].objType]);
+					DGSetItemText(dialogID, itemIndex, objTypeStr[placingZone.marginCellsExtra[i].objType]);
 					DGShowItem(dialogID, itemIndex);
 					if (i == 0)
 						DG2_BUTTON_OBJ_TYPE_START_INDEX = itemIndex;
@@ -2514,7 +2500,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nMarginCellsVerBasic; i++) {
 					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX - sizeX - 5, posY + 25 + (sizeY * i), 100, 25);
 					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemValDouble(dialogID, itemIndex, placingZone.marginCellsBasic[i][0].verLen);
+					DGSetItemValDouble(dialogID, itemIndex, placingZone.marginCellsBasic[i].verLen);
 					DGShowItem(dialogID, itemIndex);
 					if (i == 0)
 						DG2_EDITCONTROL_OBJ_HEIGHT_START_INDEX = itemIndex;
@@ -2524,7 +2510,7 @@ namespace namespaceWallTableform {
 				for (int i = 0; i < placingZone.nMarginCellsVerExtra; i++) {
 					itemIndex = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, posX - sizeX - 5, posY + 25 + (sizeY * i), 100, 25);
 					DGSetItemFont(dialogID, itemIndex, DG_IS_LARGE | DG_IS_PLAIN);
-					DGSetItemValDouble(dialogID, itemIndex, placingZone.marginCellsExtra[i][0].verLen);
+					DGSetItemValDouble(dialogID, itemIndex, placingZone.marginCellsExtra[i].verLen);
 					DGShowItem(dialogID, itemIndex);
 					if (i == 0)
 						DG2_EDITCONTROL_OBJ_HEIGHT_START_INDEX = itemIndex;
@@ -2553,14 +2539,14 @@ namespace namespaceWallTableform {
 			if (*bFront == true) {
 				remainHeight = placingZone.marginTopBasic;
 				for (int i = 0; i < placingZone.nMarginCellsVerBasic; i++) {
-					remainHeight -= placingZone.marginCellsBasic[i][0].verLen;
+					remainHeight -= placingZone.marginCellsBasic[i].verLen;
 				}
 				DGSetItemValDouble(dialogID, DG2_EDITCONTROL_REMAIN_HEIGHT, remainHeight);
 			}
 			else {
 				remainHeight = placingZone.marginTopExtra;
 				for (int i = 0; i < placingZone.nMarginCellsVerExtra; i++) {
-					remainHeight -= placingZone.marginCellsExtra[i][0].verLen;
+					remainHeight -= placingZone.marginCellsExtra[i].verLen;
 				}
 				DGSetItemValDouble(dialogID, DG2_EDITCONTROL_REMAIN_HEIGHT, remainHeight);
 			}
@@ -2628,80 +2614,76 @@ namespace namespaceWallTableform {
 
 			// 객체 종류를 조사하여 필요한 레이어만 켜기
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
-				for (int j = 0; j < placingZone.nCellsVerBasic; j++) {
-					if (placingZone.cellsBasic[j][i].objType == OBJ_EUROFORM)
-						placingZone.bLayerInd_Euroform = true;
-					if (placingZone.cellsBasic[j][i].objType == OBJ_FILLERSPACER)
-						placingZone.bLayerInd_Fillerspacer = true;
-					if ((placingZone.cellsBasic[j][i].objType == OBJ_INCORNER_PANEL_L) || (placingZone.cellsBasic[j][i].objType == OBJ_INCORNER_PANEL_R))
-						placingZone.bLayerInd_IncornerPanel = true;
-					if ((placingZone.cellsBasic[j][i].objType == OBJ_OUTCORNER_PANEL_L) || (placingZone.cellsBasic[j][i].objType == OBJ_OUTCORNER_PANEL_R))
-						placingZone.bLayerInd_OutcornerPanel = true;
-					if ((placingZone.cellsBasic[j][i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsBasic[j][i].objType == OBJ_OUTCORNER_ANGLE_R))
-						placingZone.bLayerInd_OutcornerAngle = true;
-					if (placingZone.cellsBasic[j][i].objType == OBJ_WALL_TABLEFORM_A) {
-						placingZone.bLayerInd_Euroform = true;
-						placingZone.bLayerInd_Rectpipe = true;
-						placingZone.bLayerInd_Pinbolt = true;
-						placingZone.bLayerInd_Headpiece = true;
-						placingZone.bLayerInd_Props = true;
-						placingZone.bLayerInd_Join = true;
-					}
-					if (placingZone.cellsBasic[j][i].objType == OBJ_WALL_TABLEFORM_B) {
-						placingZone.bLayerInd_Euroform = true;
-						placingZone.bLayerInd_Rectpipe = true;
-						placingZone.bLayerInd_Pinbolt = true;
-						placingZone.bLayerInd_Headpiece = true;
-						placingZone.bLayerInd_Props = true;
-						placingZone.bLayerInd_Join = true;
-					}
-					if (placingZone.cellsBasic[j][i].objType == OBJ_WALL_TABLEFORM_C) {
-						placingZone.bLayerInd_Euroform = true;
-						placingZone.bLayerInd_Rectpipe = true;
-						placingZone.bLayerInd_Pinbolt = true;
-						placingZone.bLayerInd_Headpiece = true;
-						placingZone.bLayerInd_Props = true;
-						placingZone.bLayerInd_Join = true;
-						placingZone.bLayerInd_CrossJointBar = true;
-					}
+				if (placingZone.cellsBasic[i].objType == OBJ_EUROFORM)
+					placingZone.bLayerInd_Euroform = true;
+				if (placingZone.cellsBasic[i].objType == OBJ_FILLERSPACER)
+					placingZone.bLayerInd_Fillerspacer = true;
+				if ((placingZone.cellsBasic[i].objType == OBJ_INCORNER_PANEL_L) || (placingZone.cellsBasic[i].objType == OBJ_INCORNER_PANEL_R))
+					placingZone.bLayerInd_IncornerPanel = true;
+				if ((placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_PANEL_L) || (placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_PANEL_R))
+					placingZone.bLayerInd_OutcornerPanel = true;
+				if ((placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsBasic[i].objType == OBJ_OUTCORNER_ANGLE_R))
+					placingZone.bLayerInd_OutcornerAngle = true;
+				if (placingZone.cellsBasic[i].objType == OBJ_WALL_TABLEFORM_A) {
+					placingZone.bLayerInd_Euroform = true;
+					placingZone.bLayerInd_Rectpipe = true;
+					placingZone.bLayerInd_Pinbolt = true;
+					placingZone.bLayerInd_Headpiece = true;
+					placingZone.bLayerInd_Props = true;
+					placingZone.bLayerInd_Join = true;
+				}
+				if (placingZone.cellsBasic[i].objType == OBJ_WALL_TABLEFORM_B) {
+					placingZone.bLayerInd_Euroform = true;
+					placingZone.bLayerInd_Rectpipe = true;
+					placingZone.bLayerInd_Pinbolt = true;
+					placingZone.bLayerInd_Headpiece = true;
+					placingZone.bLayerInd_Props = true;
+					placingZone.bLayerInd_Join = true;
+				}
+				if (placingZone.cellsBasic[i].objType == OBJ_WALL_TABLEFORM_C) {
+					placingZone.bLayerInd_Euroform = true;
+					placingZone.bLayerInd_Rectpipe = true;
+					placingZone.bLayerInd_Pinbolt = true;
+					placingZone.bLayerInd_Headpiece = true;
+					placingZone.bLayerInd_Props = true;
+					placingZone.bLayerInd_Join = true;
+					placingZone.bLayerInd_CrossJointBar = true;
 				}
 
-				for (int j = 0; j < placingZone.nCellsVerExtra; j++) {
-					if (placingZone.cellsExtra[j][i].objType == OBJ_EUROFORM)
-						placingZone.bLayerInd_Euroform = true;
-					if (placingZone.cellsExtra[j][i].objType == OBJ_FILLERSPACER)
-						placingZone.bLayerInd_Fillerspacer = true;
-					if ((placingZone.cellsExtra[j][i].objType == OBJ_INCORNER_PANEL_L) || (placingZone.cellsExtra[j][i].objType == OBJ_INCORNER_PANEL_R))
-						placingZone.bLayerInd_IncornerPanel = true;
-					if ((placingZone.cellsExtra[j][i].objType == OBJ_OUTCORNER_PANEL_L) || (placingZone.cellsExtra[j][i].objType == OBJ_OUTCORNER_PANEL_R))
-						placingZone.bLayerInd_OutcornerPanel = true;
-					if ((placingZone.cellsExtra[j][i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsExtra[j][i].objType == OBJ_OUTCORNER_ANGLE_R))
-						placingZone.bLayerInd_OutcornerAngle = true;
-					if (placingZone.cellsExtra[j][i].objType == OBJ_WALL_TABLEFORM_A) {
-						placingZone.bLayerInd_Euroform = true;
-						placingZone.bLayerInd_Rectpipe = true;
-						placingZone.bLayerInd_Pinbolt = true;
-						placingZone.bLayerInd_Headpiece = true;
-						placingZone.bLayerInd_Props = true;
-						placingZone.bLayerInd_Join = true;
-					}
-					if (placingZone.cellsExtra[j][i].objType == OBJ_WALL_TABLEFORM_B) {
-						placingZone.bLayerInd_Euroform = true;
-						placingZone.bLayerInd_Rectpipe = true;
-						placingZone.bLayerInd_Pinbolt = true;
-						placingZone.bLayerInd_Headpiece = true;
-						placingZone.bLayerInd_Props = true;
-						placingZone.bLayerInd_Join = true;
-					}
-					if (placingZone.cellsExtra[j][i].objType == OBJ_WALL_TABLEFORM_C) {
-						placingZone.bLayerInd_Euroform = true;
-						placingZone.bLayerInd_Rectpipe = true;
-						placingZone.bLayerInd_Pinbolt = true;
-						placingZone.bLayerInd_Headpiece = true;
-						placingZone.bLayerInd_Props = true;
-						placingZone.bLayerInd_Join = true;
-						placingZone.bLayerInd_CrossJointBar = true;
-					}
+				if (placingZone.cellsExtra[i].objType == OBJ_EUROFORM)
+					placingZone.bLayerInd_Euroform = true;
+				if (placingZone.cellsExtra[i].objType == OBJ_FILLERSPACER)
+					placingZone.bLayerInd_Fillerspacer = true;
+				if ((placingZone.cellsExtra[i].objType == OBJ_INCORNER_PANEL_L) || (placingZone.cellsExtra[i].objType == OBJ_INCORNER_PANEL_R))
+					placingZone.bLayerInd_IncornerPanel = true;
+				if ((placingZone.cellsExtra[i].objType == OBJ_OUTCORNER_PANEL_L) || (placingZone.cellsExtra[i].objType == OBJ_OUTCORNER_PANEL_R))
+					placingZone.bLayerInd_OutcornerPanel = true;
+				if ((placingZone.cellsExtra[i].objType == OBJ_OUTCORNER_ANGLE_L) || (placingZone.cellsExtra[i].objType == OBJ_OUTCORNER_ANGLE_R))
+					placingZone.bLayerInd_OutcornerAngle = true;
+				if (placingZone.cellsExtra[i].objType == OBJ_WALL_TABLEFORM_A) {
+					placingZone.bLayerInd_Euroform = true;
+					placingZone.bLayerInd_Rectpipe = true;
+					placingZone.bLayerInd_Pinbolt = true;
+					placingZone.bLayerInd_Headpiece = true;
+					placingZone.bLayerInd_Props = true;
+					placingZone.bLayerInd_Join = true;
+				}
+				if (placingZone.cellsExtra[i].objType == OBJ_WALL_TABLEFORM_B) {
+					placingZone.bLayerInd_Euroform = true;
+					placingZone.bLayerInd_Rectpipe = true;
+					placingZone.bLayerInd_Pinbolt = true;
+					placingZone.bLayerInd_Headpiece = true;
+					placingZone.bLayerInd_Props = true;
+					placingZone.bLayerInd_Join = true;
+				}
+				if (placingZone.cellsExtra[i].objType == OBJ_WALL_TABLEFORM_C) {
+					placingZone.bLayerInd_Euroform = true;
+					placingZone.bLayerInd_Rectpipe = true;
+					placingZone.bLayerInd_Pinbolt = true;
+					placingZone.bLayerInd_Headpiece = true;
+					placingZone.bLayerInd_Props = true;
+					placingZone.bLayerInd_Join = true;
+					placingZone.bLayerInd_CrossJointBar = true;
 				}
 			}
 
@@ -3347,7 +3329,9 @@ GSErrCode	placeWallTableform(void)
 	placingZone.alignPositions();
 
 	// !!!
-	placingZone.placeCells();
+	placingZone.placeWallTableformA(placingZone.cellsBasic[0], true, true);
+
+	//placingZone.placeCells();
 	// 1단계 다이얼로그 기반으로 객체 배치
 	// 상단 여백 채우기 (낮은쪽) bFrontTopMarginFill
 	// 상단 여백 채우기 (높은쪽) bBackTopMarginFill
