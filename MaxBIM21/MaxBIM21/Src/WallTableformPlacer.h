@@ -122,8 +122,14 @@ namespace namespaceWallTableform {
 	double DEFAULT_TABLEFORM_WIDTH = 2.250;
 	double DEFAULT_EUROFORM_HEIGHT = 1.200;
 
+	int MAX_COL_IN_CELL = 5;
 	int MAX_ROW = 10;
 	int MAX_COL = 50;
+
+	GS::Array<API_Guid> elemList_Front;
+	GS::Array<API_Guid> elemList_Back;
+	GS::Array<API_Guid> elemList_Margin_Front;
+	GS::Array<API_Guid> elemList_Margin_Back;
 
 	struct Cell
 	{
@@ -173,10 +179,10 @@ namespace namespaceWallTableform {
 		int		nMarginCellsVerBasic;	// 수직 방향 여백 셀 개수 (낮은쪽)
 		int		nMarginCellsVerExtra;	// 수직 방향 여백 셀 개수 (높은쪽)
 
-		Cell	cellsBasic[50];			// 셀 배열 (낮은쪽) - 가로 방향 배열
-		Cell	cellsExtra[50];			// 셀 배열 (높은쪽) - 가로 방향 배열
-		Cell	marginCellsBasic[10];	// 여백 셀 배열 (낮은쪽) - 세로 방향 배열
-		Cell	marginCellsExtra[10];	// 여백 셀 배열 (높은쪽) - 세로 방향 배열
+		Cell	cellsBasic[50];			// 셀 배열 (낮은쪽)
+		Cell	cellsExtra[50];			// 셀 배열 (높은쪽)
+		Cell	marginCellsBasic[50];	// 여백 셀 배열 (낮은쪽)
+		Cell	marginCellsExtra[50];	// 여백 셀 배열 (높은쪽)
 
 		double	marginTopBasic;	// 상단 여백 (낮은쪽)
 		double	marginTopExtra;	// 상단 여백 (높은쪽)
@@ -331,7 +337,7 @@ namespace namespaceWallTableform {
 				this->cellsBasic[i].verLen = 0.0;
 				this->cellsBasic[i].nCellsHor = 0;
 				this->cellsBasic[i].nCellsVer = 0;
-				for (int m = 0; m < 5; m++)
+				for (int m = 0; m < MAX_COL_IN_CELL; m++)
 					this->cellsBasic[i].cellHorLen[m] = 0.0;
 				for (int m = 0; m < MAX_ROW; m++)
 					this->cellsBasic[i].cellVerLen[m] = 0.0;
@@ -346,13 +352,13 @@ namespace namespaceWallTableform {
 				this->cellsExtra[i].verLen = 0.0;
 				this->cellsExtra[i].nCellsHor = 0;
 				this->cellsExtra[i].nCellsVer = 0;
-				for (int m = 0; m < 5; m++)
+				for (int m = 0; m < MAX_COL_IN_CELL; m++)
 					this->cellsExtra[i].cellHorLen[m] = 0.0;
 				for (int m = 0; m < MAX_ROW; m++)
 					this->cellsExtra[i].cellVerLen[m] = 0.0;
 			}
 
-			for (int i = 0; i < MAX_ROW; i++) {
+			for (int i = 0; i < MAX_COL; i++) {
 				this->marginCellsBasic[i].leftBottomX = 0.0;
 				this->marginCellsBasic[i].leftBottomY = 0.0;
 				this->marginCellsBasic[i].leftBottomZ = 0.0;
@@ -363,7 +369,7 @@ namespace namespaceWallTableform {
 				this->marginCellsBasic[i].verLen = 0.0;
 				this->marginCellsBasic[i].nCellsHor = 0;
 				this->marginCellsBasic[i].nCellsVer = 0;
-				for (int m = 0; m < 5; m++)
+				for (int m = 0; m < MAX_COL_IN_CELL; m++)
 					this->marginCellsBasic[i].cellHorLen[m] = 0.0;
 				for (int m = 0; m < MAX_ROW; m++)
 					this->marginCellsBasic[i].cellVerLen[m] = 0.0;
@@ -378,7 +384,7 @@ namespace namespaceWallTableform {
 				this->marginCellsExtra[i].verLen = 0.0;
 				this->marginCellsExtra[i].nCellsHor = 0;
 				this->marginCellsExtra[i].nCellsVer = 0;
-				for (int m = 0; m < 5; m++)
+				for (int m = 0; m < MAX_COL_IN_CELL; m++)
 					this->marginCellsExtra[i].cellHorLen[m] = 0.0;
 				for (int m = 0; m < MAX_ROW; m++)
 					this->marginCellsExtra[i].cellVerLen[m] = 0.0;
@@ -453,7 +459,7 @@ namespace namespaceWallTableform {
 					this->cellsExtra[i].cellVerLen[j] = 1.200;
 			}
 
-			for (int i = 0; i < MAX_ROW; i++) {
+			for (int i = 0; i < MAX_COL; i++) {
 				// 앞면 여백
 				this->marginCellsBasic[i].horLen = DEFAULT_TABLEFORM_WIDTH;
 				this->marginCellsBasic[i].verLen = 0.600;
@@ -497,9 +503,11 @@ namespace namespaceWallTableform {
 		// 배치 정보 위치 정렬
 		void alignPositions() {
 			double totalLength;
-			moveIn2D('y', this->ang, -this->gap, &this->leftBottomX, &this->leftBottomY);
+			double* tempArr;
+			int tempIndex;
 
 			for (int i = 0; i < this->nCellsHor; i++) {
+				// 셀 밀착시키기
 				this->cellsBasic[i].ang = this->ang;
 				this->cellsBasic[i].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(i) * cos(this->ang));
 				this->cellsBasic[i].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(i) * sin(this->ang));
@@ -509,9 +517,21 @@ namespace namespaceWallTableform {
 				this->cellsExtra[i].leftBottomX = this->leftBottomX + (this->gap * sin(this->ang)) + (this->getCellPositionLeftBottomX(i) * cos(this->ang));
 				this->cellsExtra[i].leftBottomY = this->leftBottomY - (this->gap * cos(this->ang)) + (this->getCellPositionLeftBottomX(i) * sin(this->ang));
 				this->cellsExtra[i].leftBottomZ = this->leftBottomZ;
-				moveIn2D('x', this->ang, this->cellsExtra[i].leftBottomX, &this->cellsExtra[i].leftBottomX, &this->cellsExtra[i].leftBottomY);
+				moveIn2D('x', this->ang, this->cellsExtra[i].horLen, &this->cellsExtra[i].leftBottomX, &this->cellsExtra[i].leftBottomY);
 				moveIn2D('y', this->ang, this->wallThk + this->gap * 2, &this->cellsExtra[i].leftBottomX, &this->cellsExtra[i].leftBottomY);
 
+				// 셀 너비 순서 뒤집기
+				tempArr = new double[MAX_COL_IN_CELL];
+				tempIndex = 0;
+				for (int j = (this->cellsExtra[i].nCellsHor - 1); j >= 0; j--) {
+					tempArr[tempIndex++] = this->cellsExtra[i].cellHorLen[j];
+				}
+				for (int j = 0; j < this->cellsExtra[i].nCellsHor; j++) {
+					this->cellsExtra[i].cellHorLen[j] = tempArr[j];
+				}
+				delete tempArr;
+
+				// 셀 밀착시키기
 				totalLength = 0.0;
 				for (int j = 0; j < this->nCellsVerBasic; j++)
 					totalLength += this->cellsBasic[i].cellVerLen[j];
@@ -531,17 +551,28 @@ namespace namespaceWallTableform {
 		}
 
 		// 유로폼 배치
-		API_Guid placeEuroform(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bForCeil) {
+		API_Guid placeEuroform(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double xMove, double yMove, double zMove, double horLen, double verLen, bool bVertical, bool bForCeil) {
 			API_Guid guid;
 			EasyObjectPlacement euroform;
 
 			euroform.init(L"유로폼v2.0.gsm", layerInd_Euroform, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
 
+			moveIn3D('x', euroform.radAng, xMove, &euroform.posX, &euroform.posY, &euroform.posZ);
+			moveIn3D('y', euroform.radAng, yMove, &euroform.posX, &euroform.posY, &euroform.posZ);
+			moveIn3D('z', euroform.radAng, zMove, &euroform.posX, &euroform.posY, &euroform.posZ);
+
 			// 규격폼 여부 확인
 			bool	bStandard = false;
-			if (((abs(horLen - 0.600) < EPS) || (abs(horLen - 0.500) < EPS) || (abs(horLen - 0.450) < EPS) || (abs(horLen - 0.400) < EPS) || (abs(horLen - 0.300) < EPS) || (abs(horLen - 0.200) < EPS)) &&
-				((abs(verLen - 1.200) < EPS) || (abs(verLen - 0.900) < EPS) || (abs(verLen - 0.600) < EPS)))
-				bStandard = true;
+			if (bVertical == true) {
+				if (((abs(horLen - 0.600) < EPS) || (abs(horLen - 0.500) < EPS) || (abs(horLen - 0.450) < EPS) || (abs(horLen - 0.400) < EPS) || (abs(horLen - 0.300) < EPS) || (abs(horLen - 0.200) < EPS)) &&
+					((abs(verLen - 1.200) < EPS) || (abs(verLen - 0.900) < EPS) || (abs(verLen - 0.600) < EPS)))
+					bStandard = true;
+			}
+			else {
+				if (((abs(verLen - 0.600) < EPS) || (abs(verLen - 0.500) < EPS) || (abs(verLen - 0.450) < EPS) || (abs(verLen - 0.400) < EPS) || (abs(verLen - 0.300) < EPS) || (abs(verLen - 0.200) < EPS)) &&
+					((abs(horLen - 1.200) < EPS) || (abs(horLen - 0.900) < EPS) || (abs(horLen - 0.600) < EPS)))
+					bStandard = true;
+			}
 
 			// 유로폼이 세로 방향인지, 가로 방향인지?
 			char insDir[20];
@@ -553,7 +584,7 @@ namespace namespaceWallTableform {
 			}
 			else {
 				strcpy(insDir, "벽눕히기");
-				xOffset = verLen;
+				xOffset = horLen;
 			}
 			
 			// 벽에 붙이나? 천장에 붙이나?
@@ -571,6 +602,9 @@ namespace namespaceWallTableform {
 				angX = DegreeToRad(90.0);
 				yOffset = 0.0;
 			}
+
+			if (bVertical == false)
+				exchangeDoubles(&horLen, &verLen);
 
 			if (bStandard == true) {
 				moveIn3D('x', euroform.radAng, xOffset, &euroform.posX, &euroform.posY, &euroform.posZ);
@@ -599,11 +633,15 @@ namespace namespaceWallTableform {
 		}
 
 		// 합판 배치
-		API_Guid placePlywood(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bForCeil) {
+		API_Guid placePlywood(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double xMove, double yMove, double zMove, double horLen, double verLen, bool bVertical, bool bForCeil) {
 			API_Guid guid;
 			EasyObjectPlacement plywood;
 
 			plywood.init(L"합판v1.0.gsm", layerInd_Plywood, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', plywood.radAng, xMove, &plywood.posX, &plywood.posY, &plywood.posZ);
+			moveIn3D('y', plywood.radAng, yMove, &plywood.posX, &plywood.posY, &plywood.posZ);
+			moveIn3D('z', plywood.radAng, zMove, &plywood.posX, &plywood.posY, &plywood.posZ);
 
 			char insDir[20];
 
@@ -654,11 +692,15 @@ namespace namespaceWallTableform {
 		}
 
 		// 각재 배치
-		API_Guid placeTimber(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bForCeil) {
+		API_Guid placeTimber(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double xMove, double yMove, double zMove, double horLen, double verLen, bool bVertical, bool bForCeil) {
 			API_Guid guid;
 			EasyObjectPlacement timber;
 
 			timber.init(L"목재v1.0.gsm", layerInd_Timber, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', timber.radAng, xMove, &timber.posX, &timber.posY, &timber.posZ);
+			moveIn3D('y', timber.radAng, yMove, &timber.posX, &timber.posY, &timber.posZ);
+			moveIn3D('z', timber.radAng, zMove, &timber.posX, &timber.posY, &timber.posZ);
 
 			char insDir[20];
 			double w_ang;
@@ -699,11 +741,15 @@ namespace namespaceWallTableform {
 		}
 
 		// 휠러스페이서 배치
-		API_Guid placeFillerspacer(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double verLen, bool bVertical, bool bForCeil) {
+		API_Guid placeFillerspacer(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double xMove, double yMove, double zMove, double horLen, double verLen, bool bVertical, bool bForCeil) {
 			API_Guid guid;
 			EasyObjectPlacement fillersp;
 
 			fillersp.init(L"휠러스페이서v1.0.gsm", layerInd_Fillerspacer, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', fillersp.radAng, xMove, &fillersp.posX, &fillersp.posY, &fillersp.posZ);
+			moveIn3D('y', fillersp.radAng, yMove, &fillersp.posX, &fillersp.posY, &fillersp.posZ);
+			moveIn3D('z', fillersp.radAng, zMove, &fillersp.posX, &fillersp.posY, &fillersp.posZ);
 
 			double f_ang;
 			double f_rota;
@@ -742,11 +788,15 @@ namespace namespaceWallTableform {
 		}
 
 		// 인코너판넬(L) 배치
-		API_Guid placeIncornerPanel_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double horLen2, double verLen) {
+		API_Guid placeIncornerPanel_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double xMove, double yMove, double zMove, double horLen, double horLen2, double verLen) {
 			API_Guid guid;
 			EasyObjectPlacement incornerPanel;
 
 			incornerPanel.init(L"인코너판넬v1.0.gsm", layerInd_IncornerPanel, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', incornerPanel.radAng, xMove, &incornerPanel.posX, &incornerPanel.posY, &incornerPanel.posZ);
+			moveIn3D('y', incornerPanel.radAng, yMove, &incornerPanel.posX, &incornerPanel.posY, &incornerPanel.posZ);
+			moveIn3D('z', incornerPanel.radAng, zMove, &incornerPanel.posX, &incornerPanel.posY, &incornerPanel.posZ);
 
 			incornerPanel.radAng += DegreeToRad(270.0);
 
@@ -761,11 +811,15 @@ namespace namespaceWallTableform {
 		}
 
 		// 아웃코너판넬(L) 배치
-		API_Guid placeOutcornerPanel_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double horLen2, double verLen) {
+		API_Guid placeOutcornerPanel_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double xMove, double yMove, double zMove, double horLen, double horLen2, double verLen) {
 			API_Guid guid;
 			EasyObjectPlacement outcornerPanel;
 
 			outcornerPanel.init(L"아웃코너판넬v1.0.gsm", layerInd_OutcornerPanel, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', outcornerPanel.radAng, xMove, &outcornerPanel.posX, &outcornerPanel.posY, &outcornerPanel.posZ);
+			moveIn3D('y', outcornerPanel.radAng, yMove, &outcornerPanel.posX, &outcornerPanel.posY, &outcornerPanel.posZ);
+			moveIn3D('z', outcornerPanel.radAng, zMove, &outcornerPanel.posX, &outcornerPanel.posY, &outcornerPanel.posZ);
 
 			guid = outcornerPanel.placeObject(4,
 				"wid_s", APIParT_Length, format_string("%f", horLen).c_str(),
@@ -777,11 +831,15 @@ namespace namespaceWallTableform {
 		}
 
 		// 아웃코너앵글(L) 배치
-		API_Guid placeOutcornerAngle_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double verLen) {
+		API_Guid placeOutcornerAngle_L(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double xMove, double yMove, double zMove, double verLen) {
 			API_Guid guid;
 			EasyObjectPlacement outcornerAngle;
 
 			outcornerAngle.init(L"아웃코너앵글v1.0.gsm", layerInd_OutcornerAngle, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', outcornerAngle.radAng, xMove, &outcornerAngle.posX, &outcornerAngle.posY, &outcornerAngle.posZ);
+			moveIn3D('y', outcornerAngle.radAng, yMove, &outcornerAngle.posX, &outcornerAngle.posY, &outcornerAngle.posZ);
+			moveIn3D('z', outcornerAngle.radAng, zMove, &outcornerAngle.posX, &outcornerAngle.posY, &outcornerAngle.posZ);
 
 			outcornerAngle.radAng += DegreeToRad(180.0);
 			guid = outcornerAngle.placeObject(2,
@@ -792,11 +850,15 @@ namespace namespaceWallTableform {
 		}
 
 		// 인코너판넬(R) 배치
-		API_Guid placeIncornerPanel_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen, double horLen2, double verLen) {
+		API_Guid placeIncornerPanel_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double xMove, double yMove, double zMove, double horLen, double horLen2, double verLen) {
 			API_Guid guid;
 			EasyObjectPlacement incornerPanel;
 
 			incornerPanel.init(L"인코너판넬v1.0.gsm", layerInd_IncornerPanel, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', incornerPanel.radAng, xMove, &incornerPanel.posX, &incornerPanel.posY, &incornerPanel.posZ);
+			moveIn3D('y', incornerPanel.radAng, yMove, &incornerPanel.posX, &incornerPanel.posY, &incornerPanel.posZ);
+			moveIn3D('z', incornerPanel.radAng, zMove, &incornerPanel.posX, &incornerPanel.posY, &incornerPanel.posZ);
 
 			moveIn3D('x', incornerPanel.radAng, horLen, &incornerPanel.posX, &incornerPanel.posY, &incornerPanel.posZ);
 			incornerPanel.radAng += DegreeToRad(180.0);
@@ -812,11 +874,15 @@ namespace namespaceWallTableform {
 		}
 
 		// 아웃코너판넬(R) 배치
-		API_Guid placeOutcornerPanel_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double horLen2, double verLen) {
+		API_Guid placeOutcornerPanel_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double xMove, double yMove, double zMove, double horLen, double horLen2, double verLen) {
 			API_Guid guid;
 			EasyObjectPlacement outcornerPanel;
 
 			outcornerPanel.init(L"아웃코너판넬v1.0.gsm", layerInd_OutcornerPanel, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', outcornerPanel.radAng, xMove, &outcornerPanel.posX, &outcornerPanel.posY, &outcornerPanel.posZ);
+			moveIn3D('y', outcornerPanel.radAng, yMove, &outcornerPanel.posX, &outcornerPanel.posY, &outcornerPanel.posZ);
+			moveIn3D('z', outcornerPanel.radAng, zMove, &outcornerPanel.posX, &outcornerPanel.posY, &outcornerPanel.posZ);
 
 			moveIn3D('x', outcornerPanel.radAng, horLen, &outcornerPanel.posX, &outcornerPanel.posY, &outcornerPanel.posZ);
 			outcornerPanel.radAng += DegreeToRad(90.0);
@@ -831,11 +897,15 @@ namespace namespaceWallTableform {
 		}
 
 		// 아웃코너앵글(R) 배치
-		API_Guid placeOutcornerAngle_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double verLen) {
+		API_Guid placeOutcornerAngle_R(double leftBottomX, double leftBottomY, double leftBottomZ, double radAng, double xMove, double yMove, double zMove, double verLen) {
 			API_Guid guid;
 			EasyObjectPlacement outcornerAngle;
 
 			outcornerAngle.init(L"아웃코너앵글v1.0.gsm", layerInd_OutcornerAngle, this->floorInd, leftBottomX, leftBottomY, leftBottomZ, radAng);
+
+			moveIn3D('x', outcornerAngle.radAng, xMove, &outcornerAngle.posX, &outcornerAngle.posY, &outcornerAngle.posZ);
+			moveIn3D('y', outcornerAngle.radAng, yMove, &outcornerAngle.posX, &outcornerAngle.posY, &outcornerAngle.posZ);
+			moveIn3D('z', outcornerAngle.radAng, zMove, &outcornerAngle.posX, &outcornerAngle.posY, &outcornerAngle.posZ);
 
 			outcornerAngle.radAng += DegreeToRad(270.0);
 			guid = outcornerAngle.placeObject(2,
@@ -849,14 +919,102 @@ namespace namespaceWallTableform {
 		GS::Array<API_Guid> placeWallTableformA(Cell cell, bool bVertical, bool bFront) {
 			GS::Array<API_Guid> elemList;
 
-			// 유로폼 배치 !!!
+			// 유로폼 배치
+			double xMove = 0.0;
+			double zMove = 0.0;
+
 			for (int i = 0; i < cell.nCellsVer; i++) {
+				if (i > 0)
+					zMove += cell.cellVerLen[i - 1];
+
 				for (int j = 0; j < cell.nCellsHor; j++) {
-					elemList.Push(placeEuroform(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, cell.cellHorLen[j], cell.cellVerLen[i], bVertical, false));
+					if (j > 0)
+						xMove += cell.cellHorLen[j - 1];
+					
+					if (bFront == true)
+						elemList.Push(placeEuroform(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, xMove, 0.0, zMove, cell.cellHorLen[j], cell.cellVerLen[i], bVertical, false));
+					else
+						elemList.Push(placeEuroform(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang + DegreeToRad(180.0), xMove, 0.0, zMove, cell.cellHorLen[j], cell.cellVerLen[i], bVertical, false));
 				}
+
+				xMove = 0.0;
 			}
 
 			// 각파이프(수평) 배치
+			double pipeLength;
+			double sideMargin;
+
+			if ((int)(cell.horLen * 1000) % 100 == 0) {
+				pipeLength = cell.horLen - 0.100;
+				sideMargin = 0.050;
+			}
+			else {
+				pipeLength = cell.horLen - 0.050;
+				sideMargin = 0.025;
+			}
+
+			EasyObjectPlacement rectPipe;
+			rectPipe.init(L"비계파이프v1.0.gsm", layerInd_Rectpipe, this->floorInd, cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang);
+
+			if (bFront == true) {
+				// 아래쪽
+				moveIn3D('x', rectPipe.radAng, sideMargin, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				moveIn3D('y', rectPipe.radAng, -(0.0635 + 0.025), &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				moveIn3D('z', rectPipe.radAng, 0.450, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				elemList.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('z', rectPipe.radAng, 0.062, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				elemList.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('z', rectPipe.radAng, -0.031 - 0.450, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+
+				// 가운데
+				for (int i = 0; i < cell.nCellsVer - 1; i++) {
+					if (cell.cellVerLen[i] > 0) {
+						moveIn3D('z', rectPipe.radAng, cell.cellVerLen[i], &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+
+						moveIn3D('z', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+						elemList.Push(rectPipe.placeObject(4,
+							"p_comp", APIParT_CString, "사각파이프",
+							"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+							"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+							"bPunching", APIParT_Boolean, "0.0"));
+						moveIn3D('z', rectPipe.radAng, 0.062, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+						elemList.Push(rectPipe.placeObject(4,
+							"p_comp", APIParT_CString, "사각파이프",
+							"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+							"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+							"bPunching", APIParT_Boolean, "0.0"));
+						moveIn3D('z', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+					}
+				}
+
+				// 상부
+				moveIn3D('z', rectPipe.radAng, cell.cellVerLen[cell.nCellsVer - 1] - 0.150, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+
+				moveIn3D('z', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);	// 상부
+				elemList_Front.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('z', rectPipe.radAng, 0.062, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				elemList_Front.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('z', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+			}
+			else {
+				// ...
+			}
 
 			// 각파이프(수직) 배치
 
@@ -909,7 +1067,31 @@ namespace namespaceWallTableform {
 
 		// 기본 셀 배치하기
 		void placeCells() {
-			// ... 모든 셀 순회하기 (양면이면 앞뒤로 순회, 단면이면 앞면만 순회)
+			GS::Array<API_Guid> guidsInTableform;
+
+			for (int i = 0; i < this->nCellsHor; i++) {
+				// 앞면 셀 배치
+				if (this->cellsBasic[i].objType == OBJ_WALL_TABLEFORM_A)
+					guidsInTableform = placeWallTableformA(this->cellsBasic[i], this->bVertical, true);
+				// ... 다른 유형들 추가
+
+				// 앞면 그룹화
+				while (!guidsInTableform.IsEmpty())
+					elemList_Front.Push(guidsInTableform.Pop());
+				groupElements(elemList_Front);
+				elemList_Front.Clear();
+
+				// 뒷면 셀 배치
+				if (this->cellsExtra[i].objType == OBJ_WALL_TABLEFORM_A)
+					guidsInTableform = placeWallTableformA(this->cellsExtra[i], this->bVertical, false);
+				// ... 다른 유형들 추가
+
+				// 뒷면 그룹화
+				while (!guidsInTableform.IsEmpty())
+					elemList_Back.Push(guidsInTableform.Pop());
+				groupElements(elemList_Back);
+				elemList_Back.Clear();
+			}
 		}
 
 		// 여백 셀 배치하기
@@ -932,11 +1114,6 @@ namespace namespaceWallTableform {
 	InfoWall infoWall;				// 벽 객체 정보
 	insulationElement insulElem;	// 단열재 정보
 	API_Guid structuralObject;		// 구조 객체의 GUID
-
-	GS::Array<API_Guid> elemList_Front;
-	GS::Array<API_Guid> elemList_Back;
-	GS::Array<API_Guid> elemList_Margin_Front;
-	GS::Array<API_Guid> elemList_Margin_Back;
 
 	// 항목 인덱스 (1차 다이얼로그)
 	short GRID_START_INDEX;						// 그리드
@@ -1674,19 +1851,26 @@ namespace namespaceWallTableform {
 
 			// 배치 정보 저장
 			for (int i = 0; i < placingZone.nCellsHor; i++) {
-				placingZone.cellsBasic[i].horLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i);
+				if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1)
+					placingZone.cellsBasic[i].horLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i);
+				else
+					placingZone.cellsExtra[i].horLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_WIDTH_START_INDEX + i);
 			}
 
 			if (item == RADIOBUTTON_SHOW_FRONT || item == RADIOBUTTON_SHOW_BACK) {
 				// 앞면/뒷면을 선택하는 순간
 				if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1) {
 					for (int i = 0; i < MAX_COL; i++) {
-						placingZone.cellsExtra[i].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
+						for (int j = 0; j < placingZone.nCellsVerExtra; j++) {
+							placingZone.cellsExtra[i].cellVerLen[j] = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + j);
+						}
 					}
 				}
 				else {
 					for (int i = 0; i < MAX_COL; i++) {
-						placingZone.cellsBasic[i].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
+						for (int j = 0; j < placingZone.nCellsVerBasic; j++) {
+							placingZone.cellsBasic[i].cellVerLen[j] = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + j);
+						}
 					}
 				}
 			}
@@ -1694,12 +1878,16 @@ namespace namespaceWallTableform {
 				// 그 외의 경우
 				if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1) {
 					for (int i = 0; i < MAX_COL; i++) {
-						placingZone.cellsBasic[i].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
+						for (int j = 0; j < placingZone.nCellsVerBasic; j++) {
+							placingZone.cellsBasic[i].cellVerLen[j] = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + j);
+						}
 					}
 				}
 				else {
 					for (int i = 0; i < MAX_COL; i++) {
-						placingZone.cellsExtra[i].verLen = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + i);
+						for (int j = 0; j < placingZone.nCellsVerExtra; j++) {
+							placingZone.cellsExtra[i].cellVerLen[j] = DGGetItemValDouble(dialogID, EDITCONTROL_OBJ_HEIGHT_START_INDEX + j);
+						}
 					}
 				}
 			}
@@ -1849,6 +2037,42 @@ namespace namespaceWallTableform {
 			else
 				nCellsVer = placingZone.nCellsVerExtra;
 
+			// 열 추가 버튼
+			if (item == BUTTON_ADD_COLUMN) {
+				item = 0;
+				placingZone.nCellsHor++;
+			}
+
+			// 열 삭제 버튼
+			if (item == BUTTON_DEL_COLUMN) {
+				item = 0;
+				placingZone.nCellsHor--;
+			}
+
+			// 행 추가 버튼
+			if (item == BUTTON_ADD_ROW) {
+				item = 0;
+
+				if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1)
+					placingZone.nCellsVerBasic++;
+				else
+					placingZone.nCellsVerExtra++;
+
+				nCellsVer++;
+			}
+
+			// 행 삭제 버튼
+			if (item == BUTTON_DEL_ROW) {
+				item = 0;
+
+				if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1)
+					placingZone.nCellsVerBasic--;
+				else
+					placingZone.nCellsVerExtra--;
+
+				nCellsVer--;
+			}
+
 			if (item == DG_OK) {
 				// 배치면
 				if (DGGetItemValLong(dialogID, RADIOBUTTON_SINGLE_SIDE) == 1)
@@ -1897,43 +2121,7 @@ namespace namespaceWallTableform {
 
 				break;
 			}
-			
-			// 열 추가 버튼
-			if (item == BUTTON_ADD_COLUMN) {
-				item = 0;
-				placingZone.nCellsHor++;
-			}
-			
-			// 열 삭제 버튼
-			if (item == BUTTON_DEL_COLUMN) {
-				item = 0;
-				placingZone.nCellsHor--;
-			}
-			
-			// 행 추가 버튼
-			if (item == BUTTON_ADD_ROW) {
-				item = 0;
-
-				if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1)
-					placingZone.nCellsVerBasic++;
-				else
-					placingZone.nCellsVerExtra++;
-
-				nCellsVer++;
-			}
-			
-			// 행 삭제 버튼
-			if (item == BUTTON_DEL_ROW) {
-				item = 0;
-
-				if (DGGetItemValLong(dialogID, RADIOBUTTON_SHOW_FRONT) == 1)
-					placingZone.nCellsVerBasic--;
-				else
-					placingZone.nCellsVerExtra--;
-
-				nCellsVer--;
-			}
-			
+						
 			// 객체 타입 버튼 (UI 창 표시)
 			for (int i = BUTTON_OBJ_TYPE_START_INDEX; i < BUTTON_OBJ_TYPE_START_INDEX + placingZone.nCellsHor; i++) {
 				if (item == i) {
@@ -3328,11 +3516,9 @@ GSErrCode	placeWallTableform(void)
 	// 배치 정보 위치 정렬
 	placingZone.alignPositions();
 
-	// !!!
-	placingZone.placeWallTableformA(placingZone.cellsBasic[0], true, true);
-
-	//placingZone.placeCells();
 	// 1단계 다이얼로그 기반으로 객체 배치
+	placingZone.placeCells();
+
 	// 상단 여백 채우기 (낮은쪽) bFrontTopMarginFill
 	// 상단 여백 채우기 (높은쪽) bBackTopMarginFill
 	// 단열재 채우기 bInsulationFill
