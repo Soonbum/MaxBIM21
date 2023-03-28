@@ -1003,10 +1003,9 @@ namespace namespaceWallTableform {
 						moveIn3D('z', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
 					}
 				}
-
-				// 위
 				moveIn3D('z', rectPipe.radAng, cell.cellVerLen[cell.nCellsVer - 1] - 0.150, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
 
+				// 위
 				moveIn3D('z', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);	// 상부
 				elemList.Push(rectPipe.placeObject(4,
 					"p_comp", APIParT_CString, "사각파이프",
@@ -1842,16 +1841,684 @@ namespace namespaceWallTableform {
 			// 수평 방향 테이블폼
 			else {
 				// 각파이프(수직) 배치
+				if ((int)(cellsHeight * 1000) % 100 == 0) {
+					pipeLength = cellsHeight - 0.100;
+					sideMargin = 0.050;
+				}
+				else {
+					pipeLength = cellsHeight - 0.050;
+					sideMargin = 0.025;
+				}
+
+				EasyObjectPlacement rectPipe;
+				rectPipe.init(L"비계파이프v1.0.gsm", layerInd_Rectpipe, this->floorInd, cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang);
+
+				// 아래
+				moveIn3D('z', rectPipe.radAng, sideMargin, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				moveIn3D('y', rectPipe.radAng, -(0.0635 + 0.025), &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				moveIn3D('x', rectPipe.radAng, 0.150, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+
+				moveIn3D('x', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				elemList.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('x', rectPipe.radAng, 0.062, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				elemList.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('x', rectPipe.radAng, -0.031 - 0.150, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+
+				// 가운데
+				for (int i = 0; i < cell.nCellsHor - 1; i++) {
+					if (cell.cellHorLen[i] > 0) {
+						moveIn3D('x', rectPipe.radAng, cell.cellHorLen[i], &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+
+						moveIn3D('x', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+						elemList.Push(rectPipe.placeObject(4,
+							"p_comp", APIParT_CString, "사각파이프",
+							"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+							"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+							"bPunching", APIParT_Boolean, "0.0"));
+						moveIn3D('x', rectPipe.radAng, 0.062, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+						elemList.Push(rectPipe.placeObject(4,
+							"p_comp", APIParT_CString, "사각파이프",
+							"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+							"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+							"bPunching", APIParT_Boolean, "0.0"));
+						moveIn3D('x', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+					}
+				}
+				moveIn3D('x', rectPipe.radAng, cell.cellHorLen[cell.nCellsHor - 1] - 0.150, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+
+				// 위
+				moveIn3D('x', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				elemList.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('x', rectPipe.radAng, 0.062, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				elemList.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('x', rectPipe.radAng, -0.031, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
 
 				// 각파이프(수평) 배치
+				if ((int)(cell.horLen * 1000) % 100 == 0) {
+					pipeLength = cell.horLen - 0.100;
+					sideMargin = 0.050;
+				}
+				else {
+					pipeLength = cell.horLen - 0.050;
+					sideMargin = 0.025;
+				}
+
+				rectPipe.init(L"비계파이프v1.0.gsm", layerInd_Rectpipe, this->floorInd, cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang);
+
+				moveIn3D('z', rectPipe.radAng, (cellsHeight - cell.cellVerLen[cell.nCellsVer - 1]) + 0.150, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				moveIn3D('y', rectPipe.radAng, -(0.0635 + 0.075), &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				moveIn3D('x', rectPipe.radAng, sideMargin, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+
+				moveIn3D('z', rectPipe.radAng, 0.035, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);		// 왼쪽
+				elemList.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('z', rectPipe.radAng, -0.070, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				elemList.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('z', rectPipe.radAng, 0.035 - 0.150 + cell.cellVerLen[cell.nCellsVer - 1], &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+
+				moveIn3D('z', rectPipe.radAng, (-cellsHeight + cell.cellVerLen[0]) - 0.150, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				moveIn3D('z', rectPipe.radAng, 0.035, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);		// 오른쪽
+				elemList.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
+				moveIn3D('z', rectPipe.radAng, -0.070, &rectPipe.posX, &rectPipe.posY, &rectPipe.posZ);
+				elemList.Push(rectPipe.placeObject(4,
+					"p_comp", APIParT_CString, "사각파이프",
+					"p_leng", APIParT_Length, format_string("%f", pipeLength).c_str(),
+					"p_ang", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"bPunching", APIParT_Boolean, "0.0"));
 
 				// 핀볼트 배치
+				EasyObjectPlacement pinbolt;
+				pinbolt.init(L("핀볼트세트v1.0.gsm"), layerInd_Pinbolt, this->floorInd, cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang);
+
+				moveIn3D('y', pinbolt.radAng, -0.1635, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+				moveIn3D('x', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+
+				int count = cell.nCellsVer - 1;
+				for (int i = 0; i < cell.nCellsVer - 1; i++) {	// 아래
+					if (cell.cellVerLen[i] > EPS) {
+						moveIn3D('z', pinbolt.radAng, cell.cellVerLen[i], &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+						if (count > 0) {
+							pinbolt.radAng += DegreeToRad(90.0);
+							elemList.Push(pinbolt.placeObject(7,
+								"bRotated", APIParT_Boolean, "1.0",
+								"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+								"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+								"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+								"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+								"angX", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+								"angY", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str()));
+							pinbolt.radAng -= DegreeToRad(90.0);
+
+							--count;
+						}
+					}
+				}
+
+				pinbolt.init(L("핀볼트세트v1.0.gsm"), layerInd_Pinbolt, this->floorInd, cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang);
+
+				moveIn3D('y', pinbolt.radAng, -0.1635, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+
+				for (int i = 0; i < cell.nCellsHor - 1; i++) {		// 가운데
+					if (cell.cellHorLen[i] > EPS) {
+						moveIn3D('x', pinbolt.radAng, cell.cellHorLen[i], &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+
+						count = cell.nCellsVer;
+						for (int j = 0; j < cell.nCellsVer; j++) {
+							if (cell.cellVerLen[j] > EPS) {
+								if (count > 0) {
+									if (count == cell.nCellsVer) {
+										// 우측
+										if (abs(cell.cellVerLen[j] - 0.600) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.300, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.500) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.200, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.450) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.400) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.100, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.300) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.200) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+									}
+									else if (count == 1) {
+										// 좌측
+										if (abs(cell.cellVerLen[j] - 0.600) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.300, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.500) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.200, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.450) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.400) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.100, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.300) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.200) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('y', pinbolt.radAng, -0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('y', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											moveIn3D('z', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+									}
+									else {
+										// 나머지
+										if (abs(cell.cellVerLen[j] - 0.600) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.300, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.500) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.200, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.450) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.400) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.100, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.200, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.100, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.300) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+										else if (abs(cell.cellVerLen[j] - 0.200) < EPS) {
+											moveIn3D('z', pinbolt.radAng, 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+											elemList.Push(pinbolt.placeObject(7,
+												"bRotated", APIParT_Boolean, "1.0",
+												"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+												"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+												"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+												"angX", APIParT_Angle, format_string("%f", DegreeToRad(270.0)).c_str(),
+												"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+											moveIn3D('z', pinbolt.radAng, 0.050, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+										}
+									}
+
+									--count;
+								}
+							}
+						}
+						moveIn3D('z', pinbolt.radAng, -cellsHeight, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+					}
+				}
+
+				pinbolt.init(L("핀볼트세트v1.0.gsm"), layerInd_Pinbolt, this->floorInd, cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang);
+
+				moveIn3D('y', pinbolt.radAng, -0.1635, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+				moveIn3D('x', pinbolt.radAng, cell.horLen - 0.150, &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+
+				count = cell.nCellsVer - 1;
+				for (int i = 0; i < cell.nCellsVer - 1; i++) {	// 위
+					if (cell.cellVerLen[i] > EPS) {
+						moveIn3D('z', pinbolt.radAng, cell.cellVerLen[i], &pinbolt.posX, &pinbolt.posY, &pinbolt.posZ);
+						if (count > 0) {
+							pinbolt.radAng += DegreeToRad(90.0);
+							elemList.Push(pinbolt.placeObject(7,
+								"bRotated", APIParT_Boolean, "1.0",
+								"bolt_len", APIParT_Length, format_string("%f", 0.100).c_str(),
+								"bolt_dia", APIParT_Length, format_string("%f", 0.010).c_str(),
+								"washer_pos", APIParT_Length, format_string("%f", 0.050).c_str(),
+								"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+								"angX", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+								"angY", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str()));
+							pinbolt.radAng -= DegreeToRad(90.0);
+
+							--count;
+						}
+					}
+				}
 
 				// 결합철물 배치
+				EasyObjectPlacement join;
+				join.init(L("결합철물 (사각와셔활용) v1.0.gsm"), layerInd_Join, this->floorInd, cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang);
+
+				moveIn3D('z', join.radAng, cell.cellVerLen[0] - 0.150, &join.posX, &join.posY, &join.posZ);
+				moveIn3D('y', join.radAng, -0.1815, &join.posX, &join.posY, &join.posZ);
+				moveIn3D('x', join.radAng, 0.150, &join.posX, &join.posY, &join.posZ);
+
+				elemList.Push(join.placeObject(11,
+					"bRotated", APIParT_Boolean, "1.0",
+					"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+					"bolt_dia", APIParT_Length, format_string("%f", 0.012).c_str(),
+					"bWasher1", APIParT_Boolean, "1.0",
+					"washer_pos1", APIParT_Length, format_string("%f", 0.000).c_str(),
+					"bWasher2", APIParT_Boolean, "1.0",
+					"washer_pos2", APIParT_Length, format_string("%f", 0.108).c_str(),
+					"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+					"nutType", APIParT_CString, "육각너트",
+					"angX", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+				moveIn3D('z', join.radAng, (0.150 - cell.cellVerLen[0] + cellsHeight - cell.cellVerLen[cell.nCellsVer - 1] + 0.150), &join.posX, &join.posY, &join.posZ);
+				elemList.Push(join.placeObject(11,
+					"bRotated", APIParT_Boolean, "1.0",
+					"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+					"bolt_dia", APIParT_Length, format_string("%f", 0.012).c_str(),
+					"bWasher1", APIParT_Boolean, "1.0",
+					"washer_pos1", APIParT_Length, format_string("%f", 0.000).c_str(),
+					"bWasher2", APIParT_Boolean, "1.0",
+					"washer_pos2", APIParT_Length, format_string("%f", 0.108).c_str(),
+					"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+					"nutType", APIParT_CString, "육각너트",
+					"angX", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+
+				join.init(L("결합철물 (사각와셔활용) v1.0.gsm"), layerInd_Join, this->floorInd, cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang);
+
+				moveIn3D('z', join.radAng, cell.cellVerLen[0] - 0.150, &join.posX, &join.posY, &join.posZ);
+				moveIn3D('y', join.radAng, -0.1815, &join.posX, &join.posY, &join.posZ);
+				moveIn3D('x', join.radAng, cell.horLen - 0.150, &join.posX, &join.posY, &join.posZ);
+
+				elemList.Push(join.placeObject(11,
+					"bRotated", APIParT_Boolean, "1.0",
+					"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+					"bolt_dia", APIParT_Length, format_string("%f", 0.012).c_str(),
+					"bWasher1", APIParT_Boolean, "1.0",
+					"washer_pos1", APIParT_Length, format_string("%f", 0.000).c_str(),
+					"bWasher2", APIParT_Boolean, "1.0",
+					"washer_pos2", APIParT_Length, format_string("%f", 0.108).c_str(),
+					"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+					"nutType", APIParT_CString, "육각너트",
+					"angX", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
+				moveIn3D('z', join.radAng, (0.150 - cell.cellVerLen[0] + cellsHeight - cell.cellVerLen[cell.nCellsVer - 1] + 0.150), &join.posX, &join.posY, &join.posZ);
+				elemList.Push(join.placeObject(11,
+					"bRotated", APIParT_Boolean, "1.0",
+					"bolt_len", APIParT_Length, format_string("%f", 0.150).c_str(),
+					"bolt_dia", APIParT_Length, format_string("%f", 0.012).c_str(),
+					"bWasher1", APIParT_Boolean, "1.0",
+					"washer_pos1", APIParT_Length, format_string("%f", 0.000).c_str(),
+					"bWasher2", APIParT_Boolean, "1.0",
+					"washer_pos2", APIParT_Length, format_string("%f", 0.108).c_str(),
+					"washer_size", APIParT_Length, format_string("%f", 0.100).c_str(),
+					"nutType", APIParT_CString, "육각너트",
+					"angX", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str()));
 
 				// 헤드피스 배치
+				EasyObjectPlacement headpiece;
+				headpiece.init(L("RS Push-Pull Props 헤드피스 v2.0 (인양고리 포함).gsm"), layerInd_Headpiece, this->floorInd, cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang);
+
+				moveIn3D('z', headpiece.radAng, cell.cellVerLen[0] - 0.150 + 0.100, &headpiece.posX, &headpiece.posY, &headpiece.posZ);
+				moveIn3D('y', headpiece.radAng, -0.1725, &headpiece.posX, &headpiece.posY, &headpiece.posZ);
+				moveIn3D('x', headpiece.radAng, 0.300, &headpiece.posX, &headpiece.posY, &headpiece.posZ);
+
+				elemList.Push(headpiece.placeObject(4,
+					"type", APIParT_CString, "타입 B",
+					"plateThk", APIParT_Length, format_string("%f", 0.009).c_str(),
+					"angX", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"angY", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str()));
+				moveIn3D('z', headpiece.radAng, -(cell.cellVerLen[0] - 0.150) + cellsHeight + (-cell.cellVerLen[cell.nCellsVer - 1] + 0.150), &headpiece.posX, &headpiece.posY, &headpiece.posZ);
+				elemList.Push(headpiece.placeObject(4,
+					"type", APIParT_CString, "타입 B",
+					"plateThk", APIParT_Length, format_string("%f", 0.009).c_str(),
+					"angX", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"angY", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str()));
+
+				headpiece.init(L("RS Push-Pull Props 헤드피스 v2.0 (인양고리 포함).gsm"), layerInd_Headpiece, this->floorInd, cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang);
+
+				if (cell.horLen >= 5.300 - EPS) {
+					headpieceUpPosZ = 2.500;
+				}
+				else if (cell.horLen >= 4.600 - EPS) {
+					headpieceUpPosZ = 2.500;
+				}
+				else if (cell.horLen >= 3.500 - EPS) {
+					headpieceUpPosZ = 2.500;
+				}
+				else if (cell.horLen >= 3.000 - EPS) {
+					headpieceUpPosZ = 2.200;
+				}
+				else if (cell.horLen >= 2.500 - EPS) {
+					headpieceUpPosZ = 1.900;
+				}
+				else if (cell.horLen >= 2.000 - EPS) {
+					headpieceUpPosZ = 1.500;
+				}
+				else if (cell.horLen >= 1.500 - EPS) {
+					headpieceUpPosZ = 1.100;
+				}
+				else if (cell.horLen >= 1.000 - EPS) {
+					headpieceUpPosZ = 0.800;
+				}
+				else {
+					headpieceUpPosZ = 0.150;
+				}
+
+				moveIn3D('z', headpiece.radAng, cell.cellVerLen[0] - 0.150 + 0.100, &headpiece.posX, &headpiece.posY, &headpiece.posZ);
+				moveIn3D('y', headpiece.radAng, -0.1725, &headpiece.posX, &headpiece.posY, &headpiece.posZ);
+				moveIn3D('x', headpiece.radAng, headpieceUpPosZ, &headpiece.posX, &headpiece.posY, &headpiece.posZ);
+
+				elemList.Push(headpiece.placeObject(4,
+					"type", APIParT_CString, "타입 B",
+					"plateThk", APIParT_Length, format_string("%f", 0.009).c_str(),
+					"angX", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"angY", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str()));
+				moveIn3D('z', headpiece.radAng, -(cell.cellVerLen[0] - 0.150) + cellsHeight + (-cell.cellVerLen[cell.nCellsVer - 1] + 0.150), &headpiece.posX, &headpiece.posY, &headpiece.posZ);
+				elemList.Push(headpiece.placeObject(4,
+					"type", APIParT_CString, "타입 B",
+					"plateThk", APIParT_Length, format_string("%f", 0.009).c_str(),
+					"angX", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"angY", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str()));
 
 				// Push-Pull Props 배치
+				// !!! 아직 구현하지 않음
 			}
 
 			return elemList;
@@ -1859,11 +2526,42 @@ namespace namespaceWallTableform {
 
 		// 테이블폼 타입B 배치 (각파이프 1줄)
 		GS::Array<API_Guid> placeWallTableformB(Cell cell, bool bVertical) {
-			// 유로폼 배치
+			GS::Array<API_Guid> elemList;
+
+			// 테이블폼 총 높이
+			double cellsHeight = 0.0;
+			for (int i = 0; i < cell.nCellsVer; i++)
+				cellsHeight += cell.cellVerLen[i];
+
+			// 파이프 길이 및 여백 길이
+			double pipeLength;
+			double sideMargin;
+
+			// 헤드피스 고도
+			double headpieceUpPosZ;
+
+			// 유로폼 배치 (수직/수평 공통)
+			double xMove = 0.0;
+			double zMove = 0.0;
+
+			for (int i = 0; i < cell.nCellsVer; i++) {
+				if (i > 0)
+					zMove += cell.cellVerLen[i - 1];
+
+				for (int j = 0; j < cell.nCellsHor; j++) {
+					if (j > 0)
+						xMove += cell.cellHorLen[j - 1];
+
+					elemList.Push(placeEuroform(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, xMove, 0.0, zMove, cell.cellHorLen[j], cell.cellVerLen[i], bVertical, false));
+				}
+
+				xMove = 0.0;
+			}
 
 			// 수직 방향 테이블폼
 			if (bVertical == true) {
 				// 각파이프(수평) 배치
+				// !!!
 
 				// 각파이프(수직) 배치
 
@@ -1892,11 +2590,42 @@ namespace namespaceWallTableform {
 
 		// 테이블폼 타입C 배치 (각파이프 1줄, 십자 조인트 바 활용)
 		GS::Array<API_Guid> placeWallTableformC(Cell cell, bool bVertical) {
-			// 유로폼 배치
+			GS::Array<API_Guid> elemList;
+
+			// 테이블폼 총 높이
+			double cellsHeight = 0.0;
+			for (int i = 0; i < cell.nCellsVer; i++)
+				cellsHeight += cell.cellVerLen[i];
+
+			// 파이프 길이 및 여백 길이
+			double pipeLength;
+			double sideMargin;
+
+			// 헤드피스 고도
+			double headpieceUpPosZ;
+
+			// 유로폼 배치 (수직/수평 공통)
+			double xMove = 0.0;
+			double zMove = 0.0;
+
+			for (int i = 0; i < cell.nCellsVer; i++) {
+				if (i > 0)
+					zMove += cell.cellVerLen[i - 1];
+
+				for (int j = 0; j < cell.nCellsHor; j++) {
+					if (j > 0)
+						xMove += cell.cellHorLen[j - 1];
+
+					elemList.Push(placeEuroform(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, xMove, 0.0, zMove, cell.cellHorLen[j], cell.cellVerLen[i], bVertical, false));
+				}
+
+				xMove = 0.0;
+			}
 
 			// 수직 방향 테이블폼
 			if (bVertical == true) {
 				// 십자 조인트 바 배치
+				// !!!
 
 				// 각파이프(수평) 배치
 
@@ -1944,15 +2673,17 @@ namespace namespaceWallTableform {
 				elemList_Front.Clear();
 
 				// 뒷면 셀 배치
-				if (this->cellsExtra[i].objType == OBJ_WALL_TABLEFORM_A)
-					guidsInTableform = placeWallTableformA(this->cellsExtra[i], this->bVertical);
-				// ... 다른 유형들 추가
+				if (this->bSingleSide == false) {
+					if (this->cellsExtra[i].objType == OBJ_WALL_TABLEFORM_A)
+						guidsInTableform = placeWallTableformA(this->cellsExtra[i], this->bVertical);
+					// ... 다른 유형들 추가
 
-				// 뒷면 그룹화
-				while (!guidsInTableform.IsEmpty())
-					elemList_Back.Push(guidsInTableform.Pop());
-				groupElements(elemList_Back);
-				elemList_Back.Clear();
+					// 뒷면 그룹화
+					while (!guidsInTableform.IsEmpty())
+						elemList_Back.Push(guidsInTableform.Pop());
+					groupElements(elemList_Back);
+					elemList_Back.Clear();
+				}
 			}
 		}
 
