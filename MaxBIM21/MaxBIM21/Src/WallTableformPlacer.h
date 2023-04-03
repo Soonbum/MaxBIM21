@@ -131,6 +131,16 @@ namespace namespaceWallTableform {
 	GS::Array<API_Guid> elemList_Margin_Front;
 	GS::Array<API_Guid> elemList_Margin_Back;
 
+	// 단열재
+	struct insulationElement
+	{
+		short	layerInd;		// 레이어 인덱스
+		double	thk;			// 두께
+		bool	bLimitSize;		// 가로/세로 크기 제한
+		double	maxHorLen;		// 가로 최대 길이
+		double	maxVerLen;		// 세로 최대 길이
+	};
+
 	struct Cell
 	{
 		double	leftBottomX;	// 좌하단 좌표 X
@@ -4787,20 +4797,32 @@ namespace namespaceWallTableform {
 			for (int i = 0; i < cell.nCellsVer; i++)
 				cellsHeight += cell.cellVerLen[i];
 
-			// !!! 가로이면 높이 2400까지, 세로이면 높이 1200까지
+			double remainLength = cellsHeight;
+			double maxLength;
+			double currentLength;
 
-			for (int i = 0; i < cell.nCellsVer; i++) {
-				if (i > 0)
-					zMove += cell.cellVerLen[i - 1];
+			if (bVertical == true)
+				maxLength = 2.400;
+			else
+				maxLength = 1.200;
 
-				elemList.Push(placePlywood(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, cell.horLen, cell.cellVerLen[i], bVertical, false));
+			while (remainLength > EPS) {
+				if (remainLength > maxLength - EPS)
+					currentLength = maxLength;
+				else
+					currentLength = remainLength;
+
+				elemList.Push(placePlywood(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, cell.horLen, currentLength, bVertical, false));
+				zMove += currentLength;
+
+				remainLength -= currentLength;
 			}
 
 			return elemList;
 		}
 
 		// 각재 배치
-		GS::Array<API_Guid> placeTimbers(Cell cell, bool bVertical) {
+		GS::Array<API_Guid> placeTimbers(Cell cell) {
 			GS::Array<API_Guid> elemList;
 
 			double zMove = 0.0;
@@ -4809,25 +4831,183 @@ namespace namespaceWallTableform {
 			for (int i = 0; i < cell.nCellsVer; i++)
 				cellsHeight += cell.cellVerLen[i];
 
-			// !!! 높이 3600까지
+			double remainLength = cellsHeight;
+			double maxLength;
+			double currentLength;
 
-			for (int i = 0; i < cell.nCellsVer; i++) {
-				if (i > 0)
-					zMove += cell.cellVerLen[i - 1];
+			maxLength = 3.600;
 
-				elemList.Push(placeTimber(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, cell.horLen, cell.cellVerLen[i], true, false));
+			while (remainLength > EPS) {
+				if (remainLength > maxLength - EPS)
+					currentLength = maxLength;
+				else
+					currentLength = remainLength;
+
+				elemList.Push(placeTimber(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, cell.horLen, currentLength, true, false));
+				zMove += currentLength;
+
+				remainLength -= currentLength;
 			}
 
 			return elemList;
 		}
 		
 		// 휠러스페이서 배치
+		GS::Array<API_Guid> placeFillerspacers(Cell cell) {
+			GS::Array<API_Guid> elemList;
+
+			double zMove = 0.0;
+
+			double cellsHeight = 0.0;
+			for (int i = 0; i < cell.nCellsVer; i++)
+				cellsHeight += cell.cellVerLen[i];
+
+			double remainLength = cellsHeight;
+			double maxLength;
+			double currentLength;
+
+			maxLength = 2.400;
+
+			while (remainLength > EPS) {
+				if (remainLength > maxLength - EPS)
+					currentLength = maxLength;
+				else
+					currentLength = remainLength;
+
+				elemList.Push(placeFillerspacer(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, cell.horLen, currentLength, true, false));
+				zMove += currentLength;
+
+				remainLength -= currentLength;
+			}
+
+			return elemList;
+		}
+
 		// 인코너판넬(L) 배치
+		GS::Array<API_Guid> placeIncornerPanel_Ls(Cell cell) {
+			GS::Array<API_Guid> elemList;
+
+			double zMove = 0.0;
+
+			for (int i = 0; i < cell.nCellsVer; i++) {
+				if (i > 0)
+					zMove += cell.cellVerLen[i - 1];
+
+				elemList.Push(placeIncornerPanel_L(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, cell.horLen, 0.100, cell.cellVerLen[i]));
+			}
+
+			return elemList;
+		}
+
 		// 아웃코너판넬(L) 배치
+		GS::Array<API_Guid> placeOutcornerPanel_Ls(Cell cell) {
+			GS::Array<API_Guid> elemList;
+
+			double zMove = 0.0;
+
+			for (int i = 0; i < cell.nCellsVer; i++) {
+				if (i > 0)
+					zMove += cell.cellVerLen[i - 1];
+
+				elemList.Push(placeOutcornerPanel_L(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, cell.horLen, 0.100, cell.cellVerLen[i]));
+			}
+
+			return elemList;
+		}
+
 		// 아웃코너앵글(L) 배치
+		GS::Array<API_Guid> placeOutcornerAngle_Ls(Cell cell) {
+			GS::Array<API_Guid> elemList;
+
+			double zMove = 0.0;
+
+			double cellsHeight = 0.0;
+			for (int i = 0; i < cell.nCellsVer; i++)
+				cellsHeight += cell.cellVerLen[i];
+
+			double remainLength = cellsHeight;
+			double maxLength;
+			double currentLength;
+
+			maxLength = 2.400;
+
+			while (remainLength > EPS) {
+				if (remainLength > maxLength - EPS)
+					currentLength = maxLength;
+				else
+					currentLength = remainLength;
+
+				elemList.Push(placeOutcornerAngle_L(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, currentLength));
+				zMove += currentLength;
+
+				remainLength -= currentLength;
+			}
+
+			return elemList;
+		}
+
 		// 인코너판넬(R) 배치
+		GS::Array<API_Guid> placeIncornerPanel_Rs(Cell cell) {
+			GS::Array<API_Guid> elemList;
+
+			double zMove = 0.0;
+
+			for (int i = 0; i < cell.nCellsVer; i++) {
+				if (i > 0)
+					zMove += cell.cellVerLen[i - 1];
+
+				elemList.Push(placeIncornerPanel_R(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, cell.horLen, 0.100, cell.cellVerLen[i]));
+			}
+
+			return elemList;
+		}
+
 		// 아웃코너판넬(R) 배치
+		GS::Array<API_Guid> placeOutcornerPanel_Rs(Cell cell) {
+			GS::Array<API_Guid> elemList;
+
+			double zMove = 0.0;
+
+			for (int i = 0; i < cell.nCellsVer; i++) {
+				if (i > 0)
+					zMove += cell.cellVerLen[i - 1];
+
+				elemList.Push(placeOutcornerPanel_R(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, cell.horLen, 0.100, cell.cellVerLen[i]));
+			}
+
+			return elemList;
+		}
+
 		// 아웃코너앵글(R) 배치
+		GS::Array<API_Guid> placeOutcornerAngle_Rs(Cell cell) {
+			GS::Array<API_Guid> elemList;
+
+			double zMove = 0.0;
+
+			double cellsHeight = 0.0;
+			for (int i = 0; i < cell.nCellsVer; i++)
+				cellsHeight += cell.cellVerLen[i];
+
+			double remainLength = cellsHeight;
+			double maxLength;
+			double currentLength;
+
+			maxLength = 2.400;
+
+			while (remainLength > EPS) {
+				if (remainLength > maxLength - EPS)
+					currentLength = maxLength;
+				else
+					currentLength = remainLength;
+
+				elemList.Push(placeOutcornerAngle_R(cell.leftBottomX, cell.leftBottomY, cell.leftBottomZ, cell.ang, 0.0, 0.0, zMove, currentLength));
+				zMove += currentLength;
+
+				remainLength -= currentLength;
+			}
+
+			return elemList;
+		}
 
 		// 기본 셀 배치하기
 		void placeCells() {
@@ -4846,14 +5026,21 @@ namespace namespaceWallTableform {
 				else if (this->cellsBasic[i].objType == OBJ_PLYWOOD)
 					guidsInTableform = placePlywoods(this->cellsBasic[i], this->bVertical);
 				else if (this->cellsBasic[i].objType == OBJ_TIMBER)
-					guidsInTableform = placeTimbers(this->cellsBasic[i], this->bVertical);
-				// 휠러스페이서 ...
-				// 인코너판넬(L) ...
-				// 아웃코너판넬(L) ...
-				// 아웃코너앵글(L) ...
-				// 인코너판넬(R) ...
-				// 아웃코너판넬(R) ...
-				// 아웃코너앵글(R) ...
+					guidsInTableform = placeTimbers(this->cellsBasic[i]);
+				else if (this->cellsBasic[i].objType == OBJ_FILLERSPACER)
+					guidsInTableform = placeFillerspacers(this->cellsBasic[i]);
+				else if (this->cellsBasic[i].objType == OBJ_INCORNER_PANEL_L)
+					guidsInTableform = placeIncornerPanel_Ls(this->cellsBasic[i]);
+				else if (this->cellsBasic[i].objType == OBJ_OUTCORNER_PANEL_L)
+					guidsInTableform = placeOutcornerPanel_Ls(this->cellsBasic[i]);
+				else if (this->cellsBasic[i].objType == OBJ_OUTCORNER_ANGLE_L)
+					guidsInTableform = placeOutcornerAngle_Ls(this->cellsBasic[i]);
+				else if (this->cellsBasic[i].objType == OBJ_INCORNER_PANEL_R)
+					guidsInTableform = placeIncornerPanel_Rs(this->cellsBasic[i]);
+				else if (this->cellsBasic[i].objType == OBJ_OUTCORNER_PANEL_R)
+					guidsInTableform = placeOutcornerPanel_Rs(this->cellsBasic[i]);
+				else if (this->cellsBasic[i].objType == OBJ_OUTCORNER_ANGLE_R)
+					guidsInTableform = placeOutcornerAngle_Rs(this->cellsBasic[i]);
 
 				// 앞면 그룹화
 				while (!guidsInTableform.IsEmpty())
@@ -4874,14 +5061,21 @@ namespace namespaceWallTableform {
 					else if (this->cellsExtra[i].objType == OBJ_PLYWOOD)
 						guidsInTableform = placePlywoods(this->cellsExtra[i], this->bVertical);
 					else if (this->cellsExtra[i].objType == OBJ_TIMBER)
-						guidsInTableform = placeTimbers(this->cellsExtra[i], this->bVertical);
-					// 휠러스페이서 ...
-					// 인코너판넬(L) ...
-					// 아웃코너판넬(L) ...
-					// 아웃코너앵글(L) ...
-					// 인코너판넬(R) ...
-					// 아웃코너판넬(R) ...
-					// 아웃코너앵글(R) ...
+						guidsInTableform = placeTimbers(this->cellsExtra[i]);
+					else if (this->cellsExtra[i].objType == OBJ_FILLERSPACER)
+						guidsInTableform = placeFillerspacers(this->cellsExtra[i]);
+					else if (this->cellsExtra[i].objType == OBJ_INCORNER_PANEL_L)
+						guidsInTableform = placeIncornerPanel_Rs(this->cellsExtra[i]);
+					else if (this->cellsExtra[i].objType == OBJ_OUTCORNER_PANEL_L)
+						guidsInTableform = placeOutcornerPanel_Rs(this->cellsExtra[i]);
+					else if (this->cellsExtra[i].objType == OBJ_OUTCORNER_ANGLE_L)
+						guidsInTableform = placeOutcornerAngle_Rs(this->cellsExtra[i]);
+					else if (this->cellsExtra[i].objType == OBJ_INCORNER_PANEL_R)
+						guidsInTableform = placeIncornerPanel_Ls(this->cellsExtra[i]);
+					else if (this->cellsExtra[i].objType == OBJ_OUTCORNER_PANEL_R)
+						guidsInTableform = placeOutcornerPanel_Ls(this->cellsExtra[i]);
+					else if (this->cellsExtra[i].objType == OBJ_OUTCORNER_ANGLE_R)
+						guidsInTableform = placeOutcornerAngle_Ls(this->cellsExtra[i]);
 
 					// 뒷면 그룹화
 					while (!guidsInTableform.IsEmpty())
@@ -4896,16 +5090,194 @@ namespace namespaceWallTableform {
 		void placeMarginCells() {
 			// ... 모든 여백 셀 순회하기 (양면이면 앞뒤로 순회, 단면이면 앞면만 순회)
 		}
-	};
 
-	// 단열재
-	struct insulationElement
-	{
-		short	layerInd;		// 레이어 인덱스
-		double	thk;			// 두께
-		bool	bLimitSize;		// 가로/세로 크기 제한
-		double	maxHorLen;		// 가로 최대 길이
-		double	maxVerLen;		// 세로 최대 길이
+		// 단열재 배치하기
+		void placeInsulations(insulationElement insulElem) {
+			short totalX, totalY;
+			double horLen, verLen;
+			double remainHorLen, remainVerLen;
+
+			EasyObjectPlacement insul;
+
+			//if (insulElem->bLimitSize == true) {
+			//	// 가로/세로 크기 제한이 true일 때
+			//	if (placingZone->bSingleSide == false) {
+			//		// 양면 (앞면)
+			//		insul.init(L("단열재v1.0.gsm"), insulElem->layerInd, infoWall->floorInd, placingZone->leftBottomX, placingZone->leftBottomY, placingZone->leftBottomZ, placingZone->ang);
+
+			//		remainHorLen = placingZone->horLen;
+			//		remainVerLen = placingZone->verLenBasic;
+			//		totalXX = (short)floor(remainHorLen / insulElem->maxHorLen);
+			//		totalYY = (short)floor(remainVerLen / insulElem->maxVerLen);
+
+			//		for (xx = 0; xx < totalXX + 1; ++xx) {
+			//			for (yy = 0; yy < totalYY + 1; ++yy) {
+			//				(remainHorLen > insulElem->maxHorLen) ? horLen = insulElem->maxHorLen : horLen = remainHorLen;
+			//				(remainVerLen > insulElem->maxVerLen) ? verLen = insulElem->maxVerLen : verLen = remainVerLen;
+
+			//				elemList_Front.Push(insul.placeObject(10,
+			//					"A", APIParT_Length, format_string("%f", horLen),
+			//					"B", APIParT_Length, format_string("%f", verLen),
+			//					"ZZYZX", APIParT_Length, format_string("%f", insulElem->thk),
+			//					"angX", APIParT_Angle, format_string("%f", DegreeToRad(90.0)),
+			//					"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)),
+			//					"bRestrictSize", APIParT_Boolean, (insulElem->bLimitSize ? "1.0" : "0.0"),
+			//					"maxHorLen", APIParT_Length, format_string("%f", insulElem->maxHorLen),
+			//					"maxVerLen", APIParT_Length, format_string("%f", insulElem->maxVerLen),
+			//					"bLShape", APIParT_Boolean, "0.0",
+			//					"bVerticalCut", APIParT_Boolean, "0.0"));
+
+			//				remainVerLen -= insulElem->maxVerLen;
+			//				moveIn3D('z', insul.radAng, verLen, &insul.posX, &insul.posY, &insul.posZ);
+			//			}
+			//			remainHorLen -= insulElem->maxHorLen;
+			//			remainVerLen = placingZone->verLenBasic;
+			//			moveIn3D('z', insul.radAng, -placingZone->verLenBasic, &insul.posX, &insul.posY, &insul.posZ);
+			//			moveIn3D('x', insul.radAng, horLen, &insul.posX, &insul.posY, &insul.posZ);
+			//		}
+
+			//		// 양면 (뒷면)
+			//		insul.init(L("단열재v1.0.gsm"), insulElem->layerInd, infoWall->floorInd, placingZone->leftBottomX, placingZone->leftBottomY, placingZone->leftBottomZ, placingZone->ang);
+			//		moveIn3D('y', insul.radAng, infoWall->wallThk + placingZone->gap * 2 - insulElem->thk, &insul.posX, &insul.posY, &insul.posZ);
+
+			//		remainHorLen = placingZone->horLen;
+			//		remainVerLen = placingZone->verLenBasic;
+			//		totalXX = (short)floor(remainHorLen / insulElem->maxHorLen);
+			//		totalYY = (short)floor(remainVerLen / insulElem->maxVerLen);
+
+			//		for (xx = 0; xx < totalXX + 1; ++xx) {
+			//			for (yy = 0; yy < totalYY + 1; ++yy) {
+			//				(remainHorLen > insulElem->maxHorLen) ? horLen = insulElem->maxHorLen : horLen = remainHorLen;
+			//				(remainVerLen > insulElem->maxVerLen) ? verLen = insulElem->maxVerLen : verLen = remainVerLen;
+
+			//				moveIn3D('x', insul.radAng, horLen, &insul.posX, &insul.posY, &insul.posZ);
+			//				elemList_Back.Push(insul.placeObjectMirrored(10,
+			//					"A", APIParT_Length, format_string("%f", horLen),
+			//					"B", APIParT_Length, format_string("%f", verLen),
+			//					"ZZYZX", APIParT_Length, format_string("%f", insulElem->thk),
+			//					"angX", APIParT_Angle, format_string("%f", DegreeToRad(90.0)),
+			//					"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)),
+			//					"bRestrictSize", APIParT_Boolean, (insulElem->bLimitSize ? "1.0" : "0.0"),
+			//					"maxHorLen", APIParT_Length, format_string("%f", insulElem->maxHorLen),
+			//					"maxVerLen", APIParT_Length, format_string("%f", insulElem->maxVerLen),
+			//					"bLShape", APIParT_Boolean, "0.0",
+			//					"bVerticalCut", APIParT_Boolean, "0.0"));
+			//				moveIn3D('x', insul.radAng, -horLen, &insul.posX, &insul.posY, &insul.posZ);
+
+			//				remainVerLen -= insulElem->maxVerLen;
+			//				moveIn3D('z', insul.radAng, verLen, &insul.posX, &insul.posY, &insul.posZ);
+			//			}
+			//			remainHorLen -= insulElem->maxHorLen;
+			//			remainVerLen = placingZone->verLenBasic;
+			//			moveIn3D('z', insul.radAng, -placingZone->verLenBasic, &insul.posX, &insul.posY, &insul.posZ);
+			//			moveIn3D('x', insul.radAng, horLen, &insul.posX, &insul.posY, &insul.posZ);
+			//		}
+			//	}
+			//	else {
+			//		// 단면 (앞면)
+			//		insul.init(L("단열재v1.0.gsm"), insulElem->layerInd, infoWall->floorInd, placingZone->leftBottomX, placingZone->leftBottomY, placingZone->leftBottomZ, placingZone->ang);
+
+			//		remainHorLen = placingZone->horLen;
+			//		remainVerLen = placingZone->verLenExtra;
+			//		totalXX = (short)floor(remainHorLen / insulElem->maxHorLen);
+			//		totalYY = (short)floor(remainVerLen / insulElem->maxVerLen);
+
+			//		for (xx = 0; xx < totalXX + 1; ++xx) {
+			//			for (yy = 0; yy < totalYY + 1; ++yy) {
+			//				(remainHorLen > insulElem->maxHorLen) ? horLen = insulElem->maxHorLen : horLen = remainHorLen;
+			//				(remainVerLen > insulElem->maxVerLen) ? verLen = insulElem->maxVerLen : verLen = remainVerLen;
+
+			//				elemList_Front.Push(insul.placeObject(10,
+			//					"A", APIParT_Length, format_string("%f", horLen),
+			//					"B", APIParT_Length, format_string("%f", verLen),
+			//					"ZZYZX", APIParT_Length, format_string("%f", insulElem->thk),
+			//					"angX", APIParT_Angle, format_string("%f", DegreeToRad(90.0)),
+			//					"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)),
+			//					"bRestrictSize", APIParT_Boolean, (insulElem->bLimitSize ? "1.0" : "0.0"),
+			//					"maxHorLen", APIParT_Length, format_string("%f", insulElem->maxHorLen),
+			//					"maxVerLen", APIParT_Length, format_string("%f", insulElem->maxVerLen),
+			//					"bLShape", APIParT_Boolean, "0.0",
+			//					"bVerticalCut", APIParT_Boolean, "0.0"));
+
+			//				remainVerLen -= insulElem->maxVerLen;
+			//				moveIn3D('z', insul.radAng, verLen, &insul.posX, &insul.posY, &insul.posZ);
+			//			}
+			//			remainHorLen -= insulElem->maxHorLen;
+			//			remainVerLen = placingZone->verLenExtra;
+			//			moveIn3D('z', insul.radAng, -placingZone->verLenBasic, &insul.posX, &insul.posY, &insul.posZ);
+			//			moveIn3D('x', insul.radAng, horLen, &insul.posX, &insul.posY, &insul.posZ);
+			//		}
+			//	}
+			//}
+			//else {
+			//	// 가로/세로 크기 제한이 false일 때
+			//	if (placingZone->bSingleSide == false) {
+			//		// 양면 (앞면)
+			//		insul.init(L("단열재v1.0.gsm"), insulElem->layerInd, infoWall->floorInd, placingZone->leftBottomX, placingZone->leftBottomY, placingZone->leftBottomZ, placingZone->ang);
+
+			//		horLen = placingZone->horLen;
+			//		verLen = placingZone->verLenBasic;
+
+			//		elemList_Front.Push(insul.placeObject(10,
+			//			"A", APIParT_Length, format_string("%f", horLen),
+			//			"B", APIParT_Length, format_string("%f", verLen),
+			//			"ZZYZX", APIParT_Length, format_string("%f", insulElem->thk),
+			//			"angX", APIParT_Angle, format_string("%f", DegreeToRad(90.0)),
+			//			"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)),
+			//			"bRestrictSize", APIParT_Boolean, (insulElem->bLimitSize ? "1.0" : "0.0"),
+			//			"maxHorLen", APIParT_Length, format_string("%f", insulElem->maxHorLen),
+			//			"maxVerLen", APIParT_Length, format_string("%f", insulElem->maxVerLen),
+			//			"bLShape", APIParT_Boolean, "0.0",
+			//			"bVerticalCut", APIParT_Boolean, "0.0"));
+
+			//		// 양면 (뒷면)
+			//		insul.init(L("단열재v1.0.gsm"), insulElem->layerInd, infoWall->floorInd, placingZone->leftBottomX, placingZone->leftBottomY, placingZone->leftBottomZ, placingZone->ang);
+			//		moveIn3D('y', insul.radAng, infoWall->wallThk + placingZone->gap * 2 - insulElem->thk, &insul.posX, &insul.posY, &insul.posZ);
+
+			//		horLen = placingZone->horLen;
+			//		verLen = placingZone->verLenExtra;
+
+			//		moveIn3D('x', insul.radAng, horLen, &insul.posX, &insul.posY, &insul.posZ);
+			//		elemList_Front.Push(insul.placeObjectMirrored(10,
+			//			"A", APIParT_Length, format_string("%f", horLen),
+			//			"B", APIParT_Length, format_string("%f", verLen),
+			//			"ZZYZX", APIParT_Length, format_string("%f", insulElem->thk),
+			//			"angX", APIParT_Angle, format_string("%f", DegreeToRad(90.0)),
+			//			"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)),
+			//			"bRestrictSize", APIParT_Boolean, (insulElem->bLimitSize ? "1.0" : "0.0"),
+			//			"maxHorLen", APIParT_Length, format_string("%f", insulElem->maxHorLen),
+			//			"maxVerLen", APIParT_Length, format_string("%f", insulElem->maxVerLen),
+			//			"bLShape", APIParT_Boolean, "0.0",
+			//			"bVerticalCut", APIParT_Boolean, "0.0"));
+			//		moveIn3D('x', insul.radAng, -horLen, &insul.posX, &insul.posY, &insul.posZ);
+			//	}
+			//	else {
+			//		// 단면 (앞면)
+			//		insul.init(L("단열재v1.0.gsm"), insulElem->layerInd, infoWall->floorInd, placingZone->leftBottomX, placingZone->leftBottomY, placingZone->leftBottomZ, placingZone->ang);
+
+			//		horLen = placingZone->horLen;
+			//		verLen = placingZone->verLenBasic;
+
+			//		elemList_Front.Push(insul.placeObject(10,
+			//			"A", APIParT_Length, format_string("%f", horLen),
+			//			"B", APIParT_Length, format_string("%f", verLen),
+			//			"ZZYZX", APIParT_Length, format_string("%f", insulElem->thk),
+			//			"angX", APIParT_Angle, format_string("%f", DegreeToRad(90.0)),
+			//			"angY", APIParT_Angle, format_string("%f", DegreeToRad(0.0)),
+			//			"bRestrictSize", APIParT_Boolean, (insulElem->bLimitSize ? "1.0" : "0.0"),
+			//			"maxHorLen", APIParT_Length, format_string("%f", insulElem->maxHorLen),
+			//			"maxVerLen", APIParT_Length, format_string("%f", insulElem->maxVerLen),
+			//			"bLShape", APIParT_Boolean, "0.0",
+			//			"bVerticalCut", APIParT_Boolean, "0.0"));
+			//	}
+			//}
+
+			//// 그룹화하기
+			//groupElements(elemList_Front);
+			//groupElements(elemList_Back);
+			//elemList_Front.Clear();
+			//elemList_Back.Clear();
+		}
 	};
 
 	PlacingZone placingZone;		// 배치 정보
