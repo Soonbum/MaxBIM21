@@ -16,58 +16,37 @@
 }
 
 
-'STR#' ID_MENU_STRINGS_FORMWORKS "Menu strings" {
+'STR#' 32005 "Menu strings" {
 /* [   ] */		"MaxBIM"
-/* [   ] */		"테이블폼 배치"
-/* [  1] */			"벽 테이블폼 배치^E3^ES^EE^EI^ED^EL^EW^ET"
-/* [  2] */			"슬래브 테이블폼 배치^E3^ES^EE^EI^ED^EL^EW^ET"
-/* [  3] */			"보 테이블폼 배치^E3^ES^EE^EI^ED^EL^EW^ET"
-/* [  4] */			"기둥 테이블폼 배치^E3^ES^EE^EI^ED^EL^EW^ET"
-/* [  5] */			"기초 테이블폼 배치^E3^ES^EE^EI^ED^EL^EW^ET"
-}
-
-
-'STR#' ID_MENU_PROMPT_STRINGS_FORMWORKS "Status bar strings" {
-/* [   ] */		"MaxBIM"
-/* [   ] */		"테이블폼 배치"
-/* [  1] */			"벽면에 테이블폼을 배치합니다."
-/* [  2] */			"천장 슬래브에 테이블폼 그리고 장선, 멍에제, 동바리를 배치합니다."
-/* [  3] */			"보에 테이블폼을 배치합니다."
-/* [  4] */			"기둥에 테이블폼을 배치합니다."
-/* [  5] */			"기초(낮은 슬래브/벽)에 테이블폼을 배치합니다."
-}
-
-'STR#' ID_MENU_STRINGS_LAYER_TOOLS "Menu strings" {
-/* [   ] */		"MaxBIM"
-/* [   ] */		"레이어 도구"
+/* [   ] */		"레이어 유틸"
 /* [  1] */			"레이어 쉽게 선택하기^E3^ES^EE^EI^ED^EL^EW^ET"
 /* [  2] */			"레이어 쉽게 만들기^E3^ES^EE^EI^ED^EL^EW^ET"
 /* [  3] */			"레이어 쉽게 지정하기^E3^ES^EE^EI^ED^EL^EW^ET"
 /* [  4] */			"레이어 이름 검사하기^E3^ES^EE^EI^ED^EL^EW^ET"
 }
 
-'STR#' ID_MENU_PROMPT_STRINGS_LAYER_TOOLS "Status bar strings" {
+'STR#' 32006 "Status bar strings" {
 /* [   ] */		"MaxBIM"
-/* [   ] */		"레이어 도구"
+/* [   ] */		"레이어 유틸"
 /* [  1] */			"조건들을 선택/선택해제하여 레이어들을 쉽게 선택할 수 있게 해줍니다."
 /* [  2] */			"사용자가 입력한 조건들에 해당하는 레이어들을 자동으로 생성해 줍니다."
-/* [  3] */			"선택한 객체들의 레이어 속성을 사용자가 입력한 조건들에 해당하는 레이어로 설정해 줍니다."
+/* [  3] */			"선택한 객체들의 레이어 속성을 사용자가 입력한 조건들에 해당하는 레이어로 설정해 줍니다. (요소 그룹화는 일시중지해야 함)"
 /* [  4] */			"MaxBIM의 레이어 이름 체계에 맞지 않는 레이어 이름들을 보여주고 바로 변경할 수 있게 해줍니다."
 }
 
-'STR#' ID_MENU_STRINGS_EXPORTING "Menu strings" {
+'STR#' 32007 "Menu strings" {
 /* [   ] */		"MaxBIM"
 /* [   ] */		"내보내기"
-/* [  1] */			"부재 정보 내보내기 (현재 선택한 것만)^E3^ES^EE^EI^ED^EL^EW^ET"
-/* [  2] */			"부재 정보 내보내기 (보이는 레이어 별로)^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  1] */			"선택한 부재 정보 내보내기 (Single 모드)^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  2] */			"선택한 부재 정보 내보내기 (Multi 모드)^E3^ES^EE^EI^ED^EL^EW^ET"
 /* [  3] */			"부재별 선택 후 보여주기^E3"
 /* [  4] */			"보 테이블폼 물량표 작성^E3^ES^EE^EI^ED^EL^EW^ET"
 /* [  5] */			"테이블폼 면적 계산^E3^ES^EE^EI^ED^EL^EW^ET"
-/* [  6] */			"모든 입면도 PDF로 내보내기 (현재 뷰만)^E3^ES^EE^EI^ED^EL^EW^ET"
-/* [  7] */			"모든 입면도 PDF로 내보내기 (보이는 레이어 별로)^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  6] */			"모든 입면도 PDF로 내보내기 (Single 모드)^E3^ES^EE^EI^ED^EL^EW^ET"
+/* [  7] */			"모든 입면도 PDF로 내보내기 (Multi 모드)^E3^ES^EE^EI^ED^EL^EW^ET"
 }
 
-'STR#' ID_MENU_PROMPT_STRINGS_EXPORTING "Status bar strings" {
+'STR#' 32008 "Status bar strings" {
 /* [   ] */		"MaxBIM"
 /* [   ] */		"내보내기"
 /* [  1] */			"선택한 부재에 한해서만 부재의 정보를 정리하여 CSV 파일로 내보냅니다."
@@ -79,21 +58,43 @@
 /* [  7] */			"각각의 입면도를 레이어 별로 캡쳐해서 PDF 파일로 내보냅니다."
 }
 
-'STR#' ID_MENU_STRINGS_SEMIAUTO_ARRANGE "Menu strings" {
+'STR#' 32009 "Menu strings" {
 /* [   ] */		"MaxBIM"
 /* [   ] */		"반자동 배치"
 /* [  1] */			"물량합판 부착하기^E3"
 /* [  2] */			"단열재 부착하기^E3"
 }
 
-'STR#' ID_MENU_PROMPT_STRINGS_SEMIAUTO_ARRANGE "Status bar strings" {
+'STR#' 32010 "Status bar strings" {
 /* [   ] */		"MaxBIM"
 /* [   ] */		"반자동 배치"
 /* [  1] */			"물량합판을 부착하는 데 도움을 주는 팔레트를 엽니다. 레이어와 물량합판 분류를 선택하고 그리기 버튼을 누르면 됩니다."
 /* [  2] */			"단열재를 부착하는 데 도움을 주는 팔레트를 엽니다. 레이어, 가로/세로 길이 제한을 설정하고 그리기 버튼을 누르면 됩니다."
 }
 
-'STR#' ID_MENU_STRINGS_FACILITIES "Menu strings" {
+'STR#' 32011 "Menu strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"테이블폼 배치"
+/* [  1] */			"벽에 테이블폼 배치 (3D)^E3^ES^EE"
+/* [  2] */			"슬래브 하부에 테이블폼 배치 (3D)^E3^ES^EE"
+/* [  3] */			"보에 테이블폼 배치 (3D)^E3^ES^EE"
+/* [  4] */			"기둥에 테이블폼 배치 (3D)^E3^ES^EE"
+/* [  5] */			"낮은 슬래브 측면에 테이블폼 배치 (3D)^E3^ES^EE"
+/* [  6] */			"보 전용 동바리 세트 배치^E3^ES^EE"
+}
+
+'STR#' 32012 "Status bar strings" {
+/* [   ] */		"MaxBIM"
+/* [   ] */		"테이블폼 배치"
+/* [  1] */			"벽 양면에 테이블폼을 배치합니다."
+/* [  2] */			"슬래브 하부에 테이블폼을 배치합니다."
+/* [  3] */			"보 주변에 테이블폼을 배치합니다."
+/* [  4] */			"기둥 주변에 테이블폼을 배치합니다."
+/* [  5] */			"낮은 슬래브 측면에 테이블폼을 배치합니다."
+/* [  6] */			"보 거푸집을 떠받치기 위한 동바리 세트를 배치합니다."
+}
+
+'STR#' 32013 "Menu strings" {
 /* [   ] */		"MaxBIM"
 /* [   ] */		"편의 기능"
 /* [  1] */			"3D 품질/속도 조정하기^E3^ES^EE^EI^ED^EL^EW^ET"
@@ -102,11 +103,11 @@
 /* [  4] */			"카메라 위치 저장하기/불러오기^E3^ES^EE^EI^ED^EL^EW^ET"
 }
 
-'STR#' ID_MENU_PROMPT_STRINGS_FACILITIES "Status bar strings" {
+'STR#' 32014 "Status bar strings" {
 /* [   ] */		"MaxBIM"
 /* [   ] */		"편의 기능"
 /* [  1] */			"보이는 레이어 상의 모든 객체들의 해상도(gs_resol) 값을 사용자가 선택한 값으로 변경합니다."
 /* [  2] */			"아키캐드 영역(Zone)에 3D 라벨을 부착합니다."
 /* [  3] */			"현재 평면도에서 선택한 테이블폼마다 버블을 부착합니다."
-/* [  4] */			"카메라 위치 정보를 DB에 저장하거나 다시 불러옵니다. 기존 정보를 활용하려면 cameraInfo.db 파일을 C:\\Program Files\\GRAPHISOFT\\ArchiCAD 21 폴더에 두십시오."
+/* [  4] */			"카메라 위치 정보를 DB에 저장하거나 다시 불러옵니다. 기존 정보를 활용하려면 cameraInfo.db 파일을 C:\\Program Files\\GRAPHISOFT\\ArchiCAD 19 폴더에 두십시오."
 }

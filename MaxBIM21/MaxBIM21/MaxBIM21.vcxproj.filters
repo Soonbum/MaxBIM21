@@ -35,6 +35,30 @@
     <ClCompile Include="Src\Layers.cpp">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="Src\BeamTableformPlacer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ColumnTableformPlacer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Export.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Facility.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\LowSideTableformPlacer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Quantities.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\SlabTableformPlacer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\WallTableformPlacer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\APIEnvir.h">
@@ -53,6 +77,30 @@
       <Filter>Src\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Src\Layers.h">
+      <Filter>Src\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\BeamTableformPlacer.h">
+      <Filter>Src\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ColumnTableformPlacer.h">
+      <Filter>Src\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Export.h">
+      <Filter>Src\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Facility.h">
+      <Filter>Src\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\LowSideTableformPlacer.h">
+      <Filter>Src\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Quantities.h">
+      <Filter>Src\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\SlabTableformPlacer.h">
+      <Filter>Src\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\SupportingPostForBeam.h">
       <Filter>Src\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Src\WallTableformPlacer.h">

@@ -137,17 +137,33 @@
   <ItemGroup>
     <ClInclude Include="Src\APIEnvir.h" />
     <ClInclude Include="Src\APICommon.h" />
+    <ClInclude Include="Src\BeamTableformPlacer.h" />
+    <ClInclude Include="Src\ColumnTableformPlacer.h" />
+    <ClInclude Include="Src\Export.h" />
+    <ClInclude Include="Src\Facility.h" />
     <ClInclude Include="Src\Layers.h" />
+    <ClInclude Include="Src\LowSideTableformPlacer.h" />
     <ClInclude Include="Src\MaxBIM21.h" />
+    <ClInclude Include="Src\Quantities.h" />
     <ClInclude Include="Src\ResourceIDs.h" />
+    <ClInclude Include="Src\SlabTableformPlacer.h" />
+    <ClInclude Include="Src\SupportingPostForBeam.h" />
     <ClInclude Include="Src\UtilityFunctions.h" />
     <ClInclude Include="Src\WallTableformPlacer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\$(ProjectName).c" />
     <ClCompile Include="Src\APICommon.c" />
+    <ClCompile Include="Src\BeamTableformPlacer.cpp" />
+    <ClCompile Include="Src\ColumnTableformPlacer.cpp" />
+    <ClCompile Include="Src\Export.cpp" />
+    <ClCompile Include="Src\Facility.cpp" />
     <ClCompile Include="Src\Layers.cpp" />
+    <ClCompile Include="Src\LowSideTableformPlacer.cpp" />
+    <ClCompile Include="Src\Quantities.cpp" />
+    <ClCompile Include="Src\SlabTableformPlacer.cpp" />
     <ClCompile Include="Src\UtilityFunctions.cpp" />
+    <ClCompile Include="Src\WallTableformPlacer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="RINT\$(ProjectName).grc">
