@@ -4726,7 +4726,7 @@ short DGCALLBACK columnTableformPlacerHandler_soleColumn_2 (short message, short
 				} else if (placingZone.cellsB1 [xx].objType == EUROFORM) {
 					txtButton = format_string ("유로폼\n↕%.0f", placingZone.cellsB1 [xx].height * 1000).c_str();
 				}
-				DGSetItemText (dialogID, itmIdx, GS::UniString(txtButton.c_str()));	// 그리드 버튼 텍스트 지정
+				DGSetItemText (dialogID, itmIdx, GS::UniString(convertStr(txtButton.c_str())));	// 그리드 버튼 텍스트 지정
 				DGShowItem (dialogID, itmIdx);
 				btnPosY -= 50;
 
@@ -4935,7 +4935,7 @@ short DGCALLBACK columnTableformPlacerHandler_soleColumn_2 (short message, short
 					} else if (placingZone.cellsB1 [xx].objType == EUROFORM) {
 						txtButton = format_string ("유로폼\n↕%.0f", placingZone.cellsB1 [xx].height * 1000).c_str();
 					}
-					DGSetItemText (dialogID, itmIdx, GS::UniString(txtButton.c_str()));	// 그리드 버튼 텍스트 지정
+					DGSetItemText (dialogID, itmIdx, GS::UniString(convertStr(txtButton.c_str())));	// 그리드 버튼 텍스트 지정
 					DGShowItem (dialogID, itmIdx);
 					btnPosY -= 50;
 
@@ -5142,7 +5142,7 @@ short DGCALLBACK columnTableformPlacerHandler_soleColumn_2 (short message, short
 					} else if (placingZone.cellsB1 [xx].objType == EUROFORM) {
 						txtButton = format_string ("유로폼\n↕%.0f", placingZone.cellsB1 [xx].height * 1000).c_str();
 					}
-					DGSetItemText (dialogID, itmIdx, GS::UniString(txtButton.c_str()));	// 그리드 버튼 텍스트 지정
+					DGSetItemText (dialogID, itmIdx, GS::UniString(convertStr(txtButton.c_str())));	// 그리드 버튼 텍스트 지정
 					DGShowItem (dialogID, itmIdx);
 					btnPosY -= 50;
 
@@ -5355,7 +5355,7 @@ short DGCALLBACK columnTableformPlacerHandler_soleColumn_2 (short message, short
 					} else if (placingZone.cellsB1 [xx].objType == EUROFORM) {
 						txtButton = format_string ("유로폼\n↕%.0f", placingZone.cellsB1 [xx].height * 1000).c_str();
 					}
-					DGSetItemText (dialogID, itmIdx, GS::UniString(txtButton.c_str()));	// 그리드 버튼 텍스트 지정
+					DGSetItemText (dialogID, itmIdx, GS::UniString(convertStr(txtButton.c_str())));	// 그리드 버튼 텍스트 지정
 					DGShowItem (dialogID, itmIdx);
 					btnPosY -= 50;
 
@@ -5560,7 +5560,7 @@ short DGCALLBACK columnTableformPlacerHandler_soleColumn_2 (short message, short
 					} else if (placingZone.cellsB1 [xx].objType == EUROFORM) {
 						txtButton = format_string ("유로폼\n↕%.0f", placingZone.cellsB1 [xx].height * 1000).c_str();
 					}
-					DGSetItemText (dialogID, itmIdx, GS::UniString(txtButton.c_str()));	// 그리드 버튼 텍스트 지정
+					DGSetItemText (dialogID, itmIdx, GS::UniString(convertStr(txtButton.c_str())));	// 그리드 버튼 텍스트 지정
 					DGShowItem (dialogID, itmIdx);
 					btnPosY -= 50;
 
