@@ -310,7 +310,7 @@ bool		importLayerInfo(LayerNameSystem* layerInfo)
 						}
 						if (lineCount == 10)	layerInfo->obj_name.push_back(insElem);			// 부재
 						if (lineCount == 11)	layerInfo->obj_desc.push_back(insElem);			// 부재 설명
-						if (lineCount == 12)	layerInfo->obj_cat.push_back(insElem);				// 부재가 속한 카테고리(공사구분)
+						if (lineCount == 12)	layerInfo->obj_cat.push_back(insElem);			// 부재가 속한 카테고리(공사구분)
 						if (lineCount == 13)	layerInfo->productSite_name.push_back(insElem);	// 제작처 구분
 						if (lineCount == 14) {
 							if (isStringDouble(token) == TRUE) {
@@ -552,20 +552,24 @@ GSErrCode	showLayersEasily(void)
 
 			// 8단계 또는 10단계까지 성공적으로 완료되면 구조체에 적용
 			if ((success == true) && (nBaseFields == 8)) {
+				string comparedElem;
+
 				// 일련 번호와 공사 구분 문자를 먼저 합침
 				sprintf(constructionCode, "%s-%s", tok1, tok2);
 
 				// 1,2단계. 공사 구분 확인
 				for (yy = 0; yy < layerInfo.code_name.size(); ++yy) {
-					if (strncmp(constructionCode, layerInfo.code_name[yy].c_str(), 4) == 0) {
+					if (layerInfo.code_name[yy].compare(constructionCode) == 0) {
 						layerInfo.code_state[yy] = true;
 					}
 					layerInfo.bCodeAllShow = true;
 				}
 
-				// 3단계. 동 구분
+				// 3단계. 동 구분 !!!
 				for (yy = 0; yy < layerInfo.dong_name.size(); ++yy) {
-					if (strncmp(tok3, layerInfo.dong_name[yy].c_str(), 4) == 0) {
+					GS::UniString	operand1 = tok3;
+					GS::UniString	operand2 = charToWchar(layerInfo.dong_name[yy].c_str());
+					if (operand1.Compare(operand2) == 1) {
 						layerInfo.dong_state[yy] = true;
 					}
 					layerInfo.bDongAllShow = true;
@@ -573,7 +577,9 @@ GSErrCode	showLayersEasily(void)
 
 				// 4단계. 층 구분
 				for (yy = 0; yy < layerInfo.floor_name.size(); ++yy) {
-					if (strncmp(tok4, layerInfo.floor_name[yy].c_str(), 3) == 0) {
+					GS::UniString	operand1 = tok4;
+					GS::UniString	operand2 = charToWchar(layerInfo.floor_name[yy].c_str());
+					if (operand1.Compare(operand2) == 1) {
 						layerInfo.floor_state[yy] = true;
 					}
 					layerInfo.bFloorAllShow = true;
@@ -581,7 +587,9 @@ GSErrCode	showLayersEasily(void)
 
 				// 5단계. 타설번호
 				for (yy = 0; yy < layerInfo.cast_name.size(); ++yy) {
-					if (my_strcmp(tok5, layerInfo.cast_name[yy].c_str()) == 0) {
+					GS::UniString	operand1 = tok5;
+					GS::UniString	operand2 = charToWchar(layerInfo.cast_name[yy].c_str());
+					if (operand1.Compare(operand2) == 1) {
 						layerInfo.cast_state[yy] = true;
 					}
 					layerInfo.bCastAllShow = true;
@@ -589,7 +597,9 @@ GSErrCode	showLayersEasily(void)
 
 				// 6단계. CJ 구간
 				for (yy = 0; yy < layerInfo.CJ_name.size(); ++yy) {
-					if (my_strcmp(tok6, layerInfo.CJ_name[yy].c_str()) == 0) {
+					GS::UniString	operand1 = tok6;
+					GS::UniString	operand2 = charToWchar(layerInfo.CJ_name[yy].c_str());
+					if (operand1.Compare(operand2) == 1) {
 						layerInfo.CJ_state[yy] = true;
 					}
 					layerInfo.bCJAllShow = true;
@@ -597,7 +607,9 @@ GSErrCode	showLayersEasily(void)
 
 				// 7단계. CJ 속 시공순서
 				for (yy = 0; yy < layerInfo.orderInCJ_name.size(); ++yy) {
-					if (my_strcmp(tok7, layerInfo.orderInCJ_name[yy].c_str()) == 0) {
+					GS::UniString	operand1 = tok7;
+					GS::UniString	operand2 = charToWchar(layerInfo.orderInCJ_name[yy].c_str());
+					if (operand1.Compare(operand2) == 1) {
 						layerInfo.orderInCJ_state[yy] = true;
 					}
 					layerInfo.bOrderInCJAllShow = true;
@@ -605,7 +617,7 @@ GSErrCode	showLayersEasily(void)
 
 				// 8단계. 부재 구분
 				for (yy = 0; yy < layerInfo.obj_name.size(); ++yy) {
-					if ((strncmp(constructionCode, layerInfo.obj_cat[yy].c_str(), 4) == 0) && (strncmp(tok8, layerInfo.obj_name[yy].c_str(), 5) == 0)) {
+					if ((layerInfo.obj_cat[yy].compare(constructionCode) == 0) && (layerInfo.obj_name[yy].compare(tok8) == 0)) {
 						layerInfo.obj_state[yy] = true;
 					}
 				}
@@ -613,14 +625,16 @@ GSErrCode	showLayersEasily(void)
 				if ((extSuccess == true) && (nExtendFields == 2)) {
 					// 9단계. 제작처 구분
 					for (yy = 0; yy < layerInfo.productSite_name.size(); ++yy) {
-						if (my_strcmp(tok9, layerInfo.productSite_name[yy].c_str()) == 0) {
+						GS::UniString	operand1 = tok9;
+						GS::UniString	operand2 = charToWchar(layerInfo.productSite_name[yy].c_str());
+						if (operand1.Compare(operand2) == 1) {
 							layerInfo.productSite_state[yy] = true;
 						}
 					}
 
 					// 10단계. 제작 번호
 					for (yy = 0; yy < layerInfo.productNum_name.size(); ++yy) {
-						if (strncmp(tok10, layerInfo.productNum_name[yy].c_str(), 3) == 0) {
+						if (layerInfo.productNum_name[yy].compare(tok10) == 0) {
 							layerInfo.productNum_state[yy] = true;
 						}
 						layerInfo.bProductNumAllShow = true;
@@ -662,15 +676,15 @@ GSErrCode	showLayersEasily(void)
 	short	LenCode1;
 	char	code2[1600][32];	// 동 코드
 	short	LenCode2;
-	char	code3[120][32];	// 층 코드
+	char	code3[120][32];		// 층 코드
 	short	LenCode3;
-	char	code4[120][32];	// 타설번호 코드
+	char	code4[120][32];		// 타설번호 코드
 	short	LenCode4;
-	char	code5[120][32];	// CJ 코드
+	char	code5[120][32];		// CJ 코드
 	short	LenCode5;
-	char	code6[120][32];	// CJ 속 시공순서 코드
+	char	code6[120][32];		// CJ 속 시공순서 코드
 	short	LenCode6;
-	char	code7[120][32];	// 부재 코드
+	char	code7[120][32];		// 부재 코드
 	short	LenCode7;
 	char	code8[10][32];		// 제작처 코드
 	short	LenCode8;
@@ -821,7 +835,8 @@ GSErrCode	showLayersEasily(void)
 											// 조합한 레이어 이름 검색하기
 											BNZeroMemory(&attrib, sizeof(API_Attribute));
 											attrib.header.typeID = API_LayerID;
-											CHCopyC(fullLayerName, attrib.header.name);
+											GS::UniString fullLayerNameUniStr = charToWchar(fullLayerName);
+											attrib.header.uniStringNamePtr = &fullLayerNameUniStr;
 											err = ACAPI_Attribute_Get(&attrib);
 
 											// 해당 레이어 보여주기
@@ -879,7 +894,8 @@ GSErrCode	showLayersEasily(void)
 									// 조합한 레이어 이름 검색하기
 									BNZeroMemory(&attrib, sizeof(API_Attribute));
 									attrib.header.typeID = API_LayerID;
-									CHCopyC(fullLayerName, attrib.header.name);
+									GS::UniString fullLayerNameUniStr = charToWchar(fullLayerName);
+									attrib.header.uniStringNamePtr = &fullLayerNameUniStr;
 									err = ACAPI_Attribute_Get(&attrib);
 
 									// 해당 레이어 보여주기
@@ -2274,7 +2290,8 @@ GSErrCode	makeLayersEasily(void)
 
 												attrib.header.typeID = API_LayerID;
 												attrib.layer.conClassId = 1;
-												CHCopyC(fullLayerName, attrib.header.name);
+												GS::UniString fullLayerNameUniStr = charToWchar(fullLayerName);
+												attrib.header.uniStringNamePtr = &fullLayerNameUniStr;
 												err = ACAPI_Attribute_Create(&attrib, &defs);
 
 												ACAPI_DisposeAttrDefsHdls(&defs);
@@ -2339,7 +2356,8 @@ GSErrCode	makeLayersEasily(void)
 
 										attrib.header.typeID = API_LayerID;
 										attrib.layer.conClassId = 1;
-										CHCopyC(fullLayerName, attrib.header.name);
+										GS::UniString fullLayerNameUniStr = charToWchar(fullLayerName);
+										attrib.header.uniStringNamePtr = &fullLayerNameUniStr;
 										err = ACAPI_Attribute_Create(&attrib, &defs);
 
 										ACAPI_DisposeAttrDefsHdls(&defs);
@@ -2361,7 +2379,9 @@ GSErrCode	makeLayersEasily(void)
 	deallocateMemory(&layerInfo);
 
 	// 생성된 레이어 개수 보여주기
-	WriteReport_Alert("총 %d 개의 레이어가 생성되었습니다.", madeLayers);
+	sprintf(tempStr, "총 % d 개의 레이어가 생성되었습니다.", madeLayers);
+	GS::UniString reportStr = charToWchar(tempStr);
+	DGAlert (DG_INFORMATION, L"보고", reportStr, "", L"확인", "", "");
 
 	return	err;
 }
@@ -2817,7 +2837,7 @@ short DGCALLBACK layerMakeHandler_2(short message, short dialogID, short item, D
 				if (isStringDouble(tempStr) == FALSE) {
 					itmIdx = DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, itmPosX, itmPosY, 90, 35);
 					DGSetItemFont(dialogID, itmIdx, DG_IS_LARGE | DG_IS_PLAIN);
-					sprintf(tempStr, "%s\n%s", layerInfo.dong_name[xx].c_str(), layerInfo.dong_desc[xx].c_str());
+					sprintf(tempStr, "%s %s", layerInfo.dong_name[xx].c_str(), layerInfo.dong_desc[xx].c_str());
 					DGSetItemText(dialogID, itmIdx, charToWchar(tempStr));
 					DGShowItem(dialogID, itmIdx);
 					DONG_REST_BUTTONS[restIdx] = itmIdx;
@@ -2838,7 +2858,7 @@ short DGCALLBACK layerMakeHandler_2(short message, short dialogID, short item, D
 			for (xx = 0; xx < layerInfo.floor_name.size(); ++xx) {
 				itmIdx = DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, itmPosX, itmPosY, 90, 35);
 				DGSetItemFont(dialogID, itmIdx, DG_IS_LARGE | DG_IS_PLAIN);
-				sprintf(tempStr, "%s\n%s", layerInfo.floor_name[xx].c_str(), layerInfo.floor_desc[xx].c_str());
+				sprintf(tempStr, "%s %s", layerInfo.floor_name[xx].c_str(), layerInfo.floor_desc[xx].c_str());
 				DGSetItemText(dialogID, itmIdx, charToWchar(tempStr));
 				DGShowItem(dialogID, itmIdx);
 				(layerInfo.floor_state[xx] == true) ? DGSetItemValLong(dialogID, itmIdx, TRUE) : DGSetItemValLong(dialogID, itmIdx, FALSE);
@@ -2929,7 +2949,7 @@ short DGCALLBACK layerMakeHandler_2(short message, short dialogID, short item, D
 					if (strncmp(layerInfo.code_name[xx].c_str(), layerInfo.obj_cat[yy].c_str(), 4) == 0) {
 						itmIdx = DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, itmPosX, itmPosY, 95, 28);
 						DGSetItemFont(dialogID, itmIdx, DG_IS_SMALL | DG_IS_PLAIN);
-						sprintf(tempStr, "%s\n%s", layerInfo.obj_name[yy].c_str(), layerInfo.obj_desc[yy].c_str());
+						sprintf(tempStr, "%s %s", layerInfo.obj_name[yy].c_str(), layerInfo.obj_desc[yy].c_str());
 						DGSetItemText(dialogID, itmIdx, charToWchar(tempStr));
 						DGShowItem(dialogID, itmIdx);
 						OBJ_BUTTONS[count] = itmIdx;
@@ -3459,7 +3479,8 @@ GSErrCode	assignLayerEasily(void)
 												// 선택한 레이어가 존재하는지 확인
 												BNZeroMemory(&attrib, sizeof(API_Attribute));
 												attrib.header.typeID = API_LayerID;
-												CHCopyC(fullLayerName, attrib.header.name);
+												GS::UniString fullLayerNameUniStr = charToWchar(fullLayerName);
+												attrib.header.uniStringNamePtr = &fullLayerNameUniStr;
 												err = ACAPI_Attribute_Get(&attrib);
 
 												// 레이어가 존재하면,
@@ -3490,7 +3511,8 @@ GSErrCode	assignLayerEasily(void)
 
 														attrib.header.typeID = API_LayerID;
 														attrib.layer.conClassId = 1;
-														CHCopyC(fullLayerName, attrib.header.name);
+														GS::UniString fullLayerNameUniStr = charToWchar(fullLayerName);
+														attrib.header.uniStringNamePtr = &fullLayerNameUniStr;
 														err = ACAPI_Attribute_Create(&attrib, &defs);
 
 														ACAPI_DisposeAttrDefsHdls(&defs);
@@ -3571,7 +3593,8 @@ GSErrCode	assignLayerEasily(void)
 										// 선택한 레이어가 존재하는지 확인
 										BNZeroMemory(&attrib, sizeof(API_Attribute));
 										attrib.header.typeID = API_LayerID;
-										CHCopyC(fullLayerName, attrib.header.name);
+										GS::UniString fullLayerNameUniStr = charToWchar(fullLayerName);
+										attrib.header.uniStringNamePtr = &fullLayerNameUniStr;
 										err = ACAPI_Attribute_Get(&attrib);
 
 										// 레이어가 존재하면,
@@ -3588,11 +3611,9 @@ GSErrCode	assignLayerEasily(void)
 
 												err = ACAPI_Element_Change(&elem, &mask, NULL, 0, true);
 											}
-
-											// 레이어가 존재하지 않으면,
 										}
 										else {
-
+											// 레이어가 존재하지 않으면,
 											result = DGAlert(DG_INFORMATION, "레이어가 존재하지 않음", "지정한 레이어가 존재하지 않습니다.\n새로 만드시겠습니까?", "", "예", "아니오", "");
 
 											if (result == DG_OK) {
@@ -3602,7 +3623,8 @@ GSErrCode	assignLayerEasily(void)
 
 												attrib.header.typeID = API_LayerID;
 												attrib.layer.conClassId = 1;
-												CHCopyC(fullLayerName, attrib.header.name);
+												GS::UniString fullLayerNameUniStr = charToWchar(fullLayerName);
+												attrib.header.uniStringNamePtr = &fullLayerNameUniStr;
 												err = ACAPI_Attribute_Create(&attrib, &defs);
 
 												ACAPI_DisposeAttrDefsHdls(&defs);
@@ -4387,7 +4409,7 @@ short DGCALLBACK layerAssignHandler_2(short message, short dialogID, short item,
 				if (isStringDouble(tempStr) == FALSE) {
 					itmIdx = DGAppendDialogItem(dialogID, DG_ITM_RADIOBUTTON, DG_BT_PUSHTEXT, BUTTON_DONG, itmPosX, itmPosY, 90, 35);
 					DGSetItemFont(dialogID, itmIdx, DG_IS_LARGE | DG_IS_PLAIN);
-					sprintf(tempStr, "%s\n%s", layerInfo.dong_name[xx].c_str(), layerInfo.dong_desc[xx].c_str());
+					sprintf(tempStr, "%s %s", layerInfo.dong_name[xx].c_str(), layerInfo.dong_desc[xx].c_str());
 					DGSetItemText(dialogID, itmIdx, charToWchar(tempStr));
 					DGShowItem(dialogID, itmIdx);
 					DONG_REST_BUTTONS[restIdx] = itmIdx;
@@ -4408,7 +4430,7 @@ short DGCALLBACK layerAssignHandler_2(short message, short dialogID, short item,
 			for (xx = 0; xx < layerInfo.floor_name.size(); ++xx) {
 				itmIdx = DGAppendDialogItem(dialogID, DG_ITM_RADIOBUTTON, DG_BT_PUSHTEXT, BUTTON_FLOOR, itmPosX, itmPosY, 90, 35);
 				DGSetItemFont(dialogID, itmIdx, DG_IS_LARGE | DG_IS_PLAIN);
-				sprintf(tempStr, "%s\n%s", layerInfo.floor_name[xx].c_str(), layerInfo.floor_desc[xx].c_str());
+				sprintf(tempStr, "%s %s", layerInfo.floor_name[xx].c_str(), layerInfo.floor_desc[xx].c_str());
 				DGSetItemText(dialogID, itmIdx, charToWchar(tempStr));
 				DGShowItem(dialogID, itmIdx);
 				(layerInfo.floor_state[xx] == true) ? DGSetItemValLong(dialogID, itmIdx, TRUE) : DGSetItemValLong(dialogID, itmIdx, FALSE);
@@ -4499,7 +4521,7 @@ short DGCALLBACK layerAssignHandler_2(short message, short dialogID, short item,
 					if (strncmp(layerInfo.code_name[xx].c_str(), layerInfo.obj_cat[yy].c_str(), 4) == 0) {
 						itmIdx = DGAppendDialogItem(dialogID, DG_ITM_RADIOBUTTON, DG_BT_PUSHTEXT, BUTTON_OBJ, itmPosX, itmPosY, 95, 28);
 						DGSetItemFont(dialogID, itmIdx, DG_IS_SMALL | DG_IS_PLAIN);
-						sprintf(tempStr, "%s\n%s", layerInfo.obj_name[yy].c_str(), layerInfo.obj_desc[yy].c_str());
+						sprintf(tempStr, "%s %s", layerInfo.obj_name[yy].c_str(), layerInfo.obj_desc[yy].c_str());
 						DGSetItemText(dialogID, itmIdx, charToWchar(tempStr));
 						DGShowItem(dialogID, itmIdx);
 						OBJ_BUTTONS[count] = itmIdx;
@@ -5175,9 +5197,16 @@ GSErrCode	inspectLayerNames(void)
 			bSkip = false;
 			for (yy = 0; yy < exceptionLayerNames.size(); ++yy) {
 				insElem = attrib.layer.head.name;
-				if (strncmp(insElem.c_str(), exceptionLayerNames.at(yy).c_str(), strlen(insElem.c_str())) == 0) {
+
+				GS::UniString	operand1 = attrib.layer.head.name;
+				GS::UniString	operand2 = exceptionLayerNames.at(yy).c_str();
+				if (operand1.Compare(operand2) == 1) {
 					bSkip = true;
 				}
+
+				//if (strncmp(insElem.c_str(), exceptionLayerNames.at(yy).c_str(), strlen(insElem.c_str())) == 0) {
+				//	bSkip = true;
+				//}
 			}
 
 			// 8단계 또는 10단계까지 성공적으로 완료되면
@@ -5190,43 +5219,60 @@ GSErrCode	inspectLayerNames(void)
 
 				// 기본형
 				for (yy = 0; yy < layerInfo.code_name.size(); ++yy) {
-					if (my_strcmp(layerInfo.code_name.at(yy).c_str(), constructionCode) == 0)
+					GS::UniString	operand1 = constructionCode;
+					GS::UniString	operand2 = charToWchar(layerInfo.code_name.at(yy).c_str());
+					if (operand1.Compare(operand2) == 1)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.dong_name.size(); ++yy) {
-					if (my_strcmp(layerInfo.dong_name.at(yy).c_str(), tok3) == 0) {
+					GS::UniString	operand1 = tok3;
+					GS::UniString	operand2 = charToWchar(layerInfo.dong_name.at(yy).c_str());
+					if (operand1.Compare(operand2) == 1)
 						++nValidCountBase;
-					}
 				}
 				for (yy = 0; yy < layerInfo.floor_name.size(); ++yy) {
-					if (my_strcmp(layerInfo.floor_name.at(yy).c_str(), tok4) == 0)
+					GS::UniString	operand1 = tok4;
+					GS::UniString	operand2 = charToWchar(layerInfo.floor_name.at(yy).c_str());
+					if (operand1.Compare(operand2) == 1)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.cast_name.size(); ++yy) {
-					if (my_strcmp(layerInfo.cast_name.at(yy).c_str(), tok5) == 0)
+					GS::UniString	operand1 = tok5;
+					GS::UniString	operand2 = charToWchar(layerInfo.cast_name.at(yy).c_str());
+					if (operand1.Compare(operand2) == 1)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.CJ_name.size(); ++yy) {
-					if (my_strcmp(layerInfo.CJ_name.at(yy).c_str(), tok6) == 0)
+					GS::UniString	operand1 = tok6;
+					GS::UniString	operand2 = charToWchar(layerInfo.CJ_name.at(yy).c_str());
+					if (operand1.Compare(operand2) == 1)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.orderInCJ_name.size(); ++yy) {
-					if (my_strcmp(layerInfo.orderInCJ_name.at(yy).c_str(), tok7) == 0)
+					GS::UniString	operand1 = tok7;
+					GS::UniString	operand2 = charToWchar(layerInfo.orderInCJ_name.at(yy).c_str());
+					if (operand1.Compare(operand2) == 1)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.obj_name.size(); ++yy) {
-					if (my_strcmp(layerInfo.obj_name.at(yy).c_str(), tok8) == 0)
+					GS::UniString	operand1 = tok8;
+					GS::UniString	operand2 = charToWchar(layerInfo.obj_name.at(yy).c_str());
+					if (operand1.Compare(operand2) == 1)
 						++nValidCountBase;
 				}
 
 				if ((extSuccess == true) && (nExtendFields == 2)) {
 					// 확장형
 					for (yy = 0; yy < layerInfo.productSite_name.size(); ++yy) {
-						if (my_strcmp(layerInfo.productSite_name.at(yy).c_str(), tok9) == 0)
+						GS::UniString	operand1 = tok9;
+						GS::UniString	operand2 = charToWchar(layerInfo.productSite_name.at(yy).c_str());
+						if (operand1.Compare(operand2) == 1)
 							++nValidCountExtend;
 					}
 					for (yy = 0; yy < layerInfo.productNum_name.size(); ++yy) {
-						if (my_strcmp(layerInfo.productNum_name.at(yy).c_str(), tok10) == 0)
+						GS::UniString	operand1 = tok10;
+						GS::UniString	operand2 = charToWchar(layerInfo.productNum_name.at(yy).c_str());
+						if (operand1.Compare(operand2) == 1)
 							++nValidCountExtend;
 					}
 				}
