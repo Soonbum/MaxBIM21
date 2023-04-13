@@ -9,8 +9,9 @@
 
 using namespace exportDG;
 
-VisibleObjectInfo	visibleObjInfo;			// 보이는 레이어 상의 객체별 명칭, 존재 여부, 보이기 여부
-static short	EDITCONTROL_SCALE_VALUE;	// 축척 값을 입력하는 Edit컨트롤의 ID 값
+VisibleObjectInfo	visibleObjInfo;		// 보이는 레이어 상의 객체별 명칭, 존재 여부, 보이기 여부
+short	EDITCONTROL_SCALE_VALUE;		// 축척 값을 입력하는 Edit컨트롤의 ID 값
+short	EDITCONTROL_FILENAME;			// 파일명을 입력하는 Edit컨트롤의 ID 값
 
 
 // 배열 초기화 함수
@@ -237,6 +238,7 @@ void SummaryOfObjectInfo::clear ()
 GSErrCode	exportSelectedElementInfo (void)
 {
 	GSErrCode	err = NoError;
+	short		result;
 	unsigned short		xx, yy, zz;
 	//bool		regenerate = true;
 	
@@ -290,6 +292,10 @@ GSErrCode	exportSelectedElementInfo (void)
 	API_MiscAppInfo		miscAppInfo;
 	FILE				*fp;
 	FILE				*fp_interReport;
+
+	result = DGBlankModalDialog (300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData) &filename);
+
+	// !!!
 
 	ACAPI_Environment (APIEnv_GetSpecFolderID, &specFolderID, &location);
 	ACAPI_Environment (APIEnv_GetMiscAppInfoID, &miscAppInfo);
@@ -4290,6 +4296,64 @@ short DGCALLBACK scaleQuestionHandler (short message, short dialogID, short item
 				case DG_CLOSEBOX:
 					break;
 			}
+	}
+
+	result = item;
+
+	return	result;
+}
+
+// [다이얼로그] 파일명을 입력할 수 있도록 함
+short DGCALLBACK filenameQuestionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData /* msgData */)
+{
+	short	result;
+	short	idxItem;
+	GS::UniString* filename = (GS::UniString*)userData;
+
+	switch (message) {
+	case DG_MSG_INIT:
+		// 다이얼로그 타이틀
+		DGSetDialogTitle(dialogID, L"파일명 입력하기");
+
+		// Yes 버튼
+		DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 70, 110, 70, 25);
+		DGSetItemFont(dialogID, DG_OK, DG_IS_LARGE | DG_IS_PLAIN);
+		DGSetItemText(dialogID, DG_OK, L"예");
+		DGShowItem(dialogID, DG_OK);
+
+		// No 버튼
+		DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 160, 110, 70, 25);
+		DGSetItemFont(dialogID, DG_CANCEL, DG_IS_LARGE | DG_IS_PLAIN);
+		DGSetItemText(dialogID, DG_CANCEL, L"아니오");
+		DGShowItem(dialogID, DG_CANCEL);
+
+		// 라벨: 안내문
+		idxItem = DGAppendDialogItem(dialogID, DG_ITM_STATICTEXT, DG_IS_LEFT, DG_FT_NONE, 30, 15, 200, 25);
+		DGSetItemFont(dialogID, idxItem, DG_IS_LARGE | DG_IS_PLAIN);
+		DGSetItemText(dialogID, idxItem, L"내보낼 파일의 이름을 입력하십시오.");
+		DGShowItem(dialogID, idxItem);
+
+		// Edit 컨트롤
+		EDITCONTROL_FILENAME = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_TEXT, 0, 70, 54, 160, 25);
+		DGSetItemFont(dialogID, EDITCONTROL_FILENAME, DG_IS_LARGE | DG_IS_PLAIN);
+		//DGSetItemText(dialogID, EDITCONTROL_FILENAME, *filename);
+		DGShowItem(dialogID, EDITCONTROL_FILENAME);
+
+		break;
+
+	case DG_MSG_CLICK:
+		switch (item) {
+		case DG_OK:
+			*filename = DGGetItemText(dialogID, EDITCONTROL_FILENAME);
+			break;
+		case DG_CANCEL:
+			break;
+		}
+	case DG_MSG_CLOSE:
+		switch (item) {
+		case DG_CLOSEBOX:
+			break;
+		}
 	}
 
 	result = item;

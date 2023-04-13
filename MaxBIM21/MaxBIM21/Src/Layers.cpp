@@ -565,7 +565,7 @@ GSErrCode	showLayersEasily(void)
 					layerInfo.bCodeAllShow = true;
 				}
 
-				// 3단계. 동 구분 !!!
+				// 3단계. 동 구분
 				for (yy = 0; yy < layerInfo.dong_name.size(); ++yy) {
 					GS::UniString	operand1 = tok3;
 					GS::UniString	operand2 = charToWchar(layerInfo.dong_name[yy].c_str());
@@ -5203,10 +5203,6 @@ GSErrCode	inspectLayerNames(void)
 				if (operand1.Compare(operand2) == 1) {
 					bSkip = true;
 				}
-
-				//if (strncmp(insElem.c_str(), exceptionLayerNames.at(yy).c_str(), strlen(insElem.c_str())) == 0) {
-				//	bSkip = true;
-				//}
 			}
 
 			// 8단계 또는 10단계까지 성공적으로 완료되면
