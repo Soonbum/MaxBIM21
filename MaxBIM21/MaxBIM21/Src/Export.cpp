@@ -254,7 +254,6 @@ GSErrCode	exportSelectedElementInfo (void)
 	SummaryOfObjectInfo	objectInfo;
 
 	char			buffer [512];
-	char			filename [512];
 	char			tempStr [512];
 	const char*		foundStr;
 	bool			foundObject;
@@ -286,22 +285,21 @@ GSErrCode	exportSelectedElementInfo (void)
 
 	// 엑셀 파일로 기둥 정보 내보내기
 	// 파일 저장을 위한 변수
-	API_SpecFolderID	specFolderID = API_ApplicationFolderID;
-	IO::Location		location;
-	GS::UniString		resultString;
-	API_MiscAppInfo		miscAppInfo;
 	FILE				*fp;
 	FILE				*fp_interReport;
 
-	result = DGBlankModalDialog (300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData) &filename);
+	GS::UniString		inputFilename;
+	GS::UniString		madeFilename;
+	char				filename[256];
+	result = DGBlankModalDialog (300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData) &inputFilename);
 
-	// !!!
-
-	ACAPI_Environment (APIEnv_GetSpecFolderID, &specFolderID, &location);
-	ACAPI_Environment (APIEnv_GetMiscAppInfoID, &miscAppInfo);
-	sprintf (filename, "%s - 선택한 부재 정보.csv", miscAppInfo.caption);
+	// !!! 파일명 한글이 안됨
+	madeFilename = inputFilename + GS::UniString(".csv");
+	strcpy(filename, madeFilename.ToCStr().Get());
 	fp = fopen (filename, "w+");
-	sprintf (filename, "%s - 선택한 부재 정보 (중간보고서).txt", miscAppInfo.caption);
+
+	madeFilename = inputFilename + " (REPORT).txt";
+	strcpy(filename, madeFilename.ToCStr().Get());
 	fp_interReport = fopen (filename, "w+");
 
 	if ((fp == NULL) || (fp_interReport == NULL)) {
@@ -336,9 +334,11 @@ GSErrCode	exportSelectedElementInfo (void)
 
 						// 객체 종류를 찾았다면,
 						if (my_strcmp (foundStr, "") != 0) {
-							retVal = my_strcmp (objectInfo.keyDesc.at(yy).c_str (), foundStr);
+							// !!!
+							//retVal = objectInfo.keyDesc.at(yy).compare(foundStr);
+							retVal = convertStr(objectInfo.keyDesc.at(yy).c_str()).Compare(foundStr);
 
-							if (retVal == 0) {
+							if (retVal == true) {
 								foundObject = true;
 								foundExistValue = false;
 
@@ -468,6 +468,8 @@ GSErrCode	exportSelectedElementInfo (void)
 						fprintf (fp, buffer);
 
 					} else if ((my_strcmp (objectInfo.keyDesc.at(xx).c_str (), "유로폼") == 0) || (my_strcmp (objectInfo.keyDesc.at(xx).c_str (), "스틸폼") == 0)) {
+					//} else if ((convertStr(objectInfo.keyDesc.at(xx).c_str()).Compare(L"유로폼") == true) || (convertStr(objectInfo.keyDesc.at(xx).c_str()).Compare(L"스틸폼") == true)) {
+					// !!!
 						// 규격폼
 						if (atoi (objectInfo.records.at(yy).at(1).c_str ()) > 0) {
 							sprintf (buffer, "%s X %s ", objectInfo.records.at(yy).at(2), objectInfo.records.at(yy).at(3));
@@ -1525,9 +1527,9 @@ GSErrCode	exportSelectedElementInfo (void)
 	// 그룹화 일시정지 OFF
 	suspendGroups (false);
 
-	ACAPI_Environment (APIEnv_GetSpecFolderID, &specFolderID, &location);
+	//ACAPI_Environment (APIEnv_GetSpecFolderID, &specFolderID, &location);
 	//location.ToDisplayText (&resultString);
-	WriteReport_Alert ("결과물을 다음 위치에 저장했습니다.\n\n%s\n또는 프로젝트 파일이 있는 폴더", resultString.ToCStr ().Get ());
+	//WriteReport_Alert ("결과물을 다음 위치에 저장했습니다.\n\n%s\n또는 프로젝트 파일이 있는 폴더", resultString.ToCStr ().Get ());
 
 	return	err;
 }

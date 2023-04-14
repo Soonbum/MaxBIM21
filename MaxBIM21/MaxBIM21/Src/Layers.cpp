@@ -569,7 +569,7 @@ GSErrCode	showLayersEasily(void)
 				for (yy = 0; yy < layerInfo.dong_name.size(); ++yy) {
 					GS::UniString	operand1 = tok3;
 					GS::UniString	operand2 = charToWchar(layerInfo.dong_name[yy].c_str());
-					if (operand1.Compare(operand2) == 1) {
+					if (operand1.Compare(operand2) == true) {
 						layerInfo.dong_state[yy] = true;
 					}
 					layerInfo.bDongAllShow = true;
@@ -579,7 +579,7 @@ GSErrCode	showLayersEasily(void)
 				for (yy = 0; yy < layerInfo.floor_name.size(); ++yy) {
 					GS::UniString	operand1 = tok4;
 					GS::UniString	operand2 = charToWchar(layerInfo.floor_name[yy].c_str());
-					if (operand1.Compare(operand2) == 1) {
+					if (operand1.Compare(operand2) == true) {
 						layerInfo.floor_state[yy] = true;
 					}
 					layerInfo.bFloorAllShow = true;
@@ -589,7 +589,7 @@ GSErrCode	showLayersEasily(void)
 				for (yy = 0; yy < layerInfo.cast_name.size(); ++yy) {
 					GS::UniString	operand1 = tok5;
 					GS::UniString	operand2 = charToWchar(layerInfo.cast_name[yy].c_str());
-					if (operand1.Compare(operand2) == 1) {
+					if (operand1.Compare(operand2) == true) {
 						layerInfo.cast_state[yy] = true;
 					}
 					layerInfo.bCastAllShow = true;
@@ -599,7 +599,7 @@ GSErrCode	showLayersEasily(void)
 				for (yy = 0; yy < layerInfo.CJ_name.size(); ++yy) {
 					GS::UniString	operand1 = tok6;
 					GS::UniString	operand2 = charToWchar(layerInfo.CJ_name[yy].c_str());
-					if (operand1.Compare(operand2) == 1) {
+					if (operand1.Compare(operand2) == true) {
 						layerInfo.CJ_state[yy] = true;
 					}
 					layerInfo.bCJAllShow = true;
@@ -609,7 +609,7 @@ GSErrCode	showLayersEasily(void)
 				for (yy = 0; yy < layerInfo.orderInCJ_name.size(); ++yy) {
 					GS::UniString	operand1 = tok7;
 					GS::UniString	operand2 = charToWchar(layerInfo.orderInCJ_name[yy].c_str());
-					if (operand1.Compare(operand2) == 1) {
+					if (operand1.Compare(operand2) == true) {
 						layerInfo.orderInCJ_state[yy] = true;
 					}
 					layerInfo.bOrderInCJAllShow = true;
@@ -627,7 +627,7 @@ GSErrCode	showLayersEasily(void)
 					for (yy = 0; yy < layerInfo.productSite_name.size(); ++yy) {
 						GS::UniString	operand1 = tok9;
 						GS::UniString	operand2 = charToWchar(layerInfo.productSite_name[yy].c_str());
-						if (operand1.Compare(operand2) == 1) {
+						if (operand1.Compare(operand2) == true) {
 							layerInfo.productSite_state[yy] = true;
 						}
 					}
@@ -5200,7 +5200,7 @@ GSErrCode	inspectLayerNames(void)
 
 				GS::UniString	operand1 = attrib.layer.head.name;
 				GS::UniString	operand2 = exceptionLayerNames.at(yy).c_str();
-				if (operand1.Compare(operand2) == 1) {
+				if (operand1.Compare(operand2) == true) {
 					bSkip = true;
 				}
 			}
@@ -5217,43 +5217,43 @@ GSErrCode	inspectLayerNames(void)
 				for (yy = 0; yy < layerInfo.code_name.size(); ++yy) {
 					GS::UniString	operand1 = constructionCode;
 					GS::UniString	operand2 = charToWchar(layerInfo.code_name.at(yy).c_str());
-					if (operand1.Compare(operand2) == 1)
+					if (operand1.Compare(operand2) == true)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.dong_name.size(); ++yy) {
 					GS::UniString	operand1 = tok3;
 					GS::UniString	operand2 = charToWchar(layerInfo.dong_name.at(yy).c_str());
-					if (operand1.Compare(operand2) == 1)
+					if (operand1.Compare(operand2) == true)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.floor_name.size(); ++yy) {
 					GS::UniString	operand1 = tok4;
 					GS::UniString	operand2 = charToWchar(layerInfo.floor_name.at(yy).c_str());
-					if (operand1.Compare(operand2) == 1)
+					if (operand1.Compare(operand2) == true)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.cast_name.size(); ++yy) {
 					GS::UniString	operand1 = tok5;
 					GS::UniString	operand2 = charToWchar(layerInfo.cast_name.at(yy).c_str());
-					if (operand1.Compare(operand2) == 1)
+					if (operand1.Compare(operand2) == true)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.CJ_name.size(); ++yy) {
 					GS::UniString	operand1 = tok6;
 					GS::UniString	operand2 = charToWchar(layerInfo.CJ_name.at(yy).c_str());
-					if (operand1.Compare(operand2) == 1)
+					if (operand1.Compare(operand2) == true)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.orderInCJ_name.size(); ++yy) {
 					GS::UniString	operand1 = tok7;
 					GS::UniString	operand2 = charToWchar(layerInfo.orderInCJ_name.at(yy).c_str());
-					if (operand1.Compare(operand2) == 1)
+					if (operand1.Compare(operand2) == true)
 						++nValidCountBase;
 				}
 				for (yy = 0; yy < layerInfo.obj_name.size(); ++yy) {
 					GS::UniString	operand1 = tok8;
 					GS::UniString	operand2 = charToWchar(layerInfo.obj_name.at(yy).c_str());
-					if (operand1.Compare(operand2) == 1)
+					if (operand1.Compare(operand2) == true)
 						++nValidCountBase;
 				}
 
@@ -5262,13 +5262,13 @@ GSErrCode	inspectLayerNames(void)
 					for (yy = 0; yy < layerInfo.productSite_name.size(); ++yy) {
 						GS::UniString	operand1 = tok9;
 						GS::UniString	operand2 = charToWchar(layerInfo.productSite_name.at(yy).c_str());
-						if (operand1.Compare(operand2) == 1)
+						if (operand1.Compare(operand2) == true)
 							++nValidCountExtend;
 					}
 					for (yy = 0; yy < layerInfo.productNum_name.size(); ++yy) {
 						GS::UniString	operand1 = tok10;
 						GS::UniString	operand2 = charToWchar(layerInfo.productNum_name.at(yy).c_str());
-						if (operand1.Compare(operand2) == 1)
+						if (operand1.Compare(operand2) == true)
 							++nValidCountExtend;
 					}
 				}
