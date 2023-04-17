@@ -542,6 +542,109 @@ char* convertStr(const GS::UniString uni_str)
 	return retStr;
 }
 
+//// UTF16 -> UTF8 문자 변환 (출처: http://egloos.zum.com/profrog/v/1177107)
+//size_t	UnicodeToUTF8(wchar_t uc, char* UTF8)
+//{
+//	size_t tRequiredSize = 0;
+//
+//	if (uc <= 0x7f) {
+//		if (NULL != UTF8) {
+//			UTF8[0] = (char)uc;
+//			UTF8[1] = (char)'\0';
+//		}
+//		tRequiredSize = 1;
+//	} else if (uc <= 0x7ff) {
+//		if (NULL != UTF8) {
+//			UTF8[0] = (char)(0xc0 + uc / (0x01 << 6));
+//			UTF8[1] = (char)(0x80 + uc % (0x01 << 6));
+//			UTF8[2] = (char)'\0';
+//		}
+//		tRequiredSize = 2;
+//	} else if (uc <= 0xffff) {
+//		if (NULL != UTF8) {
+//			UTF8[0] = (char)(0xe0 + uc / (0x01 << 12));
+//			UTF8[1] = (char)(0x80 + uc / (0x01 << 6) % (0x01 << 6));
+//			UTF8[2] = (char)(0x80 + uc % (0x01 << 6));
+//			UTF8[3] = (char)'\0';
+//		}
+//		tRequiredSize = 3;
+//	}
+//
+//	return tRequiredSize;
+//}
+//
+//// UTF8 -> UTF16 문자 변환 (출처: http://egloos.zum.com/profrog/v/1177107)
+//size_t	UTF8ToUnicode(char* UTF8, wchar_t& uc)
+//{
+//	size_t tRequiredSize = 0;
+//	uc = 0x0000;
+//
+//	// ASCII byte 
+//	if (0 == (UTF8[0] & 0x80)) {
+//		uc = UTF8[0];
+//		tRequiredSize = 1;
+//	} else { // Start byte for 2byte
+//		if (0xC0 == (UTF8[0] & 0xE0) && 0x80 == (UTF8[1] & 0xC0)) {
+//			uc += (UTF8[0] & 0x1F) << 6;
+//			uc += (UTF8[1] & 0x3F) << 0;
+//			tRequiredSize = 2;
+//		} else { // Start byte for 3byte
+//			if (0xE0 == (UTF8[0] & 0xE0) && 0x80 == (UTF8[1] & 0xC0) && 0x80 == (UTF8[2] & 0xC0)) {
+//				uc += (UTF8[0] & 0x1F) << 12;
+//				uc += (UTF8[1] & 0x3F) << 6;
+//				uc += (UTF8[2] & 0x3F) << 0;
+//				tRequiredSize = 3;
+//			} else {
+//				// Invalid case
+//				//assert(false);
+//				tRequiredSize = 0;
+//			}
+//		}
+//	}
+//
+//	return tRequiredSize;
+//}
+//
+//// UTF16 -> UTF8 문자열 변환 (출처: http://egloos.zum.com/profrog/v/1177107)
+//size_t	UnicodeStrToUTF8Str(wchar_t* szUni, char* szUTF8)
+//{
+//	size_t tRequiredSize = 0;
+//
+//	int i = 0;
+//
+//	for (i = 0; szUni[i]; i++) {
+//		size_t tSize = 0;
+//		if (NULL != szUTF8)
+//			tSize = UnicodeToUTF8(szUni[i], szUTF8 + tRequiredSize);
+//		else
+//			tSize = UnicodeToUTF8(szUni[i], NULL);
+//
+//		tRequiredSize += tSize;
+//	}
+//
+//	return tRequiredSize;
+//}
+//
+//// UTF8 -> UTF16 문자열 변환 (출처: http://egloos.zum.com/profrog/v/1177107)
+//size_t	UTF8StrToUnicodeStr(char* szUTF8, size_t tUTF8Len, wchar_t* szUni)
+//{
+//	size_t tReadPos = 0;
+//	size_t i = 0;
+//
+//	for (i = 0; tReadPos < tUTF8Len; i++) {
+//		wchar_t tTempUnicodeChar = 0;
+//		size_t tSize = UTF8ToUnicode(szUTF8 + tReadPos, tTempUnicodeChar);
+//
+//		if (NULL != szUni)
+//			szUni[i] = tTempUnicodeChar;
+//
+//		tReadPos += tSize;
+//	}
+//
+//	return i;
+//}
+
+
 ////////////////////////////////////////////////// 객체 배치
 // 좌표 라벨을 배치함
 GSErrCode	placeCoordinateLabel(double xPos, double yPos, double zPos, bool bComment, std::string comment, short layerInd, short floorInd)

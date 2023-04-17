@@ -293,6 +293,9 @@ GSErrCode	exportSelectedElementInfo (void)
 	char				filename[256];
 	result = DGBlankModalDialog (300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData) &inputFilename);
 
+	if (inputFilename.GetLength() <= 0)
+		inputFilename = "notitle";
+
 	// !!! 파일명 한글이 안됨
 	madeFilename = inputFilename + GS::UniString(".csv");
 	strcpy(filename, madeFilename.ToCStr().Get());
@@ -334,8 +337,6 @@ GSErrCode	exportSelectedElementInfo (void)
 
 						// 객체 종류를 찾았다면,
 						if (my_strcmp (foundStr, "") != 0) {
-							// !!!
-							//retVal = objectInfo.keyDesc.at(yy).compare(foundStr);
 							retVal = convertStr(objectInfo.keyDesc.at(yy).c_str()).Compare(foundStr);
 
 							if (retVal == true) {
@@ -352,9 +353,13 @@ GSErrCode	exportSelectedElementInfo (void)
 									sprintf (buffer, "%s", objectInfo.varName.at(yy).at(zz).c_str ());
 									varType = getParameterTypeByName (&memo, buffer);
 
+									// !!!
 									if ((varType != APIParT_Separator) || (varType != APIParT_Title) || (varType != API_ZombieParT)) {
-										if (varType == APIParT_CString)
-											sprintf (tempStr, "%s", getParameterStringByName (&memo, buffer));	// 문자열
+										if (varType == APIParT_CString) {
+											sprintf(tempStr, "%s", getParameterStringByName(&memo, buffer));	// 문자열
+											GS::UniString unicodeStr = charToWchar(tempStr);
+											sprintf(tempStr, unicodeStr.ToCStr().Get());
+										}
 										else
 											sprintf (tempStr, "%.3f", getParameterValueByName (&memo, buffer));	// 숫자
 									}
@@ -458,21 +463,19 @@ GSErrCode	exportSelectedElementInfo (void)
 					if (my_strcmp (objectInfo.keyDesc.at(xx).c_str (), "유로폼 후크") == 0) {
 						// 원형
 						if (objectInfo.records.at(yy).at(2).compare ("원형") == 0) {
-							sprintf (buffer, "원형 / %s", objectInfo.records.at(yy).at(1));
+							sprintf (buffer, "원형 / %s", objectInfo.records.at(yy).at(1).c_str());
 						}
 
 						// 사각
 						if (objectInfo.records.at(yy).at(2).compare ("사각") == 0) {
-							sprintf (buffer, "사각 / %s", objectInfo.records.at(yy).at(1));
+							sprintf (buffer, "사각 / %s", objectInfo.records.at(yy).at(1).c_str());
 						}
 						fprintf (fp, buffer);
 
 					} else if ((my_strcmp (objectInfo.keyDesc.at(xx).c_str (), "유로폼") == 0) || (my_strcmp (objectInfo.keyDesc.at(xx).c_str (), "스틸폼") == 0)) {
-					//} else if ((convertStr(objectInfo.keyDesc.at(xx).c_str()).Compare(L"유로폼") == true) || (convertStr(objectInfo.keyDesc.at(xx).c_str()).Compare(L"스틸폼") == true)) {
-					// !!!
 						// 규격폼
 						if (atoi (objectInfo.records.at(yy).at(1).c_str ()) > 0) {
-							sprintf (buffer, "%s X %s ", objectInfo.records.at(yy).at(2), objectInfo.records.at(yy).at(3));
+							sprintf (buffer, "%s X %s ", objectInfo.records.at(yy).at(2).c_str(), objectInfo.records.at(yy).at(3).c_str());
 
 						// 비규격품
 						} else {
@@ -913,7 +916,7 @@ GSErrCode	exportSelectedElementInfo (void)
 					} else {
 						for (zz = 0 ; zz < objectInfo.nInfo.at(xx) ; ++zz) {
 							// 변수별 값 출력
-							sprintf (buffer, "%s(%s) ", objectInfo.varDesc.at(xx).at(zz).c_str (), objectInfo.records.at(yy).at(zz+1).c_str ());
+							sprintf (buffer, "%s(%s) ", objectInfo.varDesc.at(xx).at(zz).c_str (), objectInfo.records.at(yy).at(zz+1).c_str());
 							fprintf (fp, buffer);
 						}
 					}
@@ -1021,7 +1024,7 @@ GSErrCode	exportSelectedElementInfo (void)
 						// 규격
 						if (atoi (objectInfo.records.at(yy).at(1).c_str ()) > 0) {
 							// 규격폼
-							sprintf (buffer, "%s X %s | ", objectInfo.records.at(yy).at(2), objectInfo.records.at(yy).at(3));
+							sprintf (buffer, "%s X %s | ", objectInfo.records.at(yy).at(2).c_str(), objectInfo.records.at(yy).at(3).c_str());
 						} else {
 							// 비규격품
 							length = atof (objectInfo.records.at(yy).at(4).c_str ());
@@ -1800,7 +1803,7 @@ GSErrCode	exportElementInfoOnVisibleLayers (void)
 
 								// 객체 종류를 찾았다면,
 								if (my_strcmp (foundStr, "") != 0) {
-									retVal = my_strcmp (objectInfo.keyDesc.at(yy).c_str (), foundStr);
+									retVal = convertStr(objectInfo.keyDesc.at(yy).c_str ()).Compare(foundStr);
 
 									if (retVal == 0) {
 										foundObject = true;
@@ -1907,12 +1910,12 @@ GSErrCode	exportElementInfoOnVisibleLayers (void)
 							if (my_strcmp (objectInfo.keyDesc.at(xx).c_str (), "유로폼 후크") == 0) {
 								// 원형
 								if (objectInfo.records.at(yy).at(2).compare ("원형") == 0) {
-									sprintf (buffer, "원형 / %s", objectInfo.records.at(yy).at(1));
+									sprintf (buffer, "원형 / %s", objectInfo.records.at(yy).at(1).c_str());
 								}
 
 								// 사각
 								if (objectInfo.records.at(yy).at(2).compare ("사각") == 0) {
-									sprintf (buffer, "사각 / %s", objectInfo.records.at(yy).at(1));
+									sprintf (buffer, "사각 / %s", objectInfo.records.at(yy).at(1).c_str());
 								}
 								fprintf (fp, buffer);
 								fprintf (fp_unite, buffer);
@@ -1920,7 +1923,7 @@ GSErrCode	exportElementInfoOnVisibleLayers (void)
 							} else if ((my_strcmp (objectInfo.keyDesc.at(xx).c_str (), "유로폼") == 0) || (my_strcmp (objectInfo.keyDesc.at(xx).c_str (), "스틸폼") == 0)) {
 								// 규격폼
 								if (atoi (objectInfo.records.at(yy).at(1).c_str ()) > 0) {
-									sprintf (buffer, "%s X %s ", objectInfo.records.at(yy).at(2), objectInfo.records.at(yy).at(3));
+									sprintf (buffer, "%s X %s ", objectInfo.records.at(yy).at(2).c_str(), objectInfo.records.at(yy).at(3).c_str());
 
 								// 비규격품
 								} else {

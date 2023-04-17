@@ -58,6 +58,11 @@ char*		wcharToChar(const wchar_t* wstr);				// wchar_t형 문자열을 char형 문자열�
 GS::UniString	convertStr(const char* c_str);				// C 문자열을 GS::UniString 문자열로 변환
 char*			convertStr(const GS::UniString uni_str);	// GS::UniString 문자열을 C 문자열로 변환
 
+//size_t	UnicodeToUTF8(wchar_t uc, char* UTF8);									// UTF16 -> UTF8 문자 변환
+//size_t	UTF8ToUnicode(char* UTF8, wchar_t& uc);									// UTF8 -> UTF16 문자 변환
+//size_t	UnicodeStrToUTF8Str(wchar_t* szUni, char* szUTF8);						// UTF16 -> UTF8 문자열 변환
+//size_t	UTF8StrToUnicodeStr(char* szUTF8, size_t tUTF8Len, wchar_t* szUni);		// UTF8 -> UTF16 문자열 변환
+
 // 객체 배치
 GSErrCode	placeCoordinateLabel(double xPos, double yPos, double zPos, bool bComment = false, std::string comment = "", short layerInd = 1, short floorInd = 0);	// 좌표 라벨을 배치함
 
