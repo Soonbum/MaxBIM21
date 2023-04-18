@@ -8,7 +8,7 @@ using namespace std;
 namespace exportDG {
 	// 다이얼로그 항목 인덱스
 	enum	idxItems_1_exportDG {
-		LABEL_DIST_BTW_COLUMN		= 3,
+		LABEL_DIST_BTW_COLUMN = 3,
 		EDITCONTROL_DIST_BTW_COLUMN
 	};
 
@@ -51,9 +51,9 @@ namespace exportDG {
 class SummaryOfObjectInfo
 {
 public:
-	SummaryOfObjectInfo ();		// 생성자
-	void clear ();				// 레코드 내용 지우기
-	int	quantityPlus1 (vector<string> record);	// 객체의 레코드 수량 1 증가 (있으면 증가, 없으면 신규 추가)
+	SummaryOfObjectInfo();		// 생성자
+	void clear();				// 레코드 내용 지우기
+	int	quantityPlus1(vector<string> record);	// 객체의 레코드 수량 1 증가 (있으면 증가, 없으면 신규 추가)
 
 public:
 	// objectInfo.csv 파일 정보
@@ -81,11 +81,11 @@ struct VisibleObjectInfo
 {
 	// Object 타입
 	short	nKinds;				// 객체 종류 개수
-	char	varName [100][64];	// 1열: 변수명
-	char	objName [100][128];	// 2열: 객체명
-	bool	bExist [100];		// 존재 여부
-	bool	bShow [100];		// 표시 여부
-	short	itmIdx [100];		// 다이얼로그 내 인덱스
+	char	varName[100][64];	// 1열: 변수명
+	char	objName[100][128];	// 2열: 객체명
+	bool	bExist[100];		// 존재 여부
+	bool	bShow[100];		// 표시 여부
+	short	itmIdx[100];		// 다이얼로그 내 인덱스
 
 	// 알려지지 않은 Object 타입의 객체
 	bool	bShow_Unknown;
@@ -147,18 +147,18 @@ class BeamTableformCellArray
 {
 public:
 	short	iBeamDirection;			// HORIZONTAL_DIRECTION, VERTICAL_DIRECTION
-	double	cellElev [2];			// [n]: n+1단 고도값
-	double	cellPos [2];			// [n]: n+1단 X,Y값
+	double	cellElev[2];			// [n]: n+1단 고도값
+	double	cellPos[2];			// [n]: n+1단 X,Y값
 	short	nCells_Left;			// 사용하는 셀 개수
 	short	nCells_Right;			// 사용하는 셀 개수
 	short	nCells_Bottom;			// 사용하는 셀 개수
-	objectInBeamTableform	cells_Left [30][2];		// 보 테이블폼 자재 배열 (2단까지 가능)
-	objectInBeamTableform	cells_Right [30][2];	// 보 테이블폼 자재 배열 (2단까지 가능)
-	objectInBeamTableform	cells_Bottom [30][2];	// 보 테이블폼 자재 배열 (2단까지 가능)
+	objectInBeamTableform	cells_Left[30][2];		// 보 테이블폼 자재 배열 (2단까지 가능)
+	objectInBeamTableform	cells_Right[30][2];	// 보 테이블폼 자재 배열 (2단까지 가능)
+	objectInBeamTableform	cells_Bottom[30][2];	// 보 테이블폼 자재 배열 (2단까지 가능)
 
 public:
-	BeamTableformCellArray ();
-	void	init ();
+	BeamTableformCellArray();
+	void	init();
 };
 
 // 레이어 이름 및 해당 레이어의 인덱스
@@ -169,29 +169,29 @@ public:
 	string	layerName;
 };
 
-void		initArray (double arr [], short arrSize);											// 배열 초기화 함수
-int			compare (const void* first, const void* second);									// 오름차순으로 정렬할 때 사용하는 비교함수 (퀵소트)
-bool		comparePosX (const objectInBeamTableform& a, const objectInBeamTableform& b);		// vector 내 자재 정보 구조체 정렬을 위한 비교 함수 (좌표값 X 기준)
-bool		comparePosY (const objectInBeamTableform& a, const objectInBeamTableform& b);		// vector 내 자재 정보 구조체 정렬을 위한 비교 함수 (좌표값 Y 기준)
-bool		compareLayerName (const LayerList& a, const LayerList& b);							// vector 내 레이어 정보 구조체 정렬을 위한 비교 함수 (레이어 이름 기준)
-bool		compareVectorString (const vector<string>& a, const vector<string>& b);				// vector 내 레코드 내 필드를 기준으로 내림차순 정렬을 위한 비교 함수
+void		initArray(double arr[], short arrSize);											// 배열 초기화 함수
+int			compare(const void* first, const void* second);									// 오름차순으로 정렬할 때 사용하는 비교함수 (퀵소트)
+bool		comparePosX(const objectInBeamTableform& a, const objectInBeamTableform& b);		// vector 내 자재 정보 구조체 정렬을 위한 비교 함수 (좌표값 X 기준)
+bool		comparePosY(const objectInBeamTableform& a, const objectInBeamTableform& b);		// vector 내 자재 정보 구조체 정렬을 위한 비교 함수 (좌표값 Y 기준)
+bool		compareLayerName(const LayerList& a, const LayerList& b);							// vector 내 레이어 정보 구조체 정렬을 위한 비교 함수 (레이어 이름 기준)
+bool		compareVectorString(const vector<string>& a, const vector<string>& b);				// vector 내 레코드 내 필드를 기준으로 내림차순 정렬을 위한 비교 함수
 
-GSErrCode	exportSelectedElementInfo (void);													// 선택한 부재 정보 내보내기 (Single 모드)
-GSErrCode	exportElementInfoOnVisibleLayers (void);											// 선택한 부재 정보 내보내기 (Multi 모드)
+GSErrCode	exportSelectedElementInfo(void);													// 선택한 부재 정보 내보내기 (Single 모드)
+GSErrCode	exportElementInfoOnVisibleLayers(void);											// 선택한 부재 정보 내보내기 (Multi 모드)
 
-int			quantityPlusN (vector<vector<string>> *db, vector<string> record, int n);			// 객체의 레코드 수량 n 증가
+int			quantityPlusN(vector<vector<string>>* db, vector<string> record, int n);			// 객체의 레코드 수량 n 증가
 
-GSErrCode	filterSelection (void);																// 부재별 선택 후 보여주기
-short		DGCALLBACK filterSelectionHandler (short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);		// [다이얼로그] 다이얼로그에서 보이는 레이어 상에 있는 객체들의 종류를 보여주고, 체크한 종류의 객체들만 선택 후 보여줌
+GSErrCode	filterSelection(void);																// 부재별 선택 후 보여주기
+short		DGCALLBACK filterSelectionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);		// [다이얼로그] 다이얼로그에서 보이는 레이어 상에 있는 객체들의 종류를 보여주고, 체크한 종류의 객체들만 선택 후 보여줌
 
-GSErrCode	exportBeamTableformInformation (void);												// 보 테이블폼 물량 정보 내보내기
+GSErrCode	exportBeamTableformInformation(void);												// 보 테이블폼 물량 정보 내보내기
 
-GSErrCode	calcTableformArea (void);															// 테이블폼 면적 계산
+GSErrCode	calcTableformArea(void);															// 테이블폼 면적 계산
 
-GSErrCode	exportAllElevationsToPDFSingleMode (void);											// 모든 입면도 PDF로 내보내기 (Single 모드)
-GSErrCode	exportAllElevationsToPDFMultiMode (void);											// 모든 입면도 PDF로 내보내기 (Multi 모드)
+GSErrCode	exportAllElevationsToPDFSingleMode(void);											// 모든 입면도 PDF로 내보내기 (Single 모드)
+GSErrCode	exportAllElevationsToPDFMultiMode(void);											// 모든 입면도 PDF로 내보내기 (Multi 모드)
 
-short DGCALLBACK scaleQuestionHandler (short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);			// [다이얼로그] 사용자가 축척 값을 직접 입력할 수 있도록 함
+short DGCALLBACK scaleQuestionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);			// [다이얼로그] 사용자가 축척 값을 직접 입력할 수 있도록 함
 short DGCALLBACK filenameQuestionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);		// [다이얼로그] 파일명을 입력할 수 있도록 함
 
 #endif
