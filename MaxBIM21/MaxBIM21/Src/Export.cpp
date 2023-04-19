@@ -257,7 +257,7 @@ GSErrCode	exportSelectedElementInfo(void)
 
 	char			buffer[512];
 	char			tempStr[512];
-	const char* foundStr;
+	const char*		foundStr;
 	bool			foundObject;
 	bool			foundExistValue;
 	int				retVal;
@@ -272,7 +272,7 @@ GSErrCode	exportSelectedElementInfo(void)
 	// Single 모드 전용
 	vector<vector<string>>	plywoodInfo;	// 합판 종류별 정보
 	vector<vector<string>>	darukiInfo;		// 각재 종류별 정보 (합판에 부착된 제작틀만)
-	char* token;
+	char*	token;
 	char	infoText[256];
 
 
@@ -285,26 +285,24 @@ GSErrCode	exportSelectedElementInfo(void)
 		return err;
 	}
 
-	// 엑셀 파일로 기둥 정보 내보내기
 	// 파일 저장을 위한 변수
 	FILE* fp;
 	FILE* fp_interReport;
 
 	GS::UniString		inputFilename;
 	GS::UniString		madeFilename;
-	char				filename[256];
+	char				filename[512];
 	result = DGBlankModalDialog(300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData)&inputFilename);
 
 	if (inputFilename.GetLength() <= 0)
 		inputFilename = "notitle";
 
-	// !!! 파일명 한글이 안됨
-	madeFilename = inputFilename + GS::UniString(".csv");
-	strcpy(filename, madeFilename.ToCStr().Get());
+	madeFilename = inputFilename + L".csv";
+	strcpy(filename, wcharToChar(madeFilename.ToUStr().Get()));
 	fp = fopen(filename, "w+");
 
-	madeFilename = inputFilename + " (REPORT).txt";
-	strcpy(filename, madeFilename.ToCStr().Get());
+	madeFilename = inputFilename + L" (중간보고서).txt";
+	strcpy(filename, wcharToChar(madeFilename.ToUStr().Get()));
 	fp_interReport = fopen(filename, "w+");
 
 	if ((fp == NULL) || (fp_interReport == NULL)) {
@@ -339,9 +337,9 @@ GSErrCode	exportSelectedElementInfo(void)
 
 						// 객체 종류를 찾았다면,
 						if (my_strcmp(foundStr, "") != 0) {
-							retVal = convertStr(objectInfo.keyDesc.at(yy).c_str()).Compare(foundStr);
+							retVal = my_strcmp(objectInfo.keyDesc.at(yy).c_str(), foundStr);
 
-							if (retVal == true) {
+							if (retVal == 0) {
 								foundObject = true;
 								foundExistValue = false;
 
@@ -355,13 +353,9 @@ GSErrCode	exportSelectedElementInfo(void)
 									sprintf(buffer, "%s", objectInfo.varName.at(yy).at(zz).c_str());
 									varType = getParameterTypeByName(&memo, buffer);
 
-									// !!!
 									if ((varType != APIParT_Separator) || (varType != APIParT_Title) || (varType != API_ZombieParT)) {
-										if (varType == APIParT_CString) {
+										if (varType == APIParT_CString)
 											sprintf(tempStr, "%s", getParameterStringByName(&memo, buffer));	// 문자열
-											GS::UniString unicodeStr = tempStr;
-											sprintf(tempStr, unicodeStr.CopyUTF8());
-										}
 										else
 											sprintf(tempStr, "%.3f", getParameterValueByName(&memo, buffer));	// 숫자
 									}
@@ -448,8 +442,8 @@ GSErrCode	exportSelectedElementInfo(void)
 						if (atoi(objectInfo.records.at(yy).at(1).c_str()) > 0) {
 							sprintf(buffer, "%s X %s ", objectInfo.records.at(yy).at(2).c_str(), objectInfo.records.at(yy).at(3).c_str());
 
-							// 비규격품
 						}
+						// 비규격품
 						else {
 							length = atof(objectInfo.records.at(yy).at(4).c_str());
 							length2 = atof(objectInfo.records.at(yy).at(5).c_str());
@@ -925,14 +919,8 @@ GSErrCode	exportSelectedElementInfo(void)
 					}
 					else {
 						for (zz = 0; zz < objectInfo.nInfo.at(xx); ++zz) {
-							// !!!
 							// 변수별 값 출력
-							//sprintf(buffer, "%s(%s) ", objectInfo.varDesc.at(xx).at(zz).c_str(), objectInfo.records.at(yy).at(zz + 1).c_str());
-//#define	UniStringToConstCString(str)			(str).ToCStr().Get()
-//#define	ConstCStringToUniString(cStr)			GS::UniString(cStr)
-//#define	UniStringToConstUTF8String(str)			(str).ToCStr(0, MaxUSize, CC_UTF8).Get()
-//#define	ConstUTF8StringToUniString(cStr)		GS::UniString(cStr, CC_UTF8)
-							sprintf(buffer, "%s(%s) ", objectInfo.varDesc.at(xx).at(zz).c_str(), UniStringToConstCString(ConstCStringToUniString(string(objectInfo.records.at(yy).at(zz + 1).c_str()))));
+							sprintf(buffer, "%s(%s) ", objectInfo.varDesc.at(xx).at(zz).c_str(), objectInfo.records.at(yy).at(zz + 1).c_str());
 							fprintf(fp, buffer);
 						}
 					}
@@ -1580,15 +1568,31 @@ GSErrCode	exportSelectedElementInfo(void)
 		fprintf(fp_interReport, buffer);
 	}
 
+	char path[1024];
+	char* ptr;
+	GetFullPathName(filename, 1024, path, &ptr);
+
+	// 마지막 디렉토리 구분자의 위치를 찾음
+	ptr = strrstr(path, "\\");
+	if (ptr == NULL) {
+		ptr = strrstr(path, "/");
+		if (ptr == NULL) {
+			// 디렉토리 구분자가 없음
+			return 1;
+		}
+	}
+
+	// 마지막 디렉토리 구분자 이후의 문자열을 제거함
+	*ptr = '\0';
+
+	GS::UniString infoStr = L"다음 경로에 파일이 저장되었습니다.\n" + GS::UniString(charToWchar(path));
+
 	fclose(fp_interReport);
 
 	// 그룹화 일시정지 OFF
 	suspendGroups(false);
 
-	// !!!
-	//ACAPI_Environment (APIEnv_GetSpecFolderID, &specFolderID, &location);
-	//location.ToDisplayText (&resultString);
-	//WriteReport_Alert ("결과물을 다음 위치에 저장했습니다.\n\n%s\n또는 프로젝트 파일이 있는 폴더", resultString.ToCStr ().Get ());
+	DGAlert(DG_INFORMATION, L"알림", infoStr, "", L"확인", "", "");
 
 	return	err;
 }
@@ -1597,6 +1601,7 @@ GSErrCode	exportSelectedElementInfo(void)
 GSErrCode	exportElementInfoOnVisibleLayers(void)
 {
 	GSErrCode	err = NoError;
+	short		result;
 	unsigned short		xx, yy, zz;
 	short		mm;
 
@@ -1622,10 +1627,6 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 	API_AddParID	varType;
 	vector<string>	record;
 
-	// GS::Array 반복자
-	//GS::Array<API_Guid>::Iterator	iterObj;
-	//API_Guid	curGuid;
-
 	// 레이어 관련 변수
 	short			nLayers;
 	API_Attribute	attrib;
@@ -1641,6 +1642,8 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 	// 기타
 	char			buffer[512];
 	char			filename[512];
+	GS::UniString	inputFilename;
+	GS::UniString	madeFilename;
 
 	// 작업 층 정보
 	API_StoryInfo	storyInfo;
@@ -1648,17 +1651,12 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 
 
 	// 진행바를 표현하기 위한 변수
-	GS::UniString       title("내보내기 진행 상황");
-	GS::UniString       subtitle("진행중...");
+	GS::UniString       title(L"내보내기 진행 상황");
+	GS::UniString       subtitle(L"진행중...");
 	short	nPhase;
 	Int32	cur, total;
 
-	// 엑셀 파일로 기둥 정보 내보내기
 	// 파일 저장을 위한 변수
-	API_SpecFolderID	specFolderID = API_ApplicationFolderID;
-	IO::Location		location;
-	GS::UniString		resultString;
-	API_MiscAppInfo		miscAppInfo;
 	FILE* fp;
 	FILE* fp_unite;
 
@@ -1666,7 +1664,13 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 	// 그룹화 일시정지 ON
 	suspendGroups(true);
 
-	ACAPI_Environment(APIEnv_GetSpecFolderID, &specFolderID, &location);
+	result = DGBlankModalDialog(300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData)&inputFilename);
+
+	if (inputFilename.GetLength() <= 0)
+		inputFilename = "notitle";
+
+	madeFilename = inputFilename + L" (통합).csv";
+	strcpy(filename, wcharToChar(madeFilename.ToUStr().Get()));
 
 	// [경고] 다이얼로그에서 객체 이미지를 캡쳐할지 여부를 물어봄
 	//result = DGAlert (DG_INFORMATION, "캡쳐 여부 질문", "캡쳐 작업을 수행하시겠습니까?", "", "예", "아니오", "");
@@ -1720,8 +1724,6 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 		}
 	}
 
-	ACAPI_Environment(APIEnv_GetMiscAppInfoID, &miscAppInfo);
-	sprintf(filename, "%s - 선택한 부재 정보 (통합).csv", miscAppInfo.caption);
 	fp_unite = fopen(filename, "w+");
 
 	if (fp_unite == NULL) {
@@ -1784,16 +1786,18 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 			foundLayerName = strstr(fullLayerName, "WLBM");
 			if (foundLayerName != NULL)	layerType = WLBM;
 
-			sprintf(filename, "%s - 선택한 부재 정보.csv", fullLayerName);
+			madeFilename = inputFilename + L" - " + fullLayerName + L".csv";
+			strcpy(filename, wcharToChar(madeFilename.ToUStr().Get()));
 			fp = fopen(filename, "w+");
 
 			if (fp == NULL) {
-				WriteReport_Alert("레이어 %s는 파일명이 될 수 없으므로 생략합니다.", fullLayerName);
+				GS::UniString warningStr = L"레이어 " + GS::UniString(fullLayerName) + "은(는) 파일명이 될 수 없으므로 생략합니다.";
+				DGAlert(DG_ERROR, L"오류", warningStr, "", L"확인", "", "");
 				continue;
 			}
 
 			// 레이어 이름
-			sprintf(buffer, "\n\n<< 레이어 : %s >>\n", fullLayerName);
+			sprintf(buffer, "\n\n<< 레이어 : %s >>\n", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
 			fprintf(fp, buffer);
 			fprintf(fp_unite, buffer);
 
@@ -1849,7 +1853,7 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 
 								// 객체 종류를 찾았다면,
 								if (my_strcmp(foundStr, "") != 0) {
-									retVal = convertStr(objectInfo.keyDesc.at(yy).c_str()).Compare(foundStr);
+									retVal = my_strcmp(objectInfo.keyDesc.at(yy).c_str(), foundStr);
 
 									if (retVal == 0) {
 										foundObject = true;
@@ -1940,8 +1944,8 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 								if (atoi(objectInfo.records.at(yy).at(1).c_str()) > 0) {
 									sprintf(buffer, "%s X %s ", objectInfo.records.at(yy).at(2).c_str(), objectInfo.records.at(yy).at(3).c_str());
 
-									// 비규격품
 								}
+								// 비규격품
 								else {
 									length = atof(objectInfo.records.at(yy).at(4).c_str());
 									length2 = atof(objectInfo.records.at(yy).at(5).c_str());
@@ -2351,6 +2355,25 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 	// 진행 상황 표시하는 기능 - 마무리
 	ACAPI_Interface(APIIo_CloseProcessWindowID, NULL, NULL);
 
+	char path[1024];
+	char* ptr;
+	GetFullPathName(filename, 1024, path, &ptr);
+
+	// 마지막 디렉토리 구분자의 위치를 찾음
+	ptr = strrstr(path, "\\");
+	if (ptr == NULL) {
+		ptr = strrstr(path, "/");
+		if (ptr == NULL) {
+			// 디렉토리 구분자가 없음
+			return 1;
+		}
+	}
+
+	// 마지막 디렉토리 구분자 이후의 문자열을 제거함
+	*ptr = '\0';
+
+	GS::UniString infoStr = L"다음 경로에 파일이 저장되었습니다.\n" + GS::UniString(charToWchar(path));
+
 	fclose(fp_unite);
 
 	// 모든 프로세스를 마치면 처음에 수집했던 보이는 레이어들을 다시 켜놓을 것
@@ -2370,9 +2393,7 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 	// 그룹화 일시정지 OFF
 	suspendGroups(false);
 
-	ACAPI_Environment(APIEnv_GetSpecFolderID, &specFolderID, &location);
-	//location.ToDisplayText (&resultString);
-	WriteReport_Alert("결과물을 다음 위치에 저장했습니다.\n\n%s\n또는 프로젝트 파일이 있는 폴더", resultString.ToCStr().Get());
+	DGAlert(DG_INFORMATION, L"알림", infoStr, "", L"확인", "", "");
 
 	return	err;
 }
@@ -2436,7 +2457,7 @@ GSErrCode	filterSelection(void)
 	const char* tempStr;
 	bool		foundObj;
 
-	FILE* fp;				// 파일 포인터
+	FILE* fp;					// 파일 포인터
 	char	line[10240];		// 파일에서 읽어온 라인 하나
 	char* token;				// 읽어온 문자열의 토큰
 	short	lineCount;			// 읽어온 라인 수
@@ -2715,8 +2736,8 @@ GSErrCode	exportBeamTableformInformation(void)
 {
 	GSErrCode	err = NoError;
 	unsigned short		xx;
+	short	result;
 	short	mm;
-	//bool	regenerate = true;
 
 	GS::Array<API_Guid>		objects;
 	long					nObjects = 0;
@@ -2754,20 +2775,15 @@ GSErrCode	exportBeamTableformInformation(void)
 	char			buffer_s[512];
 	char			buffer[1024];
 	char			filename[512];
+	GS::UniString		inputFilename;
+	GS::UniString		madeFilename;
 
-	// 엑셀 파일로 기둥 정보 내보내기
 	// 파일 저장을 위한 변수
-	API_SpecFolderID	specFolderID = API_ApplicationFolderID;
-	IO::Location		location;
-	GS::UniString		resultString;
-	API_MiscAppInfo		miscAppInfo;
 	FILE* fp;
 
 
 	// 그룹화 일시정지 ON
 	suspendGroups(true);
-
-	ACAPI_Environment(APIEnv_GetSpecFolderID, &specFolderID, &location);
 
 	// 프로젝트 내 레이어 개수를 알아냄
 	nLayers = getLayerCount();
@@ -2817,8 +2833,13 @@ GSErrCode	exportBeamTableformInformation(void)
 		}
 	}
 
-	ACAPI_Environment(APIEnv_GetMiscAppInfoID, &miscAppInfo);
-	sprintf(filename, "%s - 보 테이블폼 물량표.csv", miscAppInfo.caption);
+	result = DGBlankModalDialog(300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData)&inputFilename);
+
+	if (inputFilename.GetLength() <= 0)
+		inputFilename = "notitle";
+
+	madeFilename = inputFilename + L" - 보 테이블폼 물량표.csv";
+	strcpy(filename, wcharToChar(madeFilename.ToUStr().Get()));
 	fp = fopen(filename, "w+");
 
 	if (fp == NULL) {
@@ -3336,7 +3357,7 @@ GSErrCode	exportBeamTableformInformation(void)
 
 			// 정보 출력
 			if (tableformInfo.nCells_Left + tableformInfo.nCells_Right + tableformInfo.nCells_Bottom > 0) {
-				sprintf(buffer, "<< 레이어 : %s >>\n", fullLayerName);
+				sprintf(buffer, "<< 레이어 : %s >>\n", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
 				fprintf(fp, buffer);
 
 				sprintf(buffer, "%s\n\n", getExplanationOfLayerCode(fullLayerName));
@@ -3498,7 +3519,7 @@ GSErrCode	exportBeamTableformInformation(void)
 			}
 			else {
 				// 실패한 경우
-				sprintf(buffer, "<< 레이어 : %s >>\n", fullLayerName);
+				sprintf(buffer, "<< 레이어 : %s >>\n", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
 				fprintf(fp, buffer);
 
 				sprintf(buffer, "\n정규화된 보 테이블폼 레이어가 아닙니다.\n");
@@ -3521,6 +3542,26 @@ GSErrCode	exportBeamTableformInformation(void)
 		}
 	}
 
+	char path[1024];
+	char* ptr;
+	GetFullPathName(filename, 1024, path, &ptr);
+
+	// 마지막 디렉토리 구분자의 위치를 찾음
+	ptr = strrstr(path, "\\");
+	if (ptr == NULL) {
+		ptr = strrstr(path, "/");
+		if (ptr == NULL) {
+			// 디렉토리 구분자가 없음
+			return 1;
+		}
+	}
+
+	// 마지막 디렉토리 구분자 이후의 문자열을 제거함
+	*ptr = '\0';
+
+	GS::UniString infoStr = L"다음 경로에 파일이 저장되었습니다.\n" + GS::UniString(charToWchar(path));
+
+	// 파일 닫기
 	fclose(fp);
 
 	// 모든 프로세스를 마치면 처음에 수집했던 보이는 레이어들을 다시 켜놓을 것
@@ -3540,10 +3581,7 @@ GSErrCode	exportBeamTableformInformation(void)
 	// 그룹화 일시정지 OFF
 	suspendGroups(false);
 
-	ACAPI_Environment(APIEnv_GetSpecFolderID, &specFolderID, &location);
-	//location.ToDisplayText (&resultString);
-	sprintf(buffer, "결과물을 다음 위치에 저장했습니다.\n\n%s\n또는 프로젝트 파일이 있는 폴더", resultString.ToCStr().Get());
-	WriteReport_Alert(buffer);
+	DGAlert(DG_INFORMATION, L"알림", infoStr, "", L"확인", "", "");
 
 	return err;
 }
@@ -3553,8 +3591,8 @@ GSErrCode	calcTableformArea(void)
 {
 	GSErrCode	err = NoError;
 	unsigned short		xx;
-	short		mm;
-	//bool		regenerate = true;
+	short	result;
+	short	mm;
 
 	// 모든 객체, 보 저장
 	GS::Array<API_Guid>		elemList;
@@ -3576,19 +3614,16 @@ GSErrCode	calcTableformArea(void)
 	// 기타
 	char			buffer[512];
 	char			filename[512];
+	GS::UniString		inputFilename;
+	GS::UniString		madeFilename;
 
 	// 진행바를 표현하기 위한 변수
-	GS::UniString       title("내보내기 진행 상황");
-	GS::UniString       subtitle("진행중...");
+	GS::UniString       title(L"내보내기 진행 상황");
+	GS::UniString       subtitle(L"진행중...");
 	short	nPhase;
 	Int32	cur, total;
 
-	// 엑셀 파일로 기둥 정보 내보내기
 	// 파일 저장을 위한 변수
-	API_SpecFolderID	specFolderID = API_ApplicationFolderID;
-	IO::Location		location;
-	GS::UniString		resultString;
-	API_MiscAppInfo		miscAppInfo;
 	FILE* fp_unite;
 
 	bool	bTargetObject;		// 대상이 되는 객체인가?
@@ -3598,8 +3633,6 @@ GSErrCode	calcTableformArea(void)
 
 	// 그룹화 일시정지 ON
 	suspendGroups(true);
-
-	ACAPI_Environment(APIEnv_GetSpecFolderID, &specFolderID, &location);
 
 	// 프로젝트 내 레이어 개수를 알아냄
 	nLayers = getLayerCount();
@@ -3649,8 +3682,13 @@ GSErrCode	calcTableformArea(void)
 		}
 	}
 
-	ACAPI_Environment(APIEnv_GetMiscAppInfoID, &miscAppInfo);
-	sprintf(filename, "%s - 레이어별 테이블폼 면적 (통합).csv", miscAppInfo.caption);
+	result = DGBlankModalDialog(300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData)&inputFilename);
+
+	if (inputFilename.GetLength() <= 0)
+		inputFilename = "notitle";
+
+	madeFilename = inputFilename + L" - 레이어별 테이블폼 면적 (통합).csv";
+	strcpy(filename, wcharToChar(madeFilename.ToUStr().Get()));
 	fp_unite = fopen(filename, "w+");
 
 	if (fp_unite == NULL) {
@@ -3702,7 +3740,7 @@ GSErrCode	calcTableformArea(void)
 			fullLayerName[strlen(fullLayerName)] = '\0';
 
 			// 레이어 이름
-			sprintf(buffer, "<< 레이어 : %s >> : ", fullLayerName);
+			sprintf(buffer, "<< 레이어 : %s >> : ", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
 			fprintf(fp_unite, buffer);
 
 			totalArea = 0.0;
@@ -3782,6 +3820,26 @@ GSErrCode	calcTableformArea(void)
 	// 진행 상황 표시하는 기능 - 마무리
 	ACAPI_Interface(APIIo_CloseProcessWindowID, NULL, NULL);
 
+	char path[1024];
+	char* ptr;
+	GetFullPathName(filename, 1024, path, &ptr);
+
+	// 마지막 디렉토리 구분자의 위치를 찾음
+	ptr = strrstr(path, "\\");
+	if (ptr == NULL) {
+		ptr = strrstr(path, "/");
+		if (ptr == NULL) {
+			// 디렉토리 구분자가 없음
+			return 1;
+		}
+	}
+
+	// 마지막 디렉토리 구분자 이후의 문자열을 제거함
+	*ptr = '\0';
+
+	GS::UniString infoStr = L"다음 경로에 파일이 저장되었습니다.\n" + GS::UniString(charToWchar(path));
+
+	// 파일 닫기
 	fclose(fp_unite);
 
 	// 모든 프로세스를 마치면 처음에 수집했던 보이는 레이어들을 다시 켜놓을 것
@@ -3801,9 +3859,7 @@ GSErrCode	calcTableformArea(void)
 	// 그룹화 일시정지 OFF
 	suspendGroups(false);
 
-	ACAPI_Environment(APIEnv_GetSpecFolderID, &specFolderID, &location);
-	//location.ToDisplayText (&resultString);
-	WriteReport_Alert("결과물을 다음 위치에 저장했습니다.\n\n%s\n또는 프로젝트 파일이 있는 폴더", resultString.ToCStr().Get());
+	DGAlert(DG_INFORMATION, L"알림", infoStr, "", L"확인", "", "");
 
 	return err;
 }
@@ -3895,8 +3951,8 @@ GSErrCode	exportAllElevationsToPDFSingleMode(void)
 		BMpFree(reinterpret_cast<GSPtr>(dbases));
 
 	ACAPI_Environment(APIEnv_GetSpecFolderID, &specFolderID, &location);
-	//location.ToDisplayText (&resultString);
-	WriteReport_Alert("결과물을 다음 위치에 저장했습니다.\n\n%s\n또는 프로젝트 파일이 있는 폴더", resultString.ToCStr().Get());
+	resultString = location.ToDisplayText();
+	DGAlert(DG_INFORMATION, L"알림", L"결과물을 다음 위치에 저장했습니다.\n" + resultString, "", L"확인", "", "");
 
 	return err;
 }
@@ -3919,8 +3975,8 @@ GSErrCode	exportAllElevationsToPDFMultiMode(void)
 	vector<LayerList>	layerList;
 
 	// 진행바를 표현하기 위한 변수
-	GS::UniString       title("내보내기 진행 상황");
-	GS::UniString       subtitle("진행중...");
+	GS::UniString       title(L"내보내기 진행 상황");
+	GS::UniString       subtitle(L"진행중...");
 	short	nPhase;
 	Int32	cur, total;
 
@@ -4106,8 +4162,8 @@ GSErrCode	exportAllElevationsToPDFMultiMode(void)
 	}
 
 	ACAPI_Environment(APIEnv_GetSpecFolderID, &specFolderID, &location);
-	//location.ToDisplayText (&resultString);
-	WriteReport_Alert("결과물을 다음 위치에 저장했습니다.\n\n%s\n또는 프로젝트 파일이 있는 폴더", resultString.ToCStr().Get());
+	resultString = location.ToDisplayText();
+	DGAlert(DG_INFORMATION, L"알림", L"결과물을 다음 위치에 저장했습니다.\n" + resultString, "", L"확인", "", "");
 
 	return err;
 }
@@ -4154,7 +4210,7 @@ short DGCALLBACK filterSelectionHandler(short message, short dialogID, short ite
 		itmIdx = DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_TEXT, 0, 220, 50, 250, 25);
 		DGSetItemFont(dialogID, CHECKBOX_INCLUDE_UNKNOWN_OBJECT, DG_IS_LARGE | DG_IS_PLAIN);
 		sprintf(buffer, "알려지지 않은 객체 포함 (%d)", visibleObjInfo.nUnknownObjects);
-		DGSetItemText(dialogID, CHECKBOX_INCLUDE_UNKNOWN_OBJECT, buffer);
+		DGSetItemText(dialogID, CHECKBOX_INCLUDE_UNKNOWN_OBJECT, charToWchar(buffer));
 		DGShowItem(dialogID, CHECKBOX_INCLUDE_UNKNOWN_OBJECT);
 		if (visibleObjInfo.nUnknownObjects > 0)
 			DGEnableItem(dialogID, CHECKBOX_INCLUDE_UNKNOWN_OBJECT);
@@ -4229,7 +4285,7 @@ short DGCALLBACK filterSelectionHandler(short message, short dialogID, short ite
 			if (visibleObjInfo.bExist[xx] == true) {
 				visibleObjInfo.itmIdx[xx] = itmIdx = DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_TEXT, 0, itmPosX, itmPosY, 190, 25);
 				DGSetItemFont(dialogID, itmIdx, DG_IS_LARGE | DG_IS_PLAIN);
-				DGSetItemText(dialogID, itmIdx, visibleObjInfo.objName[xx]);
+				DGSetItemText(dialogID, itmIdx, charToWchar(visibleObjInfo.objName[xx]));
 				DGShowItem(dialogID, itmIdx);
 				itmPosY += 30;
 
