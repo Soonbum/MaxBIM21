@@ -159,7 +159,7 @@ GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 						}
 					}
 					ACAPI_Interface(APIIo_SetMenuItemFlagsID, &itemRef, &itemFlags);
-					return err;
+					return NoError;
 
 					break;
 
@@ -184,7 +184,7 @@ GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 						}
 					}
 					ACAPI_Interface(APIIo_SetMenuItemFlagsID, &itemRef, &itemFlags);
-					return err;
+					return NoError;
 
 					break;
 			}

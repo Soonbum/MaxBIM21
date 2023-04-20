@@ -27,6 +27,8 @@ GSErrCode	select3DQuality (void)
 	API_Element			elem;
 	API_ElementMemo		memo;
 
+	char infoStr[128];
+
 	// 그룹화 일시정지 ON
 	suspendGroups (true);
 
@@ -70,7 +72,8 @@ GSErrCode	select3DQuality (void)
 
 	elemList.Clear ();
 
-	WriteReport_Alert ("변경된 객체 개수: %d\n변경되지 않은 객체 개수: %d", ElemsChanged, ElemsUnchanged);
+	sprintf(infoStr, "변경된 객체 개수: %d\n변경되지 않은 객체 개수: %d", ElemsChanged, ElemsUnchanged);
+	DGAlert(DG_INFORMATION, L"알림", charToWchar(infoStr), "", L"확인", "", "");
 
 	// 그룹화 일시정지 OFF
 	suspendGroups (false);
@@ -88,6 +91,7 @@ GSErrCode	attach3DLabelOnZone (void)
 	short	layerInd;
 	char	roomName [256];
 	const char*	foundStr;
+	char infoStr[128];
 
 	long	ElemsAdded = 0;
 	long	ElemsDeleted = 0;
@@ -132,7 +136,8 @@ GSErrCode	attach3DLabelOnZone (void)
 	result = DGModalDialog (ACAPI_GetOwnResModule (), 32510, ACAPI_GetOwnResModule (), selectLayerHandler, (DGUserData) &layerInd);
 
 	if (result == DG_CANCEL) {
-		WriteReport_Alert ("제거된 라벨 개수: %ld\n추가된 라벨 개수: %ld", ElemsDeleted, ElemsAdded);
+		sprintf(infoStr, "제거된 라벨 개수: %ld\n추가된 라벨 개수: %ld", ElemsDeleted, ElemsAdded);
+		DGAlert(DG_INFORMATION, L"알림", charToWchar(infoStr), "", L"확인", "", "");
 		return err;
 	}
 
@@ -151,7 +156,7 @@ GSErrCode	attach3DLabelOnZone (void)
 			// 영역(Zone) 객체의 정보를 기반으로 라벨 배치
 			label.init (L("라벨v1.0.gsm"), layerInd, elem.header.floorInd, elem.zone.pos.x, elem.zone.pos.y, elem.zone.roomBaseLev + 1.000, DegreeToRad (0.0));
 
-			sprintf (roomName, "%s", (const char *) GS::UniString (elem.zone.roomName).ToCStr ());
+			sprintf (roomName, "%s", convertStr(GS::UniString(elem.zone.roomName)));
 
 			label.placeObject (13,
 				"scaleValues", APIParT_CString, "스케일에 맞게 (모델 크기)",
@@ -159,10 +164,11 @@ GSErrCode	attach3DLabelOnZone (void)
 				"bShowOn2D", APIParT_Boolean, "0",
 				"bShowOn3D", APIParT_Boolean, "1",
 				"bLocalOrigin", APIParT_Boolean, "0",
-				"szFont", APIParT_Length, format_string ("%f", 2.000),
+				"szFont", APIParT_Length, format_string ("%f", 2.000).c_str(),
 				"bCoords", APIParT_Boolean, "0",
 				"bComment", APIParT_Boolean, "1",
-				"txtComment", APIParT_CString, roomName,
+				//"txtComment", APIParT_CString, roomName,
+				"txtComment", APIParT_CString, "테스트",
 				"gs_cont_pen", APIParT_PenCol, "20",
 				"textMat", APIParT_Mater, "19",
 				"bBg", APIParT_Boolean, "0",
@@ -174,7 +180,8 @@ GSErrCode	attach3DLabelOnZone (void)
 
 	elemList.Clear ();
 
-	WriteReport_Alert ("제거된 라벨 개수: %ld\n추가된 라벨 개수: %ld", ElemsDeleted, ElemsAdded);
+	sprintf(infoStr, "제거된 라벨 개수: %ld\n추가된 라벨 개수: %ld", ElemsDeleted, ElemsAdded);
+	DGAlert(DG_INFORMATION, L"알림", charToWchar(infoStr), "", L"확인", "", "");
 
 	// 그룹화 일시정지 OFF
 	suspendGroups (false);
@@ -285,8 +292,8 @@ GSErrCode	attachBubbleOnCurrentFloorPlan (void)
 	char	*token;			// 읽어온 문자열의 토큰
 
 	// 진행바를 표현하기 위한 변수
-	GS::UniString       title ("버블 배치 진행 상황");
-	GS::UniString       subtitle ("진행중...");
+	GS::UniString       title (L"버블 배치 진행 상황");
+	GS::UniString       subtitle (L"진행중...");
 	short	nPhase;
 	Int32	cur, total;
 
@@ -475,11 +482,11 @@ GSErrCode	attachBubbleOnCurrentFloorPlan (void)
 				bubble.placeObject (14,
 					"bShowOn2D", APIParT_Boolean, "1.0",
 					"bShowOn3D", APIParT_Boolean, "1.0",
-					"szBubbleDia", APIParT_Length, format_string ("%f", cbInfo.szBubbleDia),
-					"szFont", APIParT_Length, format_string ("%f", cbInfo.szFont),
+					"szBubbleDia", APIParT_Length, format_string ("%f", cbInfo.szBubbleDia).c_str(),
+					"szFont", APIParT_Length, format_string ("%f", cbInfo.szFont).c_str(),
 					"bWithdrawal", APIParT_Boolean, "1.0",
-					"lenWithdrawal", APIParT_Length, format_string ("%f", cbInfo.lenWithdrawal),
-					"angWithdrawal", APIParT_Angle, format_string ("%f", DegreeToRad (270.0)),
+					"lenWithdrawal", APIParT_Length, format_string ("%f", cbInfo.lenWithdrawal).c_str(),
+					"angWithdrawal", APIParT_Angle, format_string ("%f", DegreeToRad (270.0)).c_str(),
 					"gs_cont_pen", APIParT_PenCol, "19",
 					"gs_fill_pen", APIParT_PenCol, "19",
 					"gs_back_pen", APIParT_PenCol, "19",
@@ -492,11 +499,11 @@ GSErrCode	attachBubbleOnCurrentFloorPlan (void)
 				bubble.placeObject (14,
 					"bShowOn2D", APIParT_Boolean, "1.0",
 					"bShowOn3D", APIParT_Boolean, "1.0",
-					"szBubbleDia", APIParT_Length, format_string ("%f", cbInfo.szBubbleDia),
-					"szFont", APIParT_Length, format_string ("%f", cbInfo.szFont),
+					"szBubbleDia", APIParT_Length, format_string ("%f", cbInfo.szBubbleDia).c_str(),
+					"szFont", APIParT_Length, format_string ("%f", cbInfo.szFont).c_str(),
 					"bWithdrawal", APIParT_Boolean, "1.0",
-					"lenWithdrawal", APIParT_Length, format_string ("%f", cbInfo.lenWithdrawal),
-					"angWithdrawal", APIParT_Angle, format_string ("%f", DegreeToRad (90.0)),
+					"lenWithdrawal", APIParT_Length, format_string ("%f", cbInfo.lenWithdrawal).c_str(),
+					"angWithdrawal", APIParT_Angle, format_string ("%f", DegreeToRad (90.0)).c_str(),
 					"gs_cont_pen", APIParT_PenCol, "19",
 					"gs_fill_pen", APIParT_PenCol, "19",
 					"gs_back_pen", APIParT_PenCol, "19",
@@ -509,11 +516,11 @@ GSErrCode	attachBubbleOnCurrentFloorPlan (void)
 				bubble.placeObject (14,
 					"bShowOn2D", APIParT_Boolean, "1.0",
 					"bShowOn3D", APIParT_Boolean, "1.0",
-					"szBubbleDia", APIParT_Length, format_string ("%f", cbInfo.szBubbleDia),
-					"szFont", APIParT_Length, format_string ("%f", cbInfo.szFont),
+					"szBubbleDia", APIParT_Length, format_string ("%f", cbInfo.szBubbleDia).c_str(),
+					"szFont", APIParT_Length, format_string ("%f", cbInfo.szFont).c_str(),
 					"bWithdrawal", APIParT_Boolean, "1.0",
-					"lenWithdrawal", APIParT_Length, format_string ("%f", cbInfo.lenWithdrawal),
-					"angWithdrawal", APIParT_Angle, format_string ("%f", DegreeToRad (0.0)),
+					"lenWithdrawal", APIParT_Length, format_string ("%f", cbInfo.lenWithdrawal).c_str(),
+					"angWithdrawal", APIParT_Angle, format_string ("%f", DegreeToRad (0.0)).c_str(),
 					"gs_cont_pen", APIParT_PenCol, "19",
 					"gs_fill_pen", APIParT_PenCol, "19",
 					"gs_back_pen", APIParT_PenCol, "19",
@@ -526,11 +533,11 @@ GSErrCode	attachBubbleOnCurrentFloorPlan (void)
 				bubble.placeObject (14,
 					"bShowOn2D", APIParT_Boolean, "1.0",
 					"bShowOn3D", APIParT_Boolean, "1.0",
-					"szBubbleDia", APIParT_Length, format_string ("%f", cbInfo.szBubbleDia),
-					"szFont", APIParT_Length, format_string ("%f", cbInfo.szFont),
+					"szBubbleDia", APIParT_Length, format_string ("%f", cbInfo.szBubbleDia).c_str(),
+					"szFont", APIParT_Length, format_string ("%f", cbInfo.szFont).c_str(),
 					"bWithdrawal", APIParT_Boolean, "1.0",
-					"lenWithdrawal", APIParT_Length, format_string ("%f", cbInfo.lenWithdrawal),
-					"angWithdrawal", APIParT_Angle, format_string ("%f", DegreeToRad (180.0)),
+					"lenWithdrawal", APIParT_Length, format_string ("%f", cbInfo.lenWithdrawal).c_str(),
+					"angWithdrawal", APIParT_Angle, format_string ("%f", DegreeToRad (180.0)).c_str(),
 					"gs_cont_pen", APIParT_PenCol, "19",
 					"gs_fill_pen", APIParT_PenCol, "19",
 					"gs_back_pen", APIParT_PenCol, "19",

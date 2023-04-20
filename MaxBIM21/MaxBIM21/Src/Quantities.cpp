@@ -107,9 +107,9 @@ static short DGCALLBACK qElemDlgCallBack (short message, short dialID, short ite
 				BNZeroMemory (&storyInfo, sizeof (API_StoryInfo));
 				ACAPI_Environment (APIEnv_GetStorySettingsID, &storyInfo);
 				for (xx = 0 ; xx <= (storyInfo.lastStory - storyInfo.firstStory) ; ++xx) {
-					sprintf (floorName, "%d. %s", storyInfo.data [0][xx].index, storyInfo.data [0][xx].uName);
+					sprintf (floorName, "%d. %s", storyInfo.data [0][xx].index, wcharToChar(storyInfo.data[0][xx].uName));
 					DGPopUpInsertItem (dialID, POPUP_FLOOR_QELEM, DG_POPUP_BOTTOM);
-					DGPopUpSetItemText (dialID, POPUP_FLOOR_QELEM, DG_POPUP_BOTTOM, floorName);
+					DGPopUpSetItemText (dialID, POPUP_FLOOR_QELEM, DG_POPUP_BOTTOM, charToWchar(floorName));
 				}
 				for (xx = 0 ; xx <= (storyInfo.lastStory - storyInfo.firstStory) ; ++xx) {
 					if (storyInfo.data [0][xx].index == 0) {
@@ -605,7 +605,7 @@ static short DGCALLBACK qElemDlgCallBack (short message, short dialID, short ite
 				break;
 		}
 
-		return err;
+		return NoError;
 	});
 
 	return 0;
@@ -722,9 +722,9 @@ static short DGCALLBACK insulElemDlgCallBack (short message, short dialID, short
 				BNZeroMemory (&storyInfo, sizeof (API_StoryInfo));
 				ACAPI_Environment (APIEnv_GetStorySettingsID, &storyInfo);
 				for (xx = 0 ; xx <= (storyInfo.lastStory - storyInfo.firstStory) ; ++xx) {
-					sprintf (floorName, "%d. %s", storyInfo.data [0][xx].index, storyInfo.data [0][xx].uName);
+					sprintf (floorName, "%d. %s", storyInfo.data [0][xx].index, wcharToChar(storyInfo.data [0][xx].uName));
 					DGPopUpInsertItem (dialID, POPUP_FLOOR_INS, DG_POPUP_BOTTOM);
-					DGPopUpSetItemText (dialID, POPUP_FLOOR_INS, DG_POPUP_BOTTOM, floorName);
+					DGPopUpSetItemText (dialID, POPUP_FLOOR_INS, DG_POPUP_BOTTOM, charToWchar(floorName));
 				}
 				for (xx = 0 ; xx <= (storyInfo.lastStory - storyInfo.firstStory) ; ++xx) {
 					if (storyInfo.data [0][xx].index == 0) {
@@ -1824,7 +1824,7 @@ static short DGCALLBACK insulElemDlgCallBack (short message, short dialID, short
 				break;
 		}
 
-		return err;
+		return NoError;
 	});
 
 	return 0;
