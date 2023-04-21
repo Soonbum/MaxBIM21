@@ -81,19 +81,6 @@
 	0  128  128
 }
 
-'GICN' 32504 "morphForWall" {
-	0  128  128
-}
-'GICN' 32505 "morphForSlab" {
-	0  128  128
-}
-'GICN' 32506 "morphForBeam" {
-	0  128  128
-}
-'GICN' 32507 "morphForColumn" {
-	0  128  128
-}
-
 'GICN' 32508 "wallColumnSection_01" {
 	0  128  128
 }
@@ -134,15 +121,6 @@
 	0  128  128
 }
 'GICN' 32521 "wallColumnSection_14" {
-	0  128  128
-}
-'GICN' 32522 "Gear" {
-	0  128  128
-}
-'GICN' 32523 "Full Rectangle" {
-	0  128  128
-}
-'GICN' 32524 "Hole Rectangle" {
 	0  128  128
 }
 
