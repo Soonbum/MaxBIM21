@@ -6,20 +6,14 @@
 namespace wallTableformPlacerDG {
 	// 다이얼로그 항목 인덱스
 	enum	idxItems_1_forWallTableform {
-		ICON_LAYER_CUSTOM = 3,
-		LABEL_LAYER_SETTINGS,
-		CHECKBOX_LAYER_COUPLING,
+		CHECKBOX_LAYER_COUPLING = 3,
 
-		LABEL_LAYER_SLABTABLEFORM,
-		LABEL_LAYER_PROFILE,
 		LABEL_LAYER_EUROFORM,
 		LABEL_LAYER_RECTPIPE,
 		LABEL_LAYER_PINBOLT,
-		LABEL_LAYER_WALLTIE,
 		LABEL_LAYER_JOIN,
 		LABEL_LAYER_HEADPIECE,
 		LABEL_LAYER_PROPS,
-		LABEL_LAYER_STEELFORM,
 		LABEL_LAYER_PLYWOOD,
 		LABEL_LAYER_TIMBER,
 		LABEL_LAYER_FILLERSP,
@@ -31,18 +25,16 @@ namespace wallTableformPlacerDG {
 		LABEL_LAYER_CROSS_JOINT_BAR,
 		LABEL_LAYER_BLUE_CLAMP,
 		LABEL_LAYER_BLUE_TIMBER_RAIL,
-		LABEL_LAYER_HIDDEN,
+		LABEL_LAYER_18,
+		LABEL_LAYER_19,
+		LABEL_LAYER_20,
 
-		USERCONTROL_LAYER_SLABTABLEFORM,
-		USERCONTROL_LAYER_PROFILE,
 		USERCONTROL_LAYER_EUROFORM,
 		USERCONTROL_LAYER_RECTPIPE,
 		USERCONTROL_LAYER_PINBOLT,
-		USERCONTROL_LAYER_WALLTIE,
 		USERCONTROL_LAYER_JOIN,
 		USERCONTROL_LAYER_HEADPIECE,
 		USERCONTROL_LAYER_PROPS,
-		USERCONTROL_LAYER_STEELFORM,
 		USERCONTROL_LAYER_PLYWOOD,
 		USERCONTROL_LAYER_TIMBER,
 		USERCONTROL_LAYER_FILLERSP,
@@ -54,7 +46,9 @@ namespace wallTableformPlacerDG {
 		USERCONTROL_LAYER_CROSS_JOINT_BAR,
 		USERCONTROL_LAYER_BLUE_CLAMP,
 		USERCONTROL_LAYER_BLUE_TIMBER_RAIL,
-		USERCONTROL_LAYER_HIDDEN,
+		USERCONTROL_LAYER_18,
+		USERCONTROL_LAYER_19,
+		USERCONTROL_LAYER_20,
 
 		BUTTON_AUTOSET
 	};
@@ -228,19 +222,146 @@ public:
 	double	marginTopExtra;		// 상단 여백 (높은쪽)
 
 public:
-	int	presetWidth_tableform [40];				// 세로 방향 테이블폼의 너비 모음 (2300 ... 200)
-	int	presetHeight_tableform [16];			// 세로 방향 테이블폼의 높이 모음 (6000 ... 1500)
+	// 세로 방향 테이블폼의 너비 모음 (2300 ... 200)
+	int	presetWidth_tableform[40] = { 2300, 2250, 2200, 2150, 2100, 2050, 2000, 1950, 1900, 1850, 1800, 1750, 1700, 1650, 1600, 1550, 1500, 1450, 1400, 1350, 1300, 1250, 1200, 1150, 1100, 1050, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 500, 4500, 400, 300, 200 };
+	// 세로 방향 테이블폼의 높이 모음 (6000 ... 1500)
+	int	presetHeight_tableform[16] = { 6000, 5700, 5400, 5100, 4800, 4500, 4200, 3900, 3600, 3300, 3000, 2700, 2400, 2100, 1800, 1500 };
 
-	int	presetWidth_euroform [7];				// 세로 방향 유로폼의 너비 모음 (600 ... 200, 0)
-	int	presetHeight_euroform [4];				// 세로 방향 유로폼의 높이 모음 (1200 ... 600, 0)
+	// 세로 방향 유로폼의 너비 모음 (600 ... 200, 0)
+	int	presetWidth_euroform[7] = { 600, 500, 450, 400, 300, 200, 0 };
+	// 세로 방향 유로폼의 높이 모음 (1200 ... 600, 0)
+	int	presetHeight_euroform[4] = { 1200, 900, 600, 0 };
 
-	int	presetWidth_config_vertical [40][5];	// 세로 방향 테이블폼 내 유로폼의 배열 순서
-	int	presetHeight_config_vertical [16][6];	// 세로 방향 테이블폼 내 유로폼의 배열 순서
-	int	presetWidth_config_horizontal [16][6];	// 가로 방향 테이블폼 내 유로폼의 배열 순서
-	int	presetHeight_config_horizontal [40][5];	// 가로 방향 테이블폼 내 유로폼의 배열 순서
+	// 세로 방향 테이블폼 내 유로폼의 배열 순서
+	int	presetWidth_config_vertical[40][5] =
+		{
+			4, 600, 600, 500, 600,		// 2300
+			4, 600, 600, 450, 600,		// 2250
+			4, 600, 600, 400, 600,		// 2200
+			4, 600, 500, 450, 600,		// 2150
+			4, 600, 600, 300, 600,		// 2100
+			4, 600, 450, 400, 600,		// 2050
+			4, 600, 600, 200, 600,		// 2000
+			4, 600, 450, 300, 600,		// 1950
+			4, 600, 500, 200, 600,		// 1900
+			4, 600, 450, 200, 600,		// 1850
+			3, 600, 600, 600, 0,		// 1800
+			4, 600, 200, 450, 500,		// 1750
+			3, 600, 500, 600, 0,		// 1700
+			3, 600, 450, 600, 0,		// 1650
+			3, 600, 400, 600, 0,		// 1600
+			3, 600, 450, 500, 0,		// 1550
+			3, 600, 300, 600, 0,		// 1500
+			3, 500, 450, 500, 0,		// 1450
+			3, 500, 400, 500, 0,		// 1400
+			3, 600, 300, 450, 0,		// 1350
+			3, 600, 200, 500, 0,		// 1300
+			3, 600, 200, 450, 0,		// 1250
+			2, 600, 600, 0, 0,			// 1200
+			3, 450, 300, 400, 0,		// 1150
+			3, 400, 300, 400, 0,		// 1100
+			3, 450, 300, 300, 0,		// 1050
+			2, 600, 400, 0, 0,			// 1000
+			2, 450, 500, 0, 0,			// 950
+			2, 600, 300, 0, 0,			// 900
+			2, 400, 450, 0, 0,			// 850
+			2, 400, 400, 0, 0,			// 800
+			2, 450, 300, 0, 0,			// 750
+			2, 400, 300, 0, 0,			// 700
+			2, 450, 200, 0, 0,			// 650
+			1, 600, 0, 0, 0,			// 600
+			1, 500, 0, 0, 0,			// 500
+			1, 450, 0, 0, 0,			// 450
+			1, 400, 0, 0, 0,			// 400
+			1, 300, 0, 0, 0,			// 300
+			1, 200, 0, 0, 0				// 200
+		};
+	// 세로 방향 테이블폼 내 유로폼의 배열 순서
+	int	presetHeight_config_vertical[16][6] =
+		{
+			5, 1200, 1200, 1200, 1200, 1200,	// 6000
+			5, 1200, 1200, 1200, 1200, 900,		// 5700
+			5, 1200, 1200, 1200, 900, 900,		// 5400
+			5, 1200, 1200, 1200, 900, 600,		// 5100
+			4, 1200, 1200, 1200, 1200, 0,		// 4800
+			4, 1200, 1200, 1200, 900, 0,		// 4500
+			4, 1200, 1200, 900, 900, 0,			// 4200
+			4, 1200, 1200, 900, 600, 0,			// 3900
+			3, 1200, 1200, 1200, 0, 0,			// 3600
+			3, 1200, 1200, 900, 0, 0,			// 3300
+			3, 1200, 1200, 600, 0, 0,			// 3000
+			3, 1200, 900, 600, 0, 0,			// 2700
+			2, 1200, 1200, 0, 0, 0,				// 2400
+			2, 1200, 900, 0, 0, 0,				// 2100
+			2, 900, 900, 0, 0, 0,				// 1800
+			2, 900, 600, 0, 0, 0				// 1500
+		};
+	// 가로 방향 테이블폼 내 유로폼의 배열 순서
+	int	presetWidth_config_horizontal[16][6] =
+		{
+			5, 1200, 1200, 1200, 1200, 1200,	// 6000
+			5, 1200, 1200, 1200, 1200, 900,		// 5700
+			5, 1200, 1200, 1200, 900, 900,		// 5400
+			5, 1200, 1200, 1200, 900, 600,		// 5100
+			4, 1200, 1200, 1200, 1200, 0,		// 4800
+			4, 1200, 1200, 1200, 900, 0,		// 4500
+			4, 1200, 1200, 900, 900, 0,			// 4200
+			4, 1200, 1200, 900, 600, 0,			// 3900
+			3, 1200, 1200, 1200, 0, 0,			// 3600
+			3, 1200, 1200, 900, 0, 0,			// 3300
+			3, 1200, 1200, 600, 0, 0,			// 3000
+			3, 1200, 900, 600, 0, 0,			// 2700
+			2, 1200, 1200, 0, 0, 0,				// 2400
+			2, 1200, 900, 0, 0, 0,				// 2100
+			2, 900, 900, 0, 0, 0,				// 1800
+			2, 900, 600, 0, 0, 0				// 1500
+		};
+	// 가로 방향 테이블폼 내 유로폼의 배열 순서
+	int	presetHeight_config_horizontal[40][5] =
+		{
+			4, 600, 600, 600, 500,		// 2300
+			4, 600, 600, 450, 600,		// 2250
+			4, 600, 600, 600, 400,		// 2200
+			4, 600, 450, 600, 500,		// 2150
+			4, 600, 300, 600, 600,		// 2100
+			4, 600, 600, 450, 400,		// 2050
+			4, 600, 600, 600, 200,		// 2000
+			4, 600, 300, 450, 600,		// 1950
+			4, 600, 600, 200, 500,		// 1900
+			4, 600, 600, 450, 200,		// 1850
+			3, 600, 600, 600, 0,		// 1800
+			4, 600, 450, 200, 500,		// 1750
+			3, 600, 600, 500, 0,		// 1700
+			3, 600, 450, 600, 0,		// 1650
+			3, 600, 600, 400, 0,		// 1600
+			3, 600, 450, 500, 0,		// 1550
+			3, 600, 300, 600, 0,		// 1500
+			3, 600, 450, 400, 0,		// 1450
+			3, 600, 300, 500, 0,		// 1400
+			3, 450, 300, 600, 0,		// 1350
+			3, 600, 200, 500, 0,		// 1300
+			3, 450, 600, 200, 0,		// 1250
+			2, 600, 600, 0, 0,			// 1200
+			3, 450, 300, 400, 0,		// 1150
+			2, 600, 500, 0, 0,			// 1100
+			3, 300, 300, 450, 0,		// 1050
+			2, 600, 400, 0, 0,			// 1000
+			2, 450, 500, 0, 0,			// 950
+			2, 600, 300, 0, 0,			// 900
+			2, 450, 400, 0, 0,			// 850
+			2, 400, 400, 0, 0,			// 800
+			2, 300, 450, 0, 0,			// 750
+			2, 300, 400, 0, 0,			// 700
+			2, 450, 200, 0, 0,			// 650
+			1, 600, 0, 0, 0,			// 600
+			1, 500, 0, 0, 0,			// 500
+			1, 450, 0, 0, 0,			// 450
+			1, 400, 0, 0, 0,			// 400
+			1, 300, 0, 0, 0,			// 300
+			1, 200, 0, 0, 0				// 200
+		};
 
 public:
-	WallTableformPlacingZone ();	// 기본 생성자
 	void	initCells (WallTableformPlacingZone* placingZone, bool bVertical);				// 셀 정보 초기화
 	double	getCellPositionLeftBottomX (WallTableformPlacingZone* placingZone, short idx);	// 셀(0-기반 인덱스 번호)의 좌하단 점 위치 X 좌표를 구함
 	void	adjustCellsPosition (WallTableformPlacingZone* placingZone);					// 셀 위치를 바르게 교정함

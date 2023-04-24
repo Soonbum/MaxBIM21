@@ -6,71 +6,62 @@
 #include "UtilityFunctions.h"
 #include "LowSideTableformPlacer.h"
 
+namespace lowSideTableformPlacerDG {
+	LowSideTableformPlacingZone	placingZone;		// 낮은 슬래브 측면 영역 정보
+
+	InfoWall						infoWall;			// 벽 객체 정보
+	InfoBeam						infoBeam;			// 보 객체 정보
+	InfoSlab						infoSlab;			// 슬래브 객체 정보
+	InfoMesh						infoMesh;			// 메시 객체 정보
+	short floorInd;
+
+	API_Guid		structuralObject_forTableformLowSide;	// 구조 객체의 GUID
+
+	short	layerInd_Euroform;			// 레이어 번호: 유로폼 (공통)
+	short	layerInd_RectPipe;			// 레이어 번호: 비계 파이프 (공통)
+	short	layerInd_PinBolt;			// 레이어 번호: 핀볼트 세트
+	short	layerInd_HeadPiece;			// 레이어 번호: 헤드피스
+	short	layerInd_Props;				// 레이어 번호: Push-Pull Props
+	short	layerInd_Join;				// 레이어 번호: 결합철물
+	short	layerInd_Plywood;			// 레이어 번호: 합판 (공통)
+	short	layerInd_Timber;			// 레이어 번호: 각재 (공통)
+	short	layerInd_EuroformHook;		// 레이어 번호: 유로폼 후크
+	short	layerInd_CrossJointBar;		// 레이어 번호: 십자 조인트 바
+	short	layerInd_BlueClamp;			// 레이어 번호: 블루 클램프
+	short	layerInd_BlueTimberRail;	// 레이어 번호: 블루 목심
+
+	short	layerInd_Fillersp;			// 레이어 번호: 휠러스페이서
+	short	layerInd_OutcornerAngle;	// 레이어 번호: 아웃코너앵글
+	short	layerInd_OutcornerPanel;	// 레이어 번호: 아웃코너판넬
+	short	layerInd_IncornerPanel;		// 레이어 번호: 인코너판넬
+	short	layerInd_RectpipeHanger;	// 레이어 번호: 각파이프 행거
+
+	bool		bLayerInd_Euroform;			// 레이어 번호: 유로폼
+	bool		bLayerInd_RectPipe;			// 레이어 번호: 비계 파이프
+	bool		bLayerInd_PinBolt;			// 레이어 번호: 핀볼트 세트
+	bool		bLayerInd_WallTie;			// 레이어 번호: 벽체 타이
+	bool		bLayerInd_HeadPiece;		// 레이어 번호: 헤드피스
+	bool		bLayerInd_Props;			// 레이어 번호: Push-Pull Props
+	bool		bLayerInd_Join;				// 레이어 번호: 결합철물
+	bool		bLayerInd_Plywood;			// 레이어 번호: 합판
+	bool		bLayerInd_Timber;			// 레이어 번호: 각재
+	bool		bLayerInd_EuroformHook;		// 레이어 번호: 유로폼 후크
+	bool		bLayerInd_CrossJointBar;	// 레이어 번호: 십자 조인트 바
+	bool		bLayerInd_BlueClamp;		// 레이어 번호: 블루 클램프
+	bool		bLayerInd_BlueTimberRail;	// 레이어 번호: 블루 목심
+
+	bool		bLayerInd_Fillersp;			// 레이어 번호: 휠러스페이서
+	bool		bLayerInd_OutcornerAngle;	// 레이어 번호: 아웃코너앵글
+	bool		bLayerInd_OutcornerPanel;	// 레이어 번호: 아웃코너판넬
+	bool		bLayerInd_IncornerPanel;	// 레이어 번호: 인코너판넬
+	bool		bLayerInd_RectpipeHanger;	// 레이어 번호: 각파이프 행거
+
+	GS::Array<API_Guid>	elemList;	// 그룹화를 위해 생성된 결과물들의 GUID를 전부 저장함
+
+	int	clickedIndex;	// 클릭한 버튼의 인덱스
+}
+
 using namespace lowSideTableformPlacerDG;
-
-static LowSideTableformPlacingZone	placingZone;		// 낮은 슬래브 측면 영역 정보
-
-static InfoWall						infoWall;			// 벽 객체 정보
-static InfoBeam						infoBeam;			// 보 객체 정보
-static InfoSlab						infoSlab;			// 슬래브 객체 정보
-static InfoMesh						infoMesh;			// 메시 객체 정보
-short floorInd;
-
-API_Guid		structuralObject_forTableformLowSide;	// 구조 객체의 GUID
-
-static short	layerInd_Euroform;			// 레이어 번호: 유로폼 (공통)
-static short	layerInd_RectPipe;			// 레이어 번호: 비계 파이프 (공통)
-static short	layerInd_PinBolt;			// 레이어 번호: 핀볼트 세트
-static short	layerInd_WallTie;			// 레이어 번호: 빅체 타이 (더 이상 사용하지 않음)
-static short	layerInd_Clamp;				// 레이어 번호: 직교 클램프 (더 이상 사용하지 않음)
-static short	layerInd_HeadPiece;			// 레이어 번호: 헤드피스
-static short	layerInd_Props;				// 레이어 번호: Push-Pull Props
-static short	layerInd_Join;				// 레이어 번호: 결합철물
-static short	layerInd_Plywood;			// 레이어 번호: 합판 (공통)
-static short	layerInd_Timber;			// 레이어 번호: 각재 (공통)
-static short	layerInd_EuroformHook;		// 레이어 번호: 유로폼 후크
-static short	layerInd_CrossJointBar;		// 레이어 번호: 십자 조인트 바
-static short	layerInd_BlueClamp;			// 레이어 번호: 블루 클램프
-static short	layerInd_BlueTimberRail;	// 레이어 번호: 블루 목심
-static short	layerInd_Hidden;			// 레이어 번호: 숨김 (더 이상 사용하지 않음)
-
-static short	layerInd_SlabTableform;		// 레이어 번호: 슬래브 테이블폼
-static short	layerInd_Profile;			// 레이어 번호: KS프로파일
-static short	layerInd_Steelform;			// 레이어 번호: 스틸폼
-static short	layerInd_Fillersp;			// 레이어 번호: 휠러스페이서
-static short	layerInd_OutcornerAngle;	// 레이어 번호: 아웃코너앵글
-static short	layerInd_OutcornerPanel;	// 레이어 번호: 아웃코너판넬
-static short	layerInd_IncornerPanel;		// 레이어 번호: 인코너판넬
-static short	layerInd_RectpipeHanger;	// 레이어 번호: 각파이프 행거
-
-static bool		bLayerInd_Euroform;			// 레이어 번호: 유로폼
-static bool		bLayerInd_RectPipe;			// 레이어 번호: 비계 파이프
-static bool		bLayerInd_PinBolt;			// 레이어 번호: 핀볼트 세트
-static bool		bLayerInd_WallTie;			// 레이어 번호: 벽체 타이
-static bool		bLayerInd_HeadPiece;		// 레이어 번호: 헤드피스
-static bool		bLayerInd_Props;			// 레이어 번호: Push-Pull Props
-static bool		bLayerInd_Join;				// 레이어 번호: 결합철물
-static bool		bLayerInd_Plywood;			// 레이어 번호: 합판
-static bool		bLayerInd_Timber;			// 레이어 번호: 각재
-static bool		bLayerInd_EuroformHook;		// 레이어 번호: 유로폼 후크
-static bool		bLayerInd_CrossJointBar;	// 레이어 번호: 십자 조인트 바
-static bool		bLayerInd_BlueClamp;		// 레이어 번호: 블루 클램프
-static bool		bLayerInd_BlueTimberRail;	// 레이어 번호: 블루 목심
-static bool		bLayerInd_Hidden;			// 레이어 번호: 숨김
-
-static bool		bLayerInd_SlabTableform;	// 레이어 번호: 슬래브 테이블폼
-static bool		bLayerInd_Profile;			// 레이어 번호: KS프로파일
-static bool		bLayerInd_Steelform;		// 레이어 번호: 스틸폼
-static bool		bLayerInd_Fillersp;			// 레이어 번호: 휠러스페이서
-static bool		bLayerInd_OutcornerAngle;	// 레이어 번호: 아웃코너앵글
-static bool		bLayerInd_OutcornerPanel;	// 레이어 번호: 아웃코너판넬
-static bool		bLayerInd_IncornerPanel;	// 레이어 번호: 인코너판넬
-static bool		bLayerInd_RectpipeHanger;	// 레이어 번호: 각파이프 행거
-
-static GS::Array<API_Guid>	elemList;	// 그룹화를 위해 생성된 결과물들의 GUID를 전부 저장함
-
-static int	clickedIndex;	// 클릭한 버튼의 인덱스
-
 
 // 낮은 슬래브 측면에 테이블폼을 배치하는 통합 루틴
 GSErrCode	placeTableformOnLowSide (void)
@@ -300,7 +291,7 @@ FIRST:
 		return err;
 
 	// [DIALOG] 2번째 다이얼로그에서 부재별 레이어를 지정함
-	result = DGModalDialog (ACAPI_GetOwnResModule (), 32503, ACAPI_GetOwnResModule (), lowSideTableformPlacerHandler2, 0);
+	result = DGModalDialog (ACAPI_GetOwnResModule (), 32601, ACAPI_GetOwnResModule (), lowSideTableformPlacerHandler2, 0);
 
 	if (result != DG_OK)
 		goto FIRST;
@@ -309,244 +300,6 @@ FIRST:
 	placingZone.placeObjects (&placingZone);
 
 	return	err;
-}
-
-// 기본 생성자
-LowSideTableformPlacingZone::LowSideTableformPlacingZone ()
-{
-	this->presetWidthVertical_tableform [0]		= 3600;
-	this->presetWidthVertical_tableform [1]		= 3500;
-	this->presetWidthVertical_tableform [2]		= 3450;
-	this->presetWidthVertical_tableform [3]		= 3400;
-	this->presetWidthVertical_tableform [4]		= 3350;
-	this->presetWidthVertical_tableform [5]		= 3300;
-	this->presetWidthVertical_tableform [6]		= 3250;
-	this->presetWidthVertical_tableform [7]		= 3200;
-	this->presetWidthVertical_tableform [8]		= 3150;
-	this->presetWidthVertical_tableform [9]		= 3100;
-	this->presetWidthVertical_tableform [10]	= 3050;
-	this->presetWidthVertical_tableform [11]	= 3000;
-	this->presetWidthVertical_tableform [12]	= 2950;
-	this->presetWidthVertical_tableform [13]	= 2900;
-	this->presetWidthVertical_tableform [14]	= 2850;
-	this->presetWidthVertical_tableform [15]	= 2800;
-	this->presetWidthVertical_tableform [16]	= 2750;
-	this->presetWidthVertical_tableform [17]	= 2700;
-	this->presetWidthVertical_tableform [18]	= 2650;
-	this->presetWidthVertical_tableform [19]	= 2600;
-	this->presetWidthVertical_tableform [20]	= 2550;
-	this->presetWidthVertical_tableform [21]	= 2500;
-	this->presetWidthVertical_tableform [22]	= 2450;
-	this->presetWidthVertical_tableform [23]	= 2400;
-	this->presetWidthVertical_tableform [24]	= 2350;
-	this->presetWidthVertical_tableform [25]	= 2300;
-	this->presetWidthVertical_tableform [26]	= 2250;
-	this->presetWidthVertical_tableform [27]	= 2200;
-	this->presetWidthVertical_tableform [28]	= 2150;
-	this->presetWidthVertical_tableform [29]	= 2100;
-	this->presetWidthVertical_tableform [30]	= 2050;
-	this->presetWidthVertical_tableform [31]	= 2000;
-	this->presetWidthVertical_tableform [32]	= 1950;
-	this->presetWidthVertical_tableform [33]	= 1900;
-	this->presetWidthVertical_tableform [34]	= 1850;
-	this->presetWidthVertical_tableform [35]	= 1800;
-	this->presetWidthVertical_tableform [36]	= 1750;
-	this->presetWidthVertical_tableform [37]	= 1700;
-	this->presetWidthVertical_tableform [38]	= 1650;
-	this->presetWidthVertical_tableform [39]	= 1600;
-	this->presetWidthVertical_tableform [40]	= 1550;
-	this->presetWidthVertical_tableform [41]	= 1500;
-	this->presetWidthVertical_tableform [42]	= 1450;
-	this->presetWidthVertical_tableform [43]	= 1400;
-	this->presetWidthVertical_tableform [44]	= 1350;
-	this->presetWidthVertical_tableform [45]	= 1300;
-	this->presetWidthVertical_tableform [46]	= 1250;
-	this->presetWidthVertical_tableform [47]	= 1200;
-	this->presetWidthVertical_tableform [48]	= 1150;
-	this->presetWidthVertical_tableform [49]	= 1100;
-	this->presetWidthVertical_tableform [50]	= 1050;
-	this->presetWidthVertical_tableform [51]	= 1000;
-	this->presetWidthVertical_tableform [52]	= 950;
-	this->presetWidthVertical_tableform [53]	= 900;
-	this->presetWidthVertical_tableform [54]	= 850;
-	this->presetWidthVertical_tableform [55]	= 800;
-	this->presetWidthVertical_tableform [56]	= 750;
-	this->presetWidthVertical_tableform [57]	= 700;
-	this->presetWidthVertical_tableform [58]	= 650;
-	this->presetWidthVertical_tableform [59]	= 600;
-	this->presetWidthVertical_tableform [60]	= 500;
-	this->presetWidthVertical_tableform [61]	= 450;
-	this->presetWidthVertical_tableform [62]	= 400;
-	this->presetWidthVertical_tableform [63]	= 300;
-	this->presetWidthVertical_tableform [64]	= 200;
-
-	this->presetWidthHorizontal_tableform [0]	= 3600;
-	this->presetWidthHorizontal_tableform [1]	= 3300;
-	this->presetWidthHorizontal_tableform [2]	= 3000;
-	this->presetWidthHorizontal_tableform [3]	= 2700;
-	this->presetWidthHorizontal_tableform [4]	= 2400;
-	this->presetWidthHorizontal_tableform [5]	= 2100;
-	this->presetWidthHorizontal_tableform [6]	= 1800;
-	this->presetWidthHorizontal_tableform [7]	= 1500;
-	this->presetWidthHorizontal_tableform [8]	= 1200;
-	this->presetWidthHorizontal_tableform [9]	= 900;
-	this->presetWidthHorizontal_tableform [10]	= 600;
-	
-	this->presetWidthVertical_euroform [0]		= 600;
-	this->presetWidthVertical_euroform [1]		= 500;
-	this->presetWidthVertical_euroform [2]		= 450;
-	this->presetWidthVertical_euroform [3]		= 400;
-	this->presetWidthVertical_euroform [4]		= 300;
-	this->presetWidthVertical_euroform [5]		= 200;
-	this->presetWidthVertical_euroform [6]		= 0;
-
-	this->presetHeightHorizontal_euroform [0]	= 1200;
-	this->presetHeightHorizontal_euroform [1]	= 900;
-	this->presetHeightHorizontal_euroform [2]	= 600;
-	this->presetHeightHorizontal_euroform [3]	= 0;
-
-	this->presetWidth_config_vertical [0][0] = 6;	this->presetWidth_config_vertical [0][1] = 600;		this->presetWidth_config_vertical [0][2] = 600;		this->presetWidth_config_vertical [0][3] = 600;
-													this->presetWidth_config_vertical [0][4] = 600;		this->presetWidth_config_vertical [0][5] = 600;		this->presetWidth_config_vertical [0][6] = 600;		// 3600
-	this->presetWidth_config_vertical [1][0] = 6;	this->presetWidth_config_vertical [1][1] = 600;		this->presetWidth_config_vertical [1][2] = 600;		this->presetWidth_config_vertical [1][3] = 600;
-													this->presetWidth_config_vertical [1][4] = 600;		this->presetWidth_config_vertical [1][5] = 500;		this->presetWidth_config_vertical [1][6] = 600;		// 3500
-	this->presetWidth_config_vertical [2][0] = 6;	this->presetWidth_config_vertical [2][1] = 600;		this->presetWidth_config_vertical [2][2] = 600;		this->presetWidth_config_vertical [2][3] = 600;
-													this->presetWidth_config_vertical [2][4] = 600;		this->presetWidth_config_vertical [2][5] = 450;		this->presetWidth_config_vertical [2][6] = 600;		// 3450
-	this->presetWidth_config_vertical [3][0] = 6;	this->presetWidth_config_vertical [3][1] = 600;		this->presetWidth_config_vertical [3][2] = 600;		this->presetWidth_config_vertical [3][3] = 600;
-													this->presetWidth_config_vertical [3][4] = 600;		this->presetWidth_config_vertical [3][5] = 400;		this->presetWidth_config_vertical [3][6] = 600;		// 3400
-	this->presetWidth_config_vertical [4][0] = 6;	this->presetWidth_config_vertical [4][1] = 600;		this->presetWidth_config_vertical [4][2] = 600;		this->presetWidth_config_vertical [4][3] = 600;
-													this->presetWidth_config_vertical [4][4] = 500;		this->presetWidth_config_vertical [4][5] = 450;		this->presetWidth_config_vertical [4][6] = 600;		// 3350
-	this->presetWidth_config_vertical [5][0] = 6;	this->presetWidth_config_vertical [5][1] = 600;		this->presetWidth_config_vertical [5][2] = 600;		this->presetWidth_config_vertical [5][3] = 600;
-													this->presetWidth_config_vertical [5][4] = 600;		this->presetWidth_config_vertical [5][5] = 300;		this->presetWidth_config_vertical [5][6] = 600;		// 3300
-	this->presetWidth_config_vertical [6][0] = 6;	this->presetWidth_config_vertical [6][1] = 600;		this->presetWidth_config_vertical [6][2] = 600;		this->presetWidth_config_vertical [6][3] = 600;
-													this->presetWidth_config_vertical [6][4] = 450;		this->presetWidth_config_vertical [6][5] = 400;		this->presetWidth_config_vertical [6][6] = 600;		// 3250
-	this->presetWidth_config_vertical [7][0] = 6;	this->presetWidth_config_vertical [7][1] = 600;		this->presetWidth_config_vertical [7][2] = 600;		this->presetWidth_config_vertical [7][3] = 600;
-													this->presetWidth_config_vertical [7][4] = 600;		this->presetWidth_config_vertical [7][5] = 200;		this->presetWidth_config_vertical [7][6] = 600;		// 3200
-	this->presetWidth_config_vertical [8][0] = 6;	this->presetWidth_config_vertical [8][1] = 600;		this->presetWidth_config_vertical [8][2] = 600;		this->presetWidth_config_vertical [8][3] = 600;
-													this->presetWidth_config_vertical [8][4] = 450;		this->presetWidth_config_vertical [8][5] = 300;		this->presetWidth_config_vertical [8][6] = 600;		// 3150
-	this->presetWidth_config_vertical [9][0] = 6;	this->presetWidth_config_vertical [9][1] = 600;		this->presetWidth_config_vertical [9][2] = 600;		this->presetWidth_config_vertical [9][3] = 600;
-													this->presetWidth_config_vertical [9][4] = 400;		this->presetWidth_config_vertical [9][5] = 300;		this->presetWidth_config_vertical [9][6] = 600;		// 3100
-	this->presetWidth_config_vertical [10][0] = 6;	this->presetWidth_config_vertical [10][1] = 600;	this->presetWidth_config_vertical [10][2] = 600;	this->presetWidth_config_vertical [10][3] = 600;
-													this->presetWidth_config_vertical [10][4] = 450;	this->presetWidth_config_vertical [10][5] = 200;	this->presetWidth_config_vertical [10][6] = 600;	// 3050
-	this->presetWidth_config_vertical [11][0] = 5;	this->presetWidth_config_vertical [11][1] = 600;	this->presetWidth_config_vertical [11][2] = 600;	this->presetWidth_config_vertical [11][3] = 600;
-													this->presetWidth_config_vertical [11][4] = 600;	this->presetWidth_config_vertical [11][5] = 600;	this->presetWidth_config_vertical [11][6] = 0;		// 3000
-	this->presetWidth_config_vertical [12][0] = 6;	this->presetWidth_config_vertical [12][1] = 600;	this->presetWidth_config_vertical [12][2] = 600;	this->presetWidth_config_vertical [12][3] = 600;
-													this->presetWidth_config_vertical [12][4] = 400;	this->presetWidth_config_vertical [12][5] = 300;	this->presetWidth_config_vertical [12][6] = 450;	// 2950
-	this->presetWidth_config_vertical [13][0] = 6;	this->presetWidth_config_vertical [13][1] = 600;	this->presetWidth_config_vertical [13][2] = 600;	this->presetWidth_config_vertical [13][3] = 600;
-													this->presetWidth_config_vertical [13][4] = 450;	this->presetWidth_config_vertical [13][5] = 200;	this->presetWidth_config_vertical [13][6] = 450;	// 2900
-	this->presetWidth_config_vertical [14][0] = 5;	this->presetWidth_config_vertical [14][1] = 600;	this->presetWidth_config_vertical [14][2] = 600;	this->presetWidth_config_vertical [14][3] = 600;
-													this->presetWidth_config_vertical [14][4] = 600;	this->presetWidth_config_vertical [14][5] = 450;	this->presetWidth_config_vertical [14][6] = 0;		// 2850
-	this->presetWidth_config_vertical [15][0] = 5;	this->presetWidth_config_vertical [15][1] = 600;	this->presetWidth_config_vertical [15][2] = 600;	this->presetWidth_config_vertical [15][3] = 600;
-													this->presetWidth_config_vertical [15][4] = 600;	this->presetWidth_config_vertical [15][5] = 400;	this->presetWidth_config_vertical [15][6] = 0;		// 2800
-	this->presetWidth_config_vertical [16][0] = 6;	this->presetWidth_config_vertical [16][1] = 600;	this->presetWidth_config_vertical [16][2] = 600;	this->presetWidth_config_vertical [16][3] = 600;
-													this->presetWidth_config_vertical [16][4] = 450;	this->presetWidth_config_vertical [16][5] = 200;	this->presetWidth_config_vertical [16][6] = 300;	// 2750
-	this->presetWidth_config_vertical [17][0] = 5;	this->presetWidth_config_vertical [17][1] = 600;	this->presetWidth_config_vertical [17][2] = 600;	this->presetWidth_config_vertical [17][3] = 600;
-													this->presetWidth_config_vertical [17][4] = 600;	this->presetWidth_config_vertical [17][5] = 300;	this->presetWidth_config_vertical [17][6] = 0;		// 2700
-	this->presetWidth_config_vertical [18][0] = 5;	this->presetWidth_config_vertical [18][1] = 600;	this->presetWidth_config_vertical [18][2] = 600;	this->presetWidth_config_vertical [18][3] = 600;
-													this->presetWidth_config_vertical [18][4] = 400;	this->presetWidth_config_vertical [18][5] = 450;	this->presetWidth_config_vertical [18][6] = 0;		// 2650
-	this->presetWidth_config_vertical [19][0] = 5;	this->presetWidth_config_vertical [19][1] = 600;	this->presetWidth_config_vertical [19][2] = 600;	this->presetWidth_config_vertical [19][3] = 600;
-													this->presetWidth_config_vertical [19][4] = 500;	this->presetWidth_config_vertical [19][5] = 300;	this->presetWidth_config_vertical [19][6] = 0;		// 2600
-	this->presetWidth_config_vertical [20][0] = 5;	this->presetWidth_config_vertical [20][1] = 600;	this->presetWidth_config_vertical [20][2] = 600;	this->presetWidth_config_vertical [20][3] = 600;
-													this->presetWidth_config_vertical [20][4] = 450;	this->presetWidth_config_vertical [20][5] = 300;	this->presetWidth_config_vertical [20][6] = 0;		// 2550
-	this->presetWidth_config_vertical [21][0] = 5;	this->presetWidth_config_vertical [21][1] = 600;	this->presetWidth_config_vertical [21][2] = 600;	this->presetWidth_config_vertical [21][3] = 600;
-													this->presetWidth_config_vertical [21][4] = 400;	this->presetWidth_config_vertical [21][5] = 300;	this->presetWidth_config_vertical [21][6] = 0;		// 2500
-	this->presetWidth_config_vertical [22][0] = 5;	this->presetWidth_config_vertical [22][1] = 600;	this->presetWidth_config_vertical [22][2] = 600;	this->presetWidth_config_vertical [22][3] = 600;
-													this->presetWidth_config_vertical [22][4] = 200;	this->presetWidth_config_vertical [22][5] = 450;	this->presetWidth_config_vertical [22][6] = 0;		// 2450
-	this->presetWidth_config_vertical [23][0] = 4;	this->presetWidth_config_vertical [23][1] = 600;	this->presetWidth_config_vertical [23][2] = 600;	this->presetWidth_config_vertical [23][3] = 600;
-													this->presetWidth_config_vertical [23][4] = 600;	this->presetWidth_config_vertical [23][5] = 0;		this->presetWidth_config_vertical [23][6] = 0;		// 2400
-	this->presetWidth_config_vertical [24][0] = 5;	this->presetWidth_config_vertical [24][1] = 600;	this->presetWidth_config_vertical [24][2] = 600;	this->presetWidth_config_vertical [24][3] = 450;
-													this->presetWidth_config_vertical [24][4] = 400;	this->presetWidth_config_vertical [24][5] = 300;	this->presetWidth_config_vertical [24][6] = 0;		// 2350
-	this->presetWidth_config_vertical [25][0] = 4;	this->presetWidth_config_vertical [25][1] = 600;	this->presetWidth_config_vertical [25][2] = 600;	this->presetWidth_config_vertical [25][3] = 500;
-													this->presetWidth_config_vertical [25][4] = 600;	this->presetWidth_config_vertical [25][5] = 0;		this->presetWidth_config_vertical [25][6] = 0;		// 2300
-	this->presetWidth_config_vertical [26][0] = 4;	this->presetWidth_config_vertical [26][1] = 600;	this->presetWidth_config_vertical [26][2] = 600;	this->presetWidth_config_vertical [26][3] = 450;
-													this->presetWidth_config_vertical [26][4] = 600;	this->presetWidth_config_vertical [26][5] = 0;		this->presetWidth_config_vertical [26][6] = 0;		// 2250
-	this->presetWidth_config_vertical [27][0] = 4;	this->presetWidth_config_vertical [27][1] = 600;	this->presetWidth_config_vertical [27][2] = 600;	this->presetWidth_config_vertical [27][3] = 400;
-													this->presetWidth_config_vertical [27][4] = 600;	this->presetWidth_config_vertical [27][5] = 0;		this->presetWidth_config_vertical [27][6] = 0;		// 2200
-	this->presetWidth_config_vertical [28][0] = 4;	this->presetWidth_config_vertical [28][1] = 600;	this->presetWidth_config_vertical [28][2] = 500;	this->presetWidth_config_vertical [28][3] = 450;
-													this->presetWidth_config_vertical [28][4] = 600;	this->presetWidth_config_vertical [28][5] = 0;		this->presetWidth_config_vertical [28][6] = 0;		// 2150
-	this->presetWidth_config_vertical [29][0] = 4;	this->presetWidth_config_vertical [29][1] = 600;	this->presetWidth_config_vertical [29][2] = 600;	this->presetWidth_config_vertical [29][3] = 300;
-													this->presetWidth_config_vertical [29][4] = 600;	this->presetWidth_config_vertical [29][5] = 0;		this->presetWidth_config_vertical [29][6] = 0;		// 2100
-	this->presetWidth_config_vertical [30][0] = 4;	this->presetWidth_config_vertical [30][1] = 600;	this->presetWidth_config_vertical [30][2] = 450;	this->presetWidth_config_vertical [30][3] = 400;
-													this->presetWidth_config_vertical [30][4] = 600;	this->presetWidth_config_vertical [30][5] = 0;		this->presetWidth_config_vertical [30][6] = 0;		// 2050
-	this->presetWidth_config_vertical [31][0] = 4;	this->presetWidth_config_vertical [31][1] = 600;	this->presetWidth_config_vertical [31][2] = 600;	this->presetWidth_config_vertical [31][3] = 200;
-													this->presetWidth_config_vertical [31][4] = 600;	this->presetWidth_config_vertical [31][5] = 0;		this->presetWidth_config_vertical [31][6] = 0;		// 2000
-	this->presetWidth_config_vertical [32][0] = 4;	this->presetWidth_config_vertical [32][1] = 600;	this->presetWidth_config_vertical [32][2] = 450;	this->presetWidth_config_vertical [32][3] = 300;
-													this->presetWidth_config_vertical [32][4] = 600;	this->presetWidth_config_vertical [32][5] = 0;		this->presetWidth_config_vertical [32][6] = 0;		// 1950
-	this->presetWidth_config_vertical [33][0] = 4;	this->presetWidth_config_vertical [33][1] = 600;	this->presetWidth_config_vertical [33][2] = 400;	this->presetWidth_config_vertical [33][3] = 300;
-													this->presetWidth_config_vertical [33][4] = 600;	this->presetWidth_config_vertical [33][5] = 0;		this->presetWidth_config_vertical [33][6] = 0;		// 1900
-	this->presetWidth_config_vertical [34][0] = 4;	this->presetWidth_config_vertical [34][1] = 600;	this->presetWidth_config_vertical [34][2] = 450;	this->presetWidth_config_vertical [34][3] = 200;
-													this->presetWidth_config_vertical [34][4] = 600;	this->presetWidth_config_vertical [34][5] = 0;		this->presetWidth_config_vertical [34][6] = 0;		// 1850
-	this->presetWidth_config_vertical [35][0] = 3;	this->presetWidth_config_vertical [35][1] = 600;	this->presetWidth_config_vertical [35][2] = 600;	this->presetWidth_config_vertical [35][3] = 600;
-													this->presetWidth_config_vertical [35][4] = 0;		this->presetWidth_config_vertical [35][5] = 0;		this->presetWidth_config_vertical [35][6] = 0;		// 1800
-	this->presetWidth_config_vertical [36][0] = 4;	this->presetWidth_config_vertical [36][1] = 600;	this->presetWidth_config_vertical [36][2] = 400;	this->presetWidth_config_vertical [36][3] = 450;
-													this->presetWidth_config_vertical [36][4] = 300;	this->presetWidth_config_vertical [36][5] = 0;		this->presetWidth_config_vertical [36][6] = 0;		// 1750
-	this->presetWidth_config_vertical [37][0] = 3;	this->presetWidth_config_vertical [37][1] = 600;	this->presetWidth_config_vertical [37][2] = 500;	this->presetWidth_config_vertical [37][3] = 600;
-													this->presetWidth_config_vertical [37][4] = 0;		this->presetWidth_config_vertical [37][5] = 0;		this->presetWidth_config_vertical [37][6] = 0;		// 1700
-	this->presetWidth_config_vertical [38][0] = 3;	this->presetWidth_config_vertical [38][1] = 600;	this->presetWidth_config_vertical [38][2] = 450;	this->presetWidth_config_vertical [38][3] = 600;
-													this->presetWidth_config_vertical [38][4] = 0;		this->presetWidth_config_vertical [38][5] = 0;		this->presetWidth_config_vertical [38][6] = 0;		// 1650
-	this->presetWidth_config_vertical [39][0] = 3;	this->presetWidth_config_vertical [39][1] = 600;	this->presetWidth_config_vertical [39][2] = 400;	this->presetWidth_config_vertical [39][3] = 600;
-													this->presetWidth_config_vertical [39][4] = 0;		this->presetWidth_config_vertical [39][5] = 0;		this->presetWidth_config_vertical [39][6] = 0;		// 1600
-	this->presetWidth_config_vertical [40][0] = 4;	this->presetWidth_config_vertical [40][1] = 600;	this->presetWidth_config_vertical [40][2] = 450;	this->presetWidth_config_vertical [40][3] = 200;
-													this->presetWidth_config_vertical [40][4] = 300;	this->presetWidth_config_vertical [40][5] = 0;		this->presetWidth_config_vertical [40][6] = 0;		// 1550
-	this->presetWidth_config_vertical [41][0] = 3;	this->presetWidth_config_vertical [41][1] = 600;	this->presetWidth_config_vertical [41][2] = 300;	this->presetWidth_config_vertical [41][3] = 600;
-													this->presetWidth_config_vertical [41][4] = 0;		this->presetWidth_config_vertical [41][5] = 0;		this->presetWidth_config_vertical [41][6] = 0;		// 1500
-	this->presetWidth_config_vertical [42][0] = 3;	this->presetWidth_config_vertical [42][1] = 600;	this->presetWidth_config_vertical [42][2] = 400;	this->presetWidth_config_vertical [42][3] = 450;
-													this->presetWidth_config_vertical [42][4] = 0;		this->presetWidth_config_vertical [42][5] = 0;		this->presetWidth_config_vertical [42][6] = 0;		// 1450
-	this->presetWidth_config_vertical [43][0] = 3;	this->presetWidth_config_vertical [43][1] = 600;	this->presetWidth_config_vertical [43][2] = 200;	this->presetWidth_config_vertical [43][3] = 600;
-													this->presetWidth_config_vertical [43][4] = 0;		this->presetWidth_config_vertical [43][5] = 0;		this->presetWidth_config_vertical [43][6] = 0;		// 1400
-	this->presetWidth_config_vertical [44][0] = 3;	this->presetWidth_config_vertical [44][1] = 600;	this->presetWidth_config_vertical [44][2] = 300;	this->presetWidth_config_vertical [44][3] = 450;
-													this->presetWidth_config_vertical [44][4] = 0;		this->presetWidth_config_vertical [44][5] = 0;		this->presetWidth_config_vertical [44][6] = 0;		// 1350
-	this->presetWidth_config_vertical [45][0] = 3;	this->presetWidth_config_vertical [45][1] = 600;	this->presetWidth_config_vertical [45][2] = 400;	this->presetWidth_config_vertical [45][3] = 300;
-													this->presetWidth_config_vertical [45][4] = 0;		this->presetWidth_config_vertical [45][5] = 0;		this->presetWidth_config_vertical [45][6] = 0;		// 1300
-	this->presetWidth_config_vertical [46][0] = 3;	this->presetWidth_config_vertical [46][1] = 600;	this->presetWidth_config_vertical [46][2] = 200;	this->presetWidth_config_vertical [46][3] = 450;
-													this->presetWidth_config_vertical [46][4] = 0;		this->presetWidth_config_vertical [46][5] = 0;		this->presetWidth_config_vertical [46][6] = 0;		// 1250
-	this->presetWidth_config_vertical [47][0] = 2;	this->presetWidth_config_vertical [47][1] = 600;	this->presetWidth_config_vertical [47][2] = 600;	this->presetWidth_config_vertical [47][3] = 0;
-													this->presetWidth_config_vertical [47][4] = 0;		this->presetWidth_config_vertical [47][5] = 0;		this->presetWidth_config_vertical [47][6] = 0;		// 1200
-	this->presetWidth_config_vertical [48][0] = 3;	this->presetWidth_config_vertical [48][1] = 450;	this->presetWidth_config_vertical [48][2] = 400;	this->presetWidth_config_vertical [48][3] = 300;
-													this->presetWidth_config_vertical [48][4] = 0;		this->presetWidth_config_vertical [48][5] = 0;		this->presetWidth_config_vertical [48][6] = 0;		// 1150
-	this->presetWidth_config_vertical [49][0] = 3;	this->presetWidth_config_vertical [49][1] = 400;	this->presetWidth_config_vertical [49][2] = 400;	this->presetWidth_config_vertical [49][3] = 300;
-													this->presetWidth_config_vertical [49][4] = 0;		this->presetWidth_config_vertical [49][5] = 0;		this->presetWidth_config_vertical [49][6] = 0;		// 1100
-	this->presetWidth_config_vertical [50][0] = 3;	this->presetWidth_config_vertical [50][1] = 450;	this->presetWidth_config_vertical [50][2] = 300;	this->presetWidth_config_vertical [50][3] = 300;
-													this->presetWidth_config_vertical [50][4] = 0;		this->presetWidth_config_vertical [50][5] = 0;		this->presetWidth_config_vertical [50][6] = 0;		// 1050
-	this->presetWidth_config_vertical [51][0] = 2;	this->presetWidth_config_vertical [51][1] = 600;	this->presetWidth_config_vertical [51][2] = 400;	this->presetWidth_config_vertical [51][3] = 0;
-													this->presetWidth_config_vertical [51][4] = 0;		this->presetWidth_config_vertical [51][5] = 0;		this->presetWidth_config_vertical [51][6] = 0;		// 1000
-	this->presetWidth_config_vertical [52][0] = 2;	this->presetWidth_config_vertical [52][1] = 500;	this->presetWidth_config_vertical [52][2] = 450;	this->presetWidth_config_vertical [52][3] = 0;
-													this->presetWidth_config_vertical [52][4] = 0;		this->presetWidth_config_vertical [52][5] = 0;		this->presetWidth_config_vertical [52][6] = 0;		// 950
-	this->presetWidth_config_vertical [53][0] = 2;	this->presetWidth_config_vertical [53][1] = 600;	this->presetWidth_config_vertical [53][2] = 300;	this->presetWidth_config_vertical [53][3] = 0;
-													this->presetWidth_config_vertical [53][4] = 0;		this->presetWidth_config_vertical [53][5] = 0;		this->presetWidth_config_vertical [53][6] = 0;		// 900
-	this->presetWidth_config_vertical [54][0] = 2;	this->presetWidth_config_vertical [54][1] = 400;	this->presetWidth_config_vertical [54][2] = 450;	this->presetWidth_config_vertical [54][3] = 0;
-													this->presetWidth_config_vertical [54][4] = 0;		this->presetWidth_config_vertical [54][5] = 0;		this->presetWidth_config_vertical [54][6] = 0;		// 850
-	this->presetWidth_config_vertical [55][0] = 2;	this->presetWidth_config_vertical [55][1] = 400;	this->presetWidth_config_vertical [55][2] = 400;	this->presetWidth_config_vertical [55][3] = 0;
-													this->presetWidth_config_vertical [55][4] = 0;		this->presetWidth_config_vertical [55][5] = 0;		this->presetWidth_config_vertical [55][6] = 0;		// 800
-	this->presetWidth_config_vertical [56][0] = 2;	this->presetWidth_config_vertical [56][1] = 450;	this->presetWidth_config_vertical [56][2] = 300;	this->presetWidth_config_vertical [56][3] = 0;
-													this->presetWidth_config_vertical [56][4] = 0;		this->presetWidth_config_vertical [56][5] = 0;		this->presetWidth_config_vertical [56][6] = 0;		// 750
-	this->presetWidth_config_vertical [57][0] = 2;	this->presetWidth_config_vertical [57][1] = 400;	this->presetWidth_config_vertical [57][2] = 300;	this->presetWidth_config_vertical [57][3] = 0;
-													this->presetWidth_config_vertical [57][4] = 0;		this->presetWidth_config_vertical [57][5] = 0;		this->presetWidth_config_vertical [57][6] = 0;		// 700
-	this->presetWidth_config_vertical [58][0] = 2;	this->presetWidth_config_vertical [58][1] = 450;	this->presetWidth_config_vertical [58][2] = 200;	this->presetWidth_config_vertical [58][3] = 0;
-													this->presetWidth_config_vertical [58][4] = 0;		this->presetWidth_config_vertical [58][5] = 0;		this->presetWidth_config_vertical [58][6] = 0;		// 650
-	this->presetWidth_config_vertical [59][0] = 1;	this->presetWidth_config_vertical [59][1] = 600;	this->presetWidth_config_vertical [59][2] = 0;		this->presetWidth_config_vertical [59][3] = 0;
-													this->presetWidth_config_vertical [59][4] = 0;		this->presetWidth_config_vertical [59][5] = 0;		this->presetWidth_config_vertical [59][6] = 0;		// 600
-	this->presetWidth_config_vertical [60][0] = 1;	this->presetWidth_config_vertical [60][1] = 500;	this->presetWidth_config_vertical [60][2] = 0;		this->presetWidth_config_vertical [60][3] = 0;
-													this->presetWidth_config_vertical [60][4] = 0;		this->presetWidth_config_vertical [60][5] = 0;		this->presetWidth_config_vertical [60][6] = 0;		// 500
-	this->presetWidth_config_vertical [61][0] = 1;	this->presetWidth_config_vertical [61][1] = 450;	this->presetWidth_config_vertical [61][2] = 0;		this->presetWidth_config_vertical [61][3] = 0;
-													this->presetWidth_config_vertical [61][4] = 0;		this->presetWidth_config_vertical [61][5] = 0;		this->presetWidth_config_vertical [61][6] = 0;		// 450
-	this->presetWidth_config_vertical [62][0] = 1;	this->presetWidth_config_vertical [62][1] = 400;	this->presetWidth_config_vertical [62][2] = 0;		this->presetWidth_config_vertical [62][3] = 0;
-													this->presetWidth_config_vertical [62][4] = 0;		this->presetWidth_config_vertical [62][5] = 0;		this->presetWidth_config_vertical [62][6] = 0;		// 400
-	this->presetWidth_config_vertical [63][0] = 1;	this->presetWidth_config_vertical [63][1] = 300;	this->presetWidth_config_vertical [63][2] = 0;		this->presetWidth_config_vertical [63][3] = 0;
-													this->presetWidth_config_vertical [63][4] = 0;		this->presetWidth_config_vertical [63][5] = 0;		this->presetWidth_config_vertical [63][6] = 0;		// 300
-	this->presetWidth_config_vertical [64][0] = 1;	this->presetWidth_config_vertical [64][1] = 200;	this->presetWidth_config_vertical [64][2] = 0;		this->presetWidth_config_vertical [64][3] = 0;
-													this->presetWidth_config_vertical [64][4] = 0;		this->presetWidth_config_vertical [64][5] = 0;		this->presetWidth_config_vertical [64][6] = 0;		// 200
-	
-	this->presetWidth_config_horizontal [0][0] = 3;		this->presetWidth_config_horizontal [0][1] = 1200;	this->presetWidth_config_horizontal [0][2] = 1200;	this->presetWidth_config_horizontal [0][3] = 1200;	// 3600
-	this->presetWidth_config_horizontal [1][0] = 3;		this->presetWidth_config_horizontal [1][1] = 1200;	this->presetWidth_config_horizontal [1][2] = 1200;	this->presetWidth_config_horizontal [1][3] = 900;	// 3300
-	this->presetWidth_config_horizontal [2][0] = 3;		this->presetWidth_config_horizontal [2][1] = 1200;	this->presetWidth_config_horizontal [2][2] = 1200;	this->presetWidth_config_horizontal [2][3] = 600;	// 3000
-	this->presetWidth_config_horizontal [3][0] = 3;		this->presetWidth_config_horizontal [3][1] = 1200;	this->presetWidth_config_horizontal [3][2] = 900;	this->presetWidth_config_horizontal [3][3] = 600;	// 2700
-	this->presetWidth_config_horizontal [4][0] = 2;		this->presetWidth_config_horizontal [4][1] = 1200;	this->presetWidth_config_horizontal [4][2] = 1200;	this->presetWidth_config_horizontal [4][3] = 0;		// 2400
-	this->presetWidth_config_horizontal [5][0] = 2;		this->presetWidth_config_horizontal [5][1] = 1200;	this->presetWidth_config_horizontal [5][2] = 900;	this->presetWidth_config_horizontal [5][3] = 0;		// 2100
-	this->presetWidth_config_horizontal [6][0] = 2;		this->presetWidth_config_horizontal [6][1] = 900;	this->presetWidth_config_horizontal [6][2] = 900;	this->presetWidth_config_horizontal [6][3] = 0;		// 1800
-	this->presetWidth_config_horizontal [7][0] = 2;		this->presetWidth_config_horizontal [7][1] = 900;	this->presetWidth_config_horizontal [7][2] = 600;	this->presetWidth_config_horizontal [7][3] = 0;		// 1500
-	this->presetWidth_config_horizontal [8][0] = 1;		this->presetWidth_config_horizontal [8][1] = 1200;	this->presetWidth_config_horizontal [8][2] = 0;		this->presetWidth_config_horizontal [8][3] = 0;		// 1200
-	this->presetWidth_config_horizontal [9][0] = 1;		this->presetWidth_config_horizontal [9][1] = 900;	this->presetWidth_config_horizontal [9][2] = 0;		this->presetWidth_config_horizontal [9][3] = 0;		// 900
-	this->presetWidth_config_horizontal [10][0] = 1;	this->presetWidth_config_horizontal [10][1] = 600;	this->presetWidth_config_horizontal [10][2] = 0;	this->presetWidth_config_horizontal [10][3] = 0;	// 600
 }
 
 // 셀 정보 초기화
@@ -1895,10 +1648,6 @@ short DGCALLBACK lowSideTableformPlacerHandler1 (short message, short dialogID, 
 				bLayerInd_Props = false;
 				bLayerInd_Join = false;
 
-				bLayerInd_SlabTableform = false;
-				bLayerInd_Profile = false;
-
-				bLayerInd_Steelform = false;
 				bLayerInd_Plywood = false;
 				bLayerInd_Timber = false;
 				bLayerInd_IncornerPanel = false;
@@ -1910,7 +1659,6 @@ short DGCALLBACK lowSideTableformPlacerHandler1 (short message, short dialogID, 
 				bLayerInd_Fillersp = false;
 				bLayerInd_BlueClamp = false;
 				bLayerInd_BlueTimberRail = false;
-				bLayerInd_Hidden = false;
 
 				// 휠러스페이서, 합판, 각재
 				for (xx = 0 ; xx < placingZone.nCellsInHor ; ++xx) {
@@ -2179,17 +1927,12 @@ short DGCALLBACK lowSideTableformPlacerHandler2 (short message, short dialogID, 
 			DGSetItemValLong (dialogID, CHECKBOX_LAYER_COUPLING, TRUE);
 
 			// 레이어 관련 라벨
-			DGSetItemText (dialogID, LABEL_LAYER_SETTINGS, L"부재별 레이어 설정");
-			DGSetItemText (dialogID, LABEL_LAYER_SLABTABLEFORM, L"슬래브 테이블폼");
-			DGSetItemText (dialogID, LABEL_LAYER_PROFILE, L"C형강");
 			DGSetItemText (dialogID, LABEL_LAYER_EUROFORM, L"유로폼");
 			DGSetItemText (dialogID, LABEL_LAYER_RECTPIPE, L"비계 파이프");
 			DGSetItemText (dialogID, LABEL_LAYER_PINBOLT, L"핀볼트 세트");
-			DGSetItemText (dialogID, LABEL_LAYER_WALLTIE, L"벽체 타이");
 			DGSetItemText (dialogID, LABEL_LAYER_JOIN, L"결합철물");
 			DGSetItemText (dialogID, LABEL_LAYER_HEADPIECE, L"헤드피스");
 			DGSetItemText (dialogID, LABEL_LAYER_PROPS, L"푸시풀프롭스");
-			DGSetItemText (dialogID, LABEL_LAYER_STEELFORM, L"스틸폼");
 			DGSetItemText (dialogID, LABEL_LAYER_PLYWOOD, L"합판");
 			DGSetItemText (dialogID, LABEL_LAYER_TIMBER, L"각재");
 			DGSetItemText (dialogID, LABEL_LAYER_FILLERSP, L"휠러스페이서");
@@ -2201,38 +1944,27 @@ short DGCALLBACK lowSideTableformPlacerHandler2 (short message, short dialogID, 
 			DGSetItemText (dialogID, LABEL_LAYER_CROSS_JOINT_BAR, L"십자조인트바");
 			DGSetItemText (dialogID, LABEL_LAYER_BLUE_CLAMP, L"블루클램프");
 			DGSetItemText (dialogID, LABEL_LAYER_BLUE_TIMBER_RAIL, L"블루목심");
-			DGSetItemText (dialogID, LABEL_LAYER_HIDDEN, L"숨김");
 
-			DGAppendDialogItem (dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 120, 730, 160, 25);
+			DGAppendDialogItem (dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 120, 610, 160, 25);
 			DGSetItemFont (dialogID, BUTTON_AUTOSET, DG_IS_LARGE | DG_IS_PLAIN);
 			DGSetItemText (dialogID, BUTTON_AUTOSET, L"레이어 자동 설정");
 			DGShowItem (dialogID, BUTTON_AUTOSET);
+
+			// 불필요한 항목 숨김
+			DGHideItem(dialogID, LABEL_LAYER_18);
+			DGHideItem(dialogID, LABEL_LAYER_19);
+			DGHideItem(dialogID, LABEL_LAYER_20);
+			DGHideItem(dialogID, USERCONTROL_LAYER_18);
+			DGHideItem(dialogID, USERCONTROL_LAYER_19);
+			DGHideItem(dialogID, USERCONTROL_LAYER_20);
+
+			// 다이얼로그 크기 조절
+			DGSetDialogSize(dialogID, DG_CLIENT, 300, 660, DG_TOPLEFT, false);
 
 			// 유저 컨트롤 초기화
 			BNZeroMemory (&ucb, sizeof (ucb));
 			ucb.dialogID = dialogID;
 			ucb.type	 = APIUserControlType_Layer;
-			ucb.itemID	 = USERCONTROL_LAYER_SLABTABLEFORM;
-			ACAPI_Interface (APIIo_SetUserControlCallbackID, &ucb, NULL);
-			DGSetItemValLong (dialogID, USERCONTROL_LAYER_SLABTABLEFORM, 1);
-			if (bLayerInd_SlabTableform == true) {
-				DGEnableItem (dialogID, LABEL_LAYER_SLABTABLEFORM);
-				DGEnableItem (dialogID, USERCONTROL_LAYER_SLABTABLEFORM);
-			} else {
-				DGDisableItem (dialogID, LABEL_LAYER_SLABTABLEFORM);
-				DGDisableItem (dialogID, USERCONTROL_LAYER_SLABTABLEFORM);
-			}
-
-			ucb.itemID	 = USERCONTROL_LAYER_PROFILE;
-			ACAPI_Interface (APIIo_SetUserControlCallbackID, &ucb, NULL);
-			DGSetItemValLong (dialogID, USERCONTROL_LAYER_PROFILE, 1);
-			if (bLayerInd_Profile == true) {
-				DGEnableItem (dialogID, LABEL_LAYER_PROFILE);
-				DGEnableItem (dialogID, USERCONTROL_LAYER_PROFILE);
-			} else {
-				DGDisableItem (dialogID, LABEL_LAYER_PROFILE);
-				DGDisableItem (dialogID, USERCONTROL_LAYER_PROFILE);
-			}
 
 			ucb.itemID	 = USERCONTROL_LAYER_EUROFORM;
 			ACAPI_Interface (APIIo_SetUserControlCallbackID, &ucb, NULL);
@@ -2267,17 +1999,6 @@ short DGCALLBACK lowSideTableformPlacerHandler2 (short message, short dialogID, 
 				DGDisableItem (dialogID, USERCONTROL_LAYER_PINBOLT);
 			}
 
-			ucb.itemID	 = USERCONTROL_LAYER_WALLTIE;
-			ACAPI_Interface (APIIo_SetUserControlCallbackID, &ucb, NULL);
-			DGSetItemValLong (dialogID, USERCONTROL_LAYER_WALLTIE, 1);
-			if (bLayerInd_WallTie == true) {
-				DGEnableItem (dialogID, LABEL_LAYER_WALLTIE);
-				DGEnableItem (dialogID, USERCONTROL_LAYER_WALLTIE);
-			} else {
-				DGDisableItem (dialogID, LABEL_LAYER_WALLTIE);
-				DGDisableItem (dialogID, USERCONTROL_LAYER_WALLTIE);
-			}
-
 			ucb.itemID	 = USERCONTROL_LAYER_JOIN;
 			ACAPI_Interface (APIIo_SetUserControlCallbackID, &ucb, NULL);
 			DGSetItemValLong (dialogID, USERCONTROL_LAYER_JOIN, 1);
@@ -2309,17 +2030,6 @@ short DGCALLBACK lowSideTableformPlacerHandler2 (short message, short dialogID, 
 			} else {
 				DGDisableItem (dialogID, LABEL_LAYER_PROPS);
 				DGDisableItem (dialogID, USERCONTROL_LAYER_PROPS);
-			}
-
-			ucb.itemID	 = USERCONTROL_LAYER_STEELFORM;
-			ACAPI_Interface (APIIo_SetUserControlCallbackID, &ucb, NULL);
-			DGSetItemValLong (dialogID, USERCONTROL_LAYER_STEELFORM, 1);
-			if (bLayerInd_Steelform == true) {
-				DGEnableItem (dialogID, LABEL_LAYER_STEELFORM);
-				DGEnableItem (dialogID, USERCONTROL_LAYER_STEELFORM);
-			} else {
-				DGDisableItem (dialogID, LABEL_LAYER_STEELFORM);
-				DGDisableItem (dialogID, USERCONTROL_LAYER_STEELFORM);
 			}
 
 			ucb.itemID	 = USERCONTROL_LAYER_PLYWOOD;
@@ -2443,16 +2153,6 @@ short DGCALLBACK lowSideTableformPlacerHandler2 (short message, short dialogID, 
 				DGDisableItem (dialogID, USERCONTROL_LAYER_BLUE_TIMBER_RAIL);
 			}
 
-			ucb.itemID	 = USERCONTROL_LAYER_HIDDEN;
-			ACAPI_Interface (APIIo_SetUserControlCallbackID, &ucb, NULL);
-			DGSetItemValLong (dialogID, USERCONTROL_LAYER_HIDDEN, 1);
-			if (bLayerInd_Hidden == true) {
-				DGEnableItem (dialogID, LABEL_LAYER_HIDDEN);
-				DGEnableItem (dialogID, USERCONTROL_LAYER_HIDDEN);
-			} else {
-				DGDisableItem (dialogID, LABEL_LAYER_HIDDEN);
-				DGDisableItem (dialogID, USERCONTROL_LAYER_HIDDEN);
-			}
 			break;
 
 		case DG_MSG_CHANGE:
@@ -2462,7 +2162,7 @@ short DGCALLBACK lowSideTableformPlacerHandler2 (short message, short dialogID, 
 
 				selectedLayer = DGGetItemValLong (dialogID, item);
 
-				for (xx = USERCONTROL_LAYER_SLABTABLEFORM ; xx <= USERCONTROL_LAYER_BLUE_TIMBER_RAIL ; ++xx)
+				for (xx = USERCONTROL_LAYER_EUROFORM; xx <= USERCONTROL_LAYER_BLUE_TIMBER_RAIL ; ++xx)
 					DGSetItemValLong (dialogID, xx, selectedLayer);
 			}
 
@@ -2472,16 +2172,12 @@ short DGCALLBACK lowSideTableformPlacerHandler2 (short message, short dialogID, 
 			switch (item) {
 				case DG_OK:
 					// 레이어 번호 저장
-					if (bLayerInd_SlabTableform == true)	layerInd_SlabTableform	= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_SLABTABLEFORM);
-					if (bLayerInd_Profile == true)			layerInd_Profile		= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_PROFILE);
 					if (bLayerInd_Euroform == true)			layerInd_Euroform		= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_EUROFORM);
 					if (bLayerInd_RectPipe == true)			layerInd_RectPipe		= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_RECTPIPE);
 					if (bLayerInd_PinBolt == true)			layerInd_PinBolt		= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_PINBOLT);
-					if (bLayerInd_WallTie == true)			layerInd_WallTie		= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_WALLTIE);
 					if (bLayerInd_Join == true)				layerInd_Join			= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_JOIN);
 					if (bLayerInd_HeadPiece == true)		layerInd_HeadPiece		= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_HEADPIECE);
 					if (bLayerInd_Props == true)			layerInd_Props			= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_PROPS);
-					if (bLayerInd_Steelform == true)		layerInd_Steelform		= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_STEELFORM);
 					if (bLayerInd_Plywood == true)			layerInd_Plywood		= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_PLYWOOD);
 					if (bLayerInd_Timber == true)			layerInd_Timber			= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_TIMBER);
 					if (bLayerInd_Fillersp == true)			layerInd_Fillersp		= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_FILLERSP);
@@ -2493,7 +2189,6 @@ short DGCALLBACK lowSideTableformPlacerHandler2 (short message, short dialogID, 
 					if (bLayerInd_CrossJointBar == true)	layerInd_CrossJointBar	= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_CROSS_JOINT_BAR);
 					if (bLayerInd_BlueClamp == true)		layerInd_BlueClamp		= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_BLUE_CLAMP);
 					if (bLayerInd_BlueTimberRail == true)	layerInd_BlueTimberRail	= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_BLUE_TIMBER_RAIL);
-					if (bLayerInd_Hidden == true)			layerInd_Hidden			= (short)DGGetItemValLong (dialogID, USERCONTROL_LAYER_HIDDEN);
 
 					break;
 
