@@ -123,8 +123,32 @@
 'GICN' 32521 "wallColumnSection_14" {
 	0  128  128
 }
-
 'GICN' 32525 "soleColumnSection_OutcornerAngle" {
+	0  128  128
+}
+
+'GICN' 32540 "Section_Beam" {
+	0  128  128
+}
+'GICN' 32541 "Section_Beam_with_Insulation" {
+	0  128  128
+}
+'GICN' 32542 "Section_Beam_Insert_Slab_1" {
+	0  128  128
+}
+'GICN' 32543 "Section_Beam_Insert_Slab_1_with_Insulation" {
+	0  128  128
+}
+'GICN' 32544 "Section_Beam_Insert_Slab_2" {
+	0  128  128
+}
+'GICN' 32545 "Section_Beam_Insert_Slab_2_with_Insulation" {
+	0  128  128
+}
+'GICN' 32546 "Section_Beam_Insert_Slab_3" {
+	0  128  128
+}
+'GICN' 32547 "Section_Beam_Insert_Slab_3_with_Insulation" {
 	0  128  128
 }
 
@@ -311,69 +335,60 @@
 }
 
 /* ---------------------------------------------------------- place Tableform on Beam */
-'GDLG'  32506  Modal | grow	  0		  0		660		870		"보에 테이블폼 배치" {
-/* [  1] */	Button			240		820		 70		 25		LargePlain		"OK"
-/* [  2] */	Button			340		820		 70		 25		LargePlain		"Cancel"
+'GDLG'  32506  Modal | grow	  0		  0		660		990		"보에 테이블폼 배치" {
+/* [  1] */	Button			240		940		 70		 25		LargePlain		"OK"
+/* [  2] */	Button			340		940		 70		 25		LargePlain		"Cancel"
 
-/* [  3] */	LeftText		 10		 10		200		 23		LargePlain		"Beam Section"
+/* [  3] */	Icon			180		140		300		250  	32540		/* BEAM image - no slab, no insulation */
+/* [  4] */	Icon			180		140		300		250  	32541		/* BEAM image - no slab, with insulation */
+/* [  5] */	Icon			180		140		300		250  	32542		/* BEAM image - same slab, no insulation */
+/* [  6] */	Icon			180		140		300		250  	32543		/* BEAM image - same slab, with insulation */
+/* [  7] */	Icon			180		140		300		250  	32544		/* BEAM image - left thick right thin slab, no insulation */
+/* [  8] */	Icon			180		140		300		250  	32545		/* BEAM image - left thick right thin slab, with insulation */
+/* [  9] */	Icon			180		140		300		250  	32546		/* BEAM image - left thin right thick slab, no insulation */
+/* [ 10] */	Icon			180		140		300		250  	32547		/* BEAM image - left thin right thick slab, with insulation */
 
-/* [  4] */	Separator		230		 50		200		200									/* Representation of Beam Section */
-/* [  5] */	LeftText		240		117		 70		 23		LargePlain		"B.L.Height"
-/* [  6] */	LengthEdit		235		140		 50		 25		LargePlain		"-2.0"	"2.0"	/* Beam Left Height */
-/* [  7] */	LeftText		350		117		 70		 23		LargePlain		"B.R.Height"
-/* [  8] */	LengthEdit		375		140		 50		 25		LargePlain		"-2.0"	"2.0"	/* Beam Right Height */
-/* [  9] */	LeftText		315		197		 70		 23		LargePlain		"B.Width"
-/* [ 10] */	LengthEdit		310		220		 50		 25		LargePlain		"-2.0"	"2.0"	/* Beam Width */
+/* [ 11] */	RightText		 60		 20		 90		 23		LargePlain		"Beam Height"
+/* [ 12] */	LengthEdit		155		 13		 50		 25		LargePlain		"-10.0"	"10.0"	/* Beam Height */
+/* [ 13] */	RightText		230		 20		 90		 23		LargePlain		"Beam Width"
+/* [ 14] */	LengthEdit		325		 13		 50		 25		LargePlain		"-10.0"	"10.0"	/* Beam Width */
 
-/* [ 11] */	Separator		190		 50		  1		200									/* Left Gap Line */
-/* [ 12] */	Separator		230		280		200		  1									/* Bottom Gap Line */
-/* [ 13] */	Separator		470		 50		  1		200									/* Right Gap Line */
-/* [ 14] */	LengthEdit		195		140		 30		 25		LargePlain		"0"	"1.0"	/* Left Gap */
-/* [ 15] */	LengthEdit		320		252		 30		 25		LargePlain		"0"	"1.0"	/* Bottom Gap */
-/* [ 16] */	LengthEdit		435		140		 30		 25		LargePlain		"0"	"1.0"	/* Right Gap */
+/* [ 15] */	RightText		 60		 50		 90		 23		LargePlain		"Slab Thk (L)"
+/* [ 16] */	LengthEdit		155		 43		 50		 25		LargePlain		"-10.0"	"10.0"	/* Slab Thickness (L) */
+/* [ 17] */	RightText		230		 50		 90		 23		LargePlain		"Slab Thk (R)"
+/* [ 18] */	LengthEdit		325		 43		 50		 25		LargePlain		"-10.0"	"10.0"	/* Slab Thickness (R) */
 
-/* [ 17] */	RightText		 80		 20		 70		 23		LargePlain		"T.L.Height"
-/* [ 18] */	LengthEdit		185		 13		 50		 25		LargePlain		"-5.0"	"5.0"	/* Total Left Height */
-/* [ 19] */	RightText		250		 20		 70		 23		LargePlain		"T.Width"
-/* [ 20] */	LengthEdit		325		 13		 50		 25		LargePlain		"-5.0"	"5.0"	/* Total Width */
-/* [ 21] */	RightText		480		 20		 70		 23		LargePlain		"T.R.Height"
-/* [ 22] */	LengthEdit		425		 13		 50		 25		LargePlain		"-5.0"	"5.0"	/* Total Right Height */
+/* [ 19] */	RightText		 60		 80		 90		 23		LargePlain		"Morph Height (L)"
+/* [ 20] */	LengthEdit		155		 73		 50		 25		LargePlain		"-10.0"	"10.0"	/* Morph Height (L) */
+/* [ 21] */	RightText		230		 80		 90		 23		LargePlain		"Morph Height (R)"
+/* [ 22] */	LengthEdit		325		 73		 50		 25		LargePlain		"-10.0"	"10.0"	/* Morph Height (R) */
 
-/* [ 23] */	LeftText		 50		 70		 70		 25		LargePlain		"Rest"
-/* [ 24] */	CheckBox		 50		105		 70		 25		LargePlain		"Timber"
-/* [ 25] */	CheckBox		 50		140		 70		 25		LargePlain		"Form"
-/* [ 26] */	CheckBox		 50		175		 70		 25		LargePlain		"Filler"
-/* [ 27] */	CheckBox		 50		210		 70		 25		LargePlain		"Form"
+/* [ 23] */	CheckBox		 45		105		 25		 25		LargePlain		""	/* Insulation On/Off */
 
-/* [ 28] */	LengthEdit		125		 63		 60		 25		LargePlain		"-2.0"	"2.0"
-/* [ 29] */	LengthEdit		125		105		 60		 25		LargePlain		"0.005"	"1.0"
-/* [ 30] */	PopupControl	125		141		 60		 25		200		10
+/* [ 24] */	RightText		 60		110		 90		 23		LargePlain		"Insul Thk (L)"
+/* [ 25] */	LengthEdit		155		103		 50		 25		LargePlain		"-10.0"	"10.0"	/* Insulation Thickness (L) */
+/* [ 26] */	RightText		230		110		 90		 23		LargePlain		"Insul Thk (B)"
+/* [ 27] */	LengthEdit		325		103		 50		 25		LargePlain		"-10.0"	"10.0"	/* Insulation Thickness (B) */
+/* [ 28] */	RightText		400		110		 90		 23		LargePlain		"Insul Thk (R)"
+/* [ 29] */	LengthEdit		495		103		 50		 25		LargePlain		"-10.0"	"10.0"	/* Insulation Thickness (R) */
+
+/* [ 30] */	LeftText		 40		246		 70		 25		LargePlain		"Rest"
+/* [ 31] */	CheckBox		 40		272		 70		 25		LargePlain		"Timber"
+/* [ 32] */	CheckBox		 40		298		 70		 25		LargePlain		"Form"
+/* [ 33] */	CheckBox		 40		324		 70		 25		LargePlain		"Filler"
+/* [ 34] */	CheckBox		 40		350		 70		 25		LargePlain		"Form"
+
+/* [ 35] */	LengthEdit		115		244		 60		 25		LargePlain		"-2.0"	"2.0"
+/* [ 36] */	LengthEdit		115		270		 60		 25		LargePlain		"0.005"	"1.0"
+/* [ 37] */	PopupControl	115		296		 60		 25		200		10
 							NoIcon	"200"
 							NoIcon	"300"
 							NoIcon	"400"
 							NoIcon	"450"
 							NoIcon	"500"
 							NoIcon	"600"
-/* [ 31] */	LengthEdit		125		175		 60		 25		LargePlain		"0.010"	"0.050"
-/* [ 32] */	PopupControl	125		208		 60		 25		200		10
-							NoIcon	"200"
-							NoIcon	"300"
-							NoIcon	"400"
-							NoIcon	"450"
-							NoIcon	"500"
-							NoIcon	"600"
-
-/* [ 33] */	LengthEdit		475		 63		 60		 25		LargePlain		"-2.0"	"2.0"
-/* [ 34] */	LengthEdit		475		105		 60		 25		LargePlain		"0.005"	"1.0"
-/* [ 35] */	PopupControl	475		141		 60		 25		200		10
-							NoIcon	"200"
-							NoIcon	"300"
-							NoIcon	"400"
-							NoIcon	"450"
-							NoIcon	"500"
-							NoIcon	"600"
-/* [ 36] */	LengthEdit		475		175		 60		 25		LargePlain		"0.010"	"0.050"
-/* [ 37] */	PopupControl	475		208		 60		 25		200		10
+/* [ 38] */	LengthEdit		115		322		 60		 25		LargePlain		"0.010"	"0.050"
+/* [ 39] */	PopupControl	115		348		 60		 25		200		10
 							NoIcon	"200"
 							NoIcon	"300"
 							NoIcon	"400"
@@ -381,25 +396,17 @@
 							NoIcon	"500"
 							NoIcon	"600"
 
-/* [ 38] */	LeftText		540		 70		 70		 25		LargePlain		"Rest"
-/* [ 39] */	CheckBox		540		105		 70		 25		LargePlain		"Timber"
-/* [ 40] */	CheckBox		540		140		 70		 25		LargePlain		"Form"
-/* [ 41] */	CheckBox		540		175		 70		 25		LargePlain		"Filler"
-/* [ 42] */	CheckBox		540		210		 70		 25		LargePlain		"Form"
-
-/* [ 43] */	CheckBox		230		320		 60		 25		LargePlain		"Form"
-/* [ 44] */	CheckBox		300		320		 60		 25		LargePlain		"Filler"
-/* [ 45] */	CheckBox		370		320		 60		 25		LargePlain		"Form"
-
-/* [ 46] */	PopupControl	230		290		 60		 25		200		10
+/* [ 40] */	LengthEdit		485		244		 60		 25		LargePlain		"-2.0"	"2.0"
+/* [ 41] */	LengthEdit		485		270		 60		 25		LargePlain		"0.005"	"1.0"
+/* [ 42] */	PopupControl	485		296		 60		 25		200		10
 							NoIcon	"200"
 							NoIcon	"300"
 							NoIcon	"400"
 							NoIcon	"450"
 							NoIcon	"500"
 							NoIcon	"600"
-/* [ 47] */	LengthEdit		300		290		 60		 25		LargePlain		"0.010"	"0.050"
-/* [ 48] */	PopupControl	370		290		 60		 25		200		10
+/* [ 43] */	LengthEdit		485		322		 60		 25		LargePlain		"0.010"	"0.050"
+/* [ 44] */	PopupControl	485		348		 60		 25		200		10
 							NoIcon	"200"
 							NoIcon	"300"
 							NoIcon	"400"
@@ -407,37 +414,63 @@
 							NoIcon	"500"
 							NoIcon	"600"
 
-/* [ 49] */	Button			295		 65		 70		 40		LargePlain		"Copy"
+/* [ 45] */	LeftText		550		246		 70		 25		LargePlain		"Rest"
+/* [ 46] */	CheckBox		550		272		 70		 25		LargePlain		"Timber"
+/* [ 47] */	CheckBox		550		298		 70		 25		LargePlain		"Form"
+/* [ 48] */	CheckBox		550		324		 70		 25		LargePlain		"Filler"
+/* [ 49] */	CheckBox		550		350		 70		 25		LargePlain		"Form"
 
-/* [ 50] */	Icon			215		368		 29		 14  	32502
-/* [ 51] */	LeftText		250		370		200		 23		LargePlain		"Layer Settings"
-/* [ 52] */	CheckBox		250		395		100		 23		LargePlain		"Coupling"
+/* [ 50] */	CheckBox		230		430		 60		 25		LargePlain		"Form"
+/* [ 51] */	CheckBox		300		430		 60		 25		LargePlain		"Filler"
+/* [ 52] */	CheckBox		370		430		 60		 25		LargePlain		"Form"
 
-/* [ 53] */	RightText		140		430		100		 23		LargePlain		"Euroform"
-/* [ 54] */	RightText		140		460		100		 23		LargePlain		"Plywood"
-/* [ 55] */	RightText		140		490		100		 23		LargePlain		"Wood"
-/* [ 56] */	RightText		140		520		100		 23		LargePlain		"OutcornerAngle"
-/* [ 57] */	RightText		140		550		100		 23		LargePlain		"Fillerspacer"
-/* [ 58] */	RightText		140		580		100		 23		LargePlain		"Rectpipe"
-/* [ 59] */	RightText		140		610		100		 23		LargePlain		"Rectpipe Hanger"
-/* [ 60] */	RightText		140		640		100		 23		LargePlain		"Pinbolt"
-/* [ 61] */	RightText		140		670		100		 23		LargePlain		"Euroform Hook"
-/* [ 62] */	RightText		140		700		100		 23		LargePlain		"Blue Clamp"
-/* [ 63] */	RightText		140		730		100		 23		LargePlain		"Blue Timber Rail"
+/* [ 53] */	PopupControl	230		400		 60		 25		200		10
+							NoIcon	"200"
+							NoIcon	"300"
+							NoIcon	"400"
+							NoIcon	"450"
+							NoIcon	"500"
+							NoIcon	"600"
+/* [ 54] */	LengthEdit		300		400		 60		 25		LargePlain		"0.010"	"0.050"
+/* [ 55] */	PopupControl	370		400		 60		 25		200		10
+							NoIcon	"200"
+							NoIcon	"300"
+							NoIcon	"400"
+							NoIcon	"450"
+							NoIcon	"500"
+							NoIcon	"600"
 
-/* [ 64] */	UserControl		250		424		160		 25		257	0x0006 0x0000 0		/* Layer Control - EUROFORM			*/
-/* [ 65] */	UserControl		250		454		160		 25		257	0x0006 0x0000 0		/* Layer Control - PLYWOOD			*/
-/* [ 66] */	UserControl		250		484		160		 25		257	0x0006 0x0000 0		/* Layer Control - WOOD				*/
-/* [ 67] */	UserControl		250		514		160		 25		257	0x0006 0x0000 0		/* Layer Control - OUTCORNER_ANGLE	*/
-/* [ 68] */	UserControl		250		544		160		 25		257	0x0006 0x0000 0		/* Layer Control - FILLERSPACER		*/
-/* [ 69] */	UserControl		250		574		160		 25		257	0x0006 0x0000 0		/* Layer Control - RECT PIPE		*/
-/* [ 70] */	UserControl		250		604		160		 25		257	0x0006 0x0000 0		/* Layer Control - RECT PIPE HANGER	*/
-/* [ 71] */	UserControl		250		634		160		 25		257	0x0006 0x0000 0		/* Layer Control - PINBOLT			*/
-/* [ 72] */	UserControl		250		664		160		 25		257	0x0006 0x0000 0		/* Layer Control - EUROFORM HOOK	*/
-/* [ 73] */	UserControl		250		694		160		 25		257	0x0006 0x0000 0		/* Layer Control - BLUE CLAMP		*/
-/* [ 74] */	UserControl		250		724		160		 25		257	0x0006 0x0000 0		/* Layer Control - BLUE TIMBER RAIL	*/
+/* [ 56] */	Button			295		265		 70		 40		LargePlain		"Copy"
 
-/* [ 75] */	Button			250		770		160		 25		LargePlain		"Autoset"
+/* [ 57] */	Icon			215		488		 29		 14  	32502
+/* [ 58] */	LeftText		250		490		200		 23		LargePlain		"Layer Settings"
+/* [ 59] */	CheckBox		250		515		100		 23		LargePlain		"Coupling"
+
+/* [ 60] */	RightText		140		550		100		 23		LargePlain		"Euroform"
+/* [ 61] */	RightText		140		580		100		 23		LargePlain		"Plywood"
+/* [ 62] */	RightText		140		610		100		 23		LargePlain		"Wood"
+/* [ 63] */	RightText		140		640		100		 23		LargePlain		"OutcornerAngle"
+/* [ 64] */	RightText		140		670		100		 23		LargePlain		"Fillerspacer"
+/* [ 65] */	RightText		140		700		100		 23		LargePlain		"Rectpipe"
+/* [ 66] */	RightText		140		730		100		 23		LargePlain		"Rectpipe Hanger"
+/* [ 67] */	RightText		140		760		100		 23		LargePlain		"Pinbolt"
+/* [ 68] */	RightText		140		790		100		 23		LargePlain		"Euroform Hook"
+/* [ 69] */	RightText		140		820		100		 23		LargePlain		"Blue Clamp"
+/* [ 70] */	RightText		140		850		100		 23		LargePlain		"Blue Timber Rail"
+
+/* [ 71] */	UserControl		250		544		160		 25		257	0x0006 0x0000 0		/* Layer Control - EUROFORM			*/
+/* [ 72] */	UserControl		250		574		160		 25		257	0x0006 0x0000 0		/* Layer Control - PLYWOOD			*/
+/* [ 73] */	UserControl		250		604		160		 25		257	0x0006 0x0000 0		/* Layer Control - WOOD				*/
+/* [ 74] */	UserControl		250		634		160		 25		257	0x0006 0x0000 0		/* Layer Control - OUTCORNER_ANGLE	*/
+/* [ 75] */	UserControl		250		664		160		 25		257	0x0006 0x0000 0		/* Layer Control - FILLERSPACER		*/
+/* [ 76] */	UserControl		250		694		160		 25		257	0x0006 0x0000 0		/* Layer Control - RECT PIPE		*/
+/* [ 77] */	UserControl		250		724		160		 25		257	0x0006 0x0000 0		/* Layer Control - RECT PIPE HANGER	*/
+/* [ 78] */	UserControl		250		754		160		 25		257	0x0006 0x0000 0		/* Layer Control - PINBOLT			*/
+/* [ 79] */	UserControl		250		784		160		 25		257	0x0006 0x0000 0		/* Layer Control - EUROFORM HOOK	*/
+/* [ 80] */	UserControl		250		814		160		 25		257	0x0006 0x0000 0		/* Layer Control - BLUE CLAMP		*/
+/* [ 81] */	UserControl		250		844		160		 25		257	0x0006 0x0000 0		/* Layer Control - BLUE TIMBER RAIL	*/
+
+/* [ 82] */	Button			250		890		160		 25		LargePlain		"Autoset"
 }
 
 /* ---------------------------------------------------------- place Insulation */
