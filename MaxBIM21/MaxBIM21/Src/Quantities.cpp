@@ -1,10 +1,12 @@
 #include <cstdio>
 #include <cstdlib>
+#include <algorithm>
 #include "MaxBIM21.h"
 #include "Definitions.hpp"
 #include "StringConversion.hpp"
 #include "UtilityFunctions.h"
 #include "Quantities.h"
+#include "Export.h"
 
 using namespace quantitiesDG;
 
@@ -1853,4 +1855,174 @@ static GSErrCode __ACENV_CALL	insulElemPaletteAPIControlCallBack (Int32 referenc
 	}
 
 	return NoError;
+}
+
+// 물량합판 자동 부착하기
+GSErrCode	placeQuantityPlywoodAutomatic(void)
+{
+	GSErrCode	err = NoError;
+
+	API_Element			elem;
+	API_ElementMemo		memo;
+
+	// 레이어 관련 변수
+	short			nLayers;
+	API_Attribute	attrib;
+	API_AttributeDef  defs;
+	short			nVisibleLayers = 0;
+	short			visLayerList[1024];
+	char			fullLayerName[512];
+	vector<LayerList>	layerList;
+
+	// 작업 층 정보
+	API_StoryInfo	storyInfo;
+	double			workLevel_object;		// 객체의 작업 층 높이
+
+	// 보, 기둥, 벽, 슬래브 정보 저장
+	GS::Array<API_Guid>	elemList_Beam;
+	GS::Array<API_Guid>	elemList_Column;
+	GS::Array<API_Guid>	elemList_Wall;
+	GS::Array<API_Guid>	elemList_Slab;
+
+
+	// 그룹화 일시정지 ON
+	suspendGroups(true);
+
+	// 프로젝트 내 레이어 개수를 알아냄
+	nLayers = getLayerCount();
+
+	// 보이는 레이어들의 목록 저장하기
+	for (short xx = 1; xx <= nLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = xx;
+		err = ACAPI_Attribute_Get(&attrib);
+		if (err == NoError) {
+			if (!((attrib.layer.head.flags & APILay_Hidden) == true)) {
+				visLayerList[nVisibleLayers++] = attrib.layer.head.index;
+			}
+		}
+	}
+
+	// 레이어 이름과 인덱스 저장
+	for (short xx = 0; xx < nVisibleLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = visLayerList[xx];
+		err = ACAPI_Attribute_Get(&attrib);
+
+		sprintf(fullLayerName, "%s", attrib.layer.head.name);
+		fullLayerName[strlen(fullLayerName)] = '\0';
+
+		LayerList newLayerItem;
+		newLayerItem.layerInd = visLayerList[xx];
+		newLayerItem.layerName = fullLayerName;
+
+		layerList.push_back(newLayerItem);
+	}
+
+	// 레이어 이름 기준으로 정렬하여 레이어 인덱스 순서 변경
+	sort(layerList.begin(), layerList.end(), compareLayerName);		// 레이어 이름 기준 오름차순 정렬
+
+	// 일시적으로 모든 레이어 숨기기
+	for (short xx = 1; xx <= nLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = xx;
+		err = ACAPI_Attribute_Get(&attrib);
+		if (err == NoError) {
+			attrib.layer.head.flags |= APILay_Hidden;
+			ACAPI_Attribute_Modify(&attrib, NULL);
+		}
+	}
+
+	// 보이는 레이어들을 하나씩 순회
+	for (short mm = 1; mm <= nVisibleLayers; ++mm) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		//attrib.layer.head.index = visLayerList [mm-1];
+		attrib.layer.head.index = layerList[mm - 1].layerInd;
+		err = ACAPI_Attribute_Get(&attrib);
+
+		// 초기화
+		elemList_Beam.Clear();
+		elemList_Column.Clear();
+		elemList_Wall.Clear();
+		elemList_Slab.Clear();
+
+		if (err == NoError) {
+			// 레이어 보이기
+			if ((attrib.layer.head.flags & APILay_Hidden) == true) {
+				attrib.layer.head.flags ^= APILay_Hidden;
+				ACAPI_Attribute_Modify(&attrib, NULL);
+			}
+
+			// 보, 기둥, 벽, 슬래브 가져오기
+			ACAPI_Element_GetElemList(API_BeamID, &elemList_Beam, APIFilt_OnVisLayer);		// 보이는 레이어에 있음
+			ACAPI_Element_GetElemList(API_ColumnID, &elemList_Column, APIFilt_OnVisLayer);	// 보이는 레이어에 있음
+			ACAPI_Element_GetElemList(API_WallID, &elemList_Wall, APIFilt_OnVisLayer);		// 보이는 레이어에 있음
+			ACAPI_Element_GetElemList(API_SlabID, &elemList_Slab, APIFilt_OnVisLayer);		// 보이는 레이어에 있음
+
+			// 레이어 이름 가져옴
+			sprintf(fullLayerName, "%s", attrib.layer.head.name);
+			fullLayerName[strlen(fullLayerName)] = '\0';
+			GS::UniString fullLayerNameUniStr = (fullLayerName);
+			GS::UniString newFullLayerNameUniStr;
+
+			// 레이어 이름이 "01-S"로 시작할 경우, "07-Q"로 치환한 레이어 이름을 생성할 것 (그 외의 경우 "기존 레이어 이름 - 물량합판" 레이어 생성할 것)
+			if (fullLayerNameUniStr.Contains("01-S") == TRUE) {
+				fullLayerNameUniStr.ReplaceFirst("01-S", "07-Q");
+			}
+			else {
+				fullLayerNameUniStr = fullLayerNameUniStr + L" - 물량합판";
+			}
+
+			newFullLayerNameUniStr = fullLayerNameUniStr.ToUStr().Get();
+
+			BNZeroMemory(&attrib, sizeof(API_Attribute));
+			BNZeroMemory(&defs, sizeof(API_AttributeDef));
+
+			attrib.header.typeID = API_LayerID;
+			attrib.layer.conClassId = 1;
+			attrib.header.uniStringNamePtr = &fullLayerNameUniStr;
+			err = ACAPI_Attribute_Create(&attrib, &defs);
+
+			ACAPI_DisposeAttrDefsHdls(&defs);
+
+			// ...
+			
+			//// 레이어 이름
+			//sprintf(buffer, "\n\n<< 레이어 : %s >>\n", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
+
+			// 레이어 숨기기
+			attrib.layer.head.flags |= APILay_Hidden;
+			ACAPI_Attribute_Modify(&attrib, NULL);
+		}
+	}
+
+	// 모든 프로세스를 마치면 처음에 수집했던 보이는 레이어들을 다시 켜놓을 것
+	for (short xx = 1; xx <= nVisibleLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = visLayerList[xx - 1];
+		err = ACAPI_Attribute_Get(&attrib);
+		if (err == NoError) {
+			if ((attrib.layer.head.flags & APILay_Hidden) == true) {
+				attrib.layer.head.flags ^= APILay_Hidden;
+				ACAPI_Attribute_Modify(&attrib, NULL);
+			}
+		}
+	}
+
+	// 그룹화 일시정지 OFF
+	suspendGroups(false);
+
+	// 4개 타입만 사용: 보, 기둥(독립), 벽체(내벽), 슬래브(RC)
+	// 층: 구조와 동일한 층으로 지정
+	// 레이어: 01-S-기타-F01-기타-기타-기타-COLU --> 07-Q-... 로 변환 (만약 레이어 형식이 다를 경우, <레이어명> - 물량)
+
+	// 1. 모든 레이어를 순회함, 구조 요소 검색
+	// 2. 보, 기둥, 벽체, 슬래브를 찾으면 6면에 붙이기
+
+	return err;
 }

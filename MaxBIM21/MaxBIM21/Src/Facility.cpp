@@ -279,11 +279,11 @@ GSErrCode	attachBubbleOnCurrentFloorPlan (void)
 	short			nVisibleLayers = 0;
 	short			visLayerList [1024];
 	char			fullLayerName [512];
-	vector<LayerList>	layerList;
+	std::vector<LayerList>	layerList;
 
 	// 선택한 객체들의 레이어 인덱스들을 저장함
 	bool	bIndexFound;
-	vector<short>	selectedLayerIndex;
+	std::vector<short>	selectedLayerIndex;
 
 	// 레이어 이름에서 접미사를 가져오기 위한 변수
 	char	bubbleText [64];

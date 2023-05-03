@@ -77,4 +77,7 @@ GSErrCode	placeInsulation (void);				// 단열재를 부착할 수 있는 팔레트를 띄움
 static short DGCALLBACK insulElemDlgCallBack (short message, short dialID, short item, DGUserData userData, DGMessageData msgData);			// 팔레트에 대한 콜백 함수 1
 static GSErrCode __ACENV_CALL	insulElemPaletteAPIControlCallBack (Int32 referenceID, API_PaletteMessageID messageID, GS::IntPtr param);	// 팔레트에 대한 콜백 함수 2
 
+
+GSErrCode	placeQuantityPlywoodAutomatic(void);	// 물량합판 자동 부착하기
+
 #endif

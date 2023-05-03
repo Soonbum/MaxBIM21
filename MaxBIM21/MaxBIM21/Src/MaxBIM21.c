@@ -190,6 +190,18 @@ GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 			}
 			break;
 
+		// 자동 배치
+		case 32015:
+			switch (menuParams->menuItemRef.itemIndex) {
+			case 1:		// 물량합판 자동 부착
+				err = ACAPI_CallUndoableCommand(L"물량합판 자동 부착", [&]() -> GSErrCode {
+					err = placeQuantityPlywoodAutomatic();
+					return err;
+				});
+				break;
+			}
+			break;
+
 		// 편의 기능
 		case 32013:
 			switch(menuParams->menuItemRef.itemIndex) {
@@ -254,6 +266,7 @@ GSErrCode	__ACENV_CALL	RegisterInterface(void)
 	err = ACAPI_Register_Menu(32005, 32006, MenuCode_UserDef, MenuFlag_Default);	// 레이어 도구
 	err = ACAPI_Register_Menu(32007, 32008, MenuCode_UserDef, MenuFlag_Default);	// 내보내기
 	err = ACAPI_Register_Menu(32009, 32010, MenuCode_UserDef, MenuFlag_Default);	// 반자동 배치
+	err = ACAPI_Register_Menu(32015, 32016, MenuCode_UserDef, MenuFlag_Default);	// 자동 배치
 	err = ACAPI_Register_Menu(32013, 32014, MenuCode_UserDef, MenuFlag_Default);	// 편의 기능
 
 	return err;
@@ -273,6 +286,7 @@ GSErrCode	__ACENV_CALL Initialize(void)
 	err = ACAPI_Install_MenuHandler(32005, MenuCommandHandler);	// 레이어 도구
 	err = ACAPI_Install_MenuHandler(32007, MenuCommandHandler);	// 내보내기
 	err = ACAPI_Install_MenuHandler(32009, MenuCommandHandler);	// 반자동 배치
+	err = ACAPI_Install_MenuHandler(32015, MenuCommandHandler);	// 자동 배치
 	err = ACAPI_Install_MenuHandler(32013, MenuCommandHandler);	// 편의 기능
 
 	return err;

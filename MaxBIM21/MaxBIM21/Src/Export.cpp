@@ -239,6 +239,56 @@ void SummaryOfObjectInfo::clear()
 	this->records.clear();
 }
 
+// 객체의 레코드 수량 n 증가
+int		quantityPlusN(vector<vector<string>>* db, vector<string> record, int n)
+{
+	int		xx, yy;
+	size_t	vecLen;
+	size_t	inVecLen1, inVecLen2;
+	int		diff;
+	int		value;
+	char	tempStr[512];
+
+	vecLen = db->size();
+
+	try {
+		for (xx = 0; xx < vecLen; ++xx) {
+			// 변수 값도 동일할 경우
+			inVecLen1 = db->at(xx).size() - 1;		// 끝의 개수 필드를 제외한 길이
+			inVecLen2 = record.size();
+
+			if (inVecLen1 == inVecLen2) {
+				// 일치하지 않는 필드가 하나라도 있는지 찾아볼 것
+				diff = 0;
+				for (yy = 0; yy < inVecLen1; ++yy) {
+					if (my_strcmp(db->at(xx).at(yy).c_str(), record.at(yy).c_str()) != 0)
+						diff++;
+				}
+
+				// 모든 필드가 일치하면
+				if (diff == 0) {
+					value = atoi(db->at(xx).back().c_str());
+					value += n;
+					sprintf(tempStr, "%d", value);
+					db->at(xx).pop_back();
+					db->at(xx).push_back(tempStr);
+					return value;
+				}
+			}
+		}
+	}
+	catch (exception& ex) {
+		WriteReport_Alert("quantityPlusN 함수에서 오류 발생: %s", ex.what());
+	}
+
+	// 없으면 신규 레코드 추가하고 n 리턴
+	sprintf(tempStr, "%d", n);
+	record.push_back(tempStr);
+	db->push_back(record);
+
+	return n;
+}
+
 // 선택한 부재 정보 내보내기 (Single 모드)
 GSErrCode	exportSelectedElementInfo(void)
 {
@@ -257,7 +307,7 @@ GSErrCode	exportSelectedElementInfo(void)
 
 	char			buffer[512];
 	char			tempStr[512];
-	const char*		foundStr;
+	const char* foundStr;
 	bool			foundObject;
 	bool			foundExistValue;
 	int				retVal;
@@ -272,7 +322,7 @@ GSErrCode	exportSelectedElementInfo(void)
 	// Single 모드 전용
 	vector<vector<string>>	plywoodInfo;	// 합판 종류별 정보
 	vector<vector<string>>	darukiInfo;		// 각재 종류별 정보 (합판에 부착된 제작틀만)
-	char*	token;
+	char* token;
 	char	infoText[256];
 
 
@@ -1619,7 +1669,7 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 	SummaryOfObjectInfo	objectInfo;
 
 	char			tempStr[512];
-	const char		*foundStr;
+	const char* foundStr;
 	bool			foundObject;
 	bool			foundExistValue;
 	int				retVal;
@@ -2396,56 +2446,6 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 	DGAlert(DG_INFORMATION, L"알림", infoStr, "", L"확인", "", "");
 
 	return	err;
-}
-
-// 객체의 레코드 수량 n 증가
-int		quantityPlusN(vector<vector<string>>* db, vector<string> record, int n)
-{
-	int		xx, yy;
-	size_t	vecLen;
-	size_t	inVecLen1, inVecLen2;
-	int		diff;
-	int		value;
-	char	tempStr[512];
-
-	vecLen = db->size();
-
-	try {
-		for (xx = 0; xx < vecLen; ++xx) {
-			// 변수 값도 동일할 경우
-			inVecLen1 = db->at(xx).size() - 1;		// 끝의 개수 필드를 제외한 길이
-			inVecLen2 = record.size();
-
-			if (inVecLen1 == inVecLen2) {
-				// 일치하지 않는 필드가 하나라도 있는지 찾아볼 것
-				diff = 0;
-				for (yy = 0; yy < inVecLen1; ++yy) {
-					if (my_strcmp(db->at(xx).at(yy).c_str(), record.at(yy).c_str()) != 0)
-						diff++;
-				}
-
-				// 모든 필드가 일치하면
-				if (diff == 0) {
-					value = atoi(db->at(xx).back().c_str());
-					value += n;
-					sprintf(tempStr, "%d", value);
-					db->at(xx).pop_back();
-					db->at(xx).push_back(tempStr);
-					return value;
-				}
-			}
-		}
-	}
-	catch (exception& ex) {
-		WriteReport_Alert("quantityPlusN 함수에서 오류 발생: %s", ex.what());
-	}
-
-	// 없으면 신규 레코드 추가하고 n 리턴
-	sprintf(tempStr, "%d", n);
-	record.push_back(tempStr);
-	db->push_back(record);
-
-	return n;
 }
 
 // 부재별 선택 후 보여주기

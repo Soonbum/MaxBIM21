@@ -45,7 +45,7 @@ namespace exportDG {
 		RIGHT_SIDE,
 		BOTTOM_SIDE
 	};
-}
+};
 
 // 선택한 부재들의 요약 정보
 class SummaryOfObjectInfo
@@ -176,10 +176,10 @@ bool		comparePosY(const objectInBeamTableform& a, const objectInBeamTableform& b
 bool		compareLayerName(const LayerList& a, const LayerList& b);							// vector 내 레이어 정보 구조체 정렬을 위한 비교 함수 (레이어 이름 기준)
 bool		compareVectorString(const vector<string>& a, const vector<string>& b);				// vector 내 레코드 내 필드를 기준으로 내림차순 정렬을 위한 비교 함수
 
+int			quantityPlusN(vector<vector<string>>* db, vector<string> record, int n);			// 객체의 레코드 수량 n 증가
+
 GSErrCode	exportSelectedElementInfo(void);													// 선택한 부재 정보 내보내기 (Single 모드)
 GSErrCode	exportElementInfoOnVisibleLayers(void);											// 선택한 부재 정보 내보내기 (Multi 모드)
-
-int			quantityPlusN(vector<vector<string>>* db, vector<string> record, int n);			// 객체의 레코드 수량 n 증가
 
 GSErrCode	filterSelection(void);																// 부재별 선택 후 보여주기
 short		DGCALLBACK filterSelectionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);		// [다이얼로그] 다이얼로그에서 보이는 레이어 상에 있는 객체들의 종류를 보여주고, 체크한 종류의 객체들만 선택 후 보여줌
