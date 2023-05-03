@@ -55,7 +55,7 @@
   
   - 아키캐드 애드온 개발 환경 구축하기 (64비트 환경): https://docs.google.com/document/d/1MN-BmUn7pGVzhBGUJiwHW4jsxZ1nxUNN/edit?usp=sharing&ouid=104508791730356351070&rtpof=true&sd=true
 
-* 메뉴 구성 (2023.04.19 업데이트)
+* 메뉴 구성 (2023.05.03 업데이트)
 
   | 대메뉴 | 소메뉴 |
   | -- | -- |
