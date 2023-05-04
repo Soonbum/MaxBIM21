@@ -171,25 +171,25 @@ public:
 
 void		initArray(double arr[], short arrSize);											// 배열 초기화 함수
 int			compare(const void* first, const void* second);									// 오름차순으로 정렬할 때 사용하는 비교함수 (퀵소트)
-bool		comparePosX(const objectInBeamTableform& a, const objectInBeamTableform& b);		// vector 내 자재 정보 구조체 정렬을 위한 비교 함수 (좌표값 X 기준)
-bool		comparePosY(const objectInBeamTableform& a, const objectInBeamTableform& b);		// vector 내 자재 정보 구조체 정렬을 위한 비교 함수 (좌표값 Y 기준)
-bool		compareLayerName(const LayerList& a, const LayerList& b);							// vector 내 레이어 정보 구조체 정렬을 위한 비교 함수 (레이어 이름 기준)
-bool		compareVectorString(const vector<string>& a, const vector<string>& b);				// vector 내 레코드 내 필드를 기준으로 내림차순 정렬을 위한 비교 함수
+bool		comparePosX(const objectInBeamTableform& a, const objectInBeamTableform& b);	// vector 내 자재 정보 구조체 정렬을 위한 비교 함수 (좌표값 X 기준)
+bool		comparePosY(const objectInBeamTableform& a, const objectInBeamTableform& b);	// vector 내 자재 정보 구조체 정렬을 위한 비교 함수 (좌표값 Y 기준)
+bool		compareLayerName(const LayerList& a, const LayerList& b);						// vector 내 레이어 정보 구조체 정렬을 위한 비교 함수 (레이어 이름 기준)
+bool		compareVectorString(const vector<string>& a, const vector<string>& b);			// vector 내 레코드 내 필드를 기준으로 내림차순 정렬을 위한 비교 함수
 
-int			quantityPlusN(vector<vector<string>>* db, vector<string> record, int n);			// 객체의 레코드 수량 n 증가
+int			quantityPlusN(vector<vector<string>>* db, vector<string> record, int n);		// 객체의 레코드 수량 n 증가
 
-GSErrCode	exportSelectedElementInfo(void);													// 선택한 부재 정보 내보내기 (Single 모드)
-GSErrCode	exportElementInfoOnVisibleLayers(void);											// 선택한 부재 정보 내보내기 (Multi 모드)
+GSErrCode	exportSelectedElementInfo(void);												// 선택한 부재 정보 내보내기 (선택한 부재에 한해)
+GSErrCode	exportElementInfoOnVisibleLayers(void);											// 선택한 부재 정보 내보내기 (보이는 레이어에 한해)
 
-GSErrCode	filterSelection(void);																// 부재별 선택 후 보여주기
+GSErrCode	filterSelection(void);															// 부재별 선택 후 보여주기
 short		DGCALLBACK filterSelectionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);		// [다이얼로그] 다이얼로그에서 보이는 레이어 상에 있는 객체들의 종류를 보여주고, 체크한 종류의 객체들만 선택 후 보여줌
 
-GSErrCode	exportBeamTableformInformation(void);												// 보 테이블폼 물량 정보 내보내기
+GSErrCode	exportBeamTableformInformation(void);											// 보 테이블폼 물량 정보 내보내기
 
-GSErrCode	calcTableformArea(void);															// 테이블폼 면적 계산
+GSErrCode	calcTableformArea(void);														// 테이블폼 면적 계산
 
-GSErrCode	exportAllElevationsToPDFSingleMode(void);											// 모든 입면도 PDF로 내보내기 (Single 모드)
-GSErrCode	exportAllElevationsToPDFMultiMode(void);											// 모든 입면도 PDF로 내보내기 (Multi 모드)
+GSErrCode	exportAllElevationsToPDFSingleMode(void);										// 모든 입면도 PDF로 내보내기 (현재 보이는 화면에 한해)
+GSErrCode	exportAllElevationsToPDFMultiMode(void);										// 모든 입면도 PDF로 내보내기 (보이는 레이어 각각)
 
 short DGCALLBACK scaleQuestionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);			// [다이얼로그] 사용자가 축척 값을 직접 입력할 수 있도록 함
 short DGCALLBACK filenameQuestionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);		// [다이얼로그] 파일명을 입력할 수 있도록 함

@@ -126,10 +126,16 @@ GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 				case 5:		// 테이블폼 면적 계산
 					err = calcTableformArea();
 					break;
-				case 6:		// 모든 입면도 PDF로 내보내기 (현재 뷰만)
+				case 6:		// 물량합판 면적 계산 (선택한 부재에 한해)
+					// ...
+					break;
+				case 7:		// 물량합판 면적 계산 (보이는 레이어에 한해)
+					// ...
+					break;
+				case 8:		// 모든 입면도 PDF로 내보내기 (현재 뷰만)
 					err = exportAllElevationsToPDFSingleMode();
 					break;
-				case 7:		// 모든 입면도 PDF로 내보내기 (보이는 레이어 별로)
+				case 9:		// 모든 입면도 PDF로 내보내기 (보이는 레이어 별로)
 					err = exportAllElevationsToPDFMultiMode();
 					break;
 			}

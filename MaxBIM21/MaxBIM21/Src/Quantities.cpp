@@ -1869,13 +1869,14 @@ GSErrCode	placeQuantityPlywoodAutomatic(void)
 	short			nLayers;
 	API_Attribute	attrib;
 	API_AttributeDef  defs;
+	API_Attribute	attrib_new;
+	API_AttributeDef  defs_new;
 	short			nVisibleLayers = 0;
 	short			visLayerList[1024];
 	char			fullLayerName[512];
 	vector<LayerList>	layerList;
 
 	// 작업 층 정보
-	API_StoryInfo	storyInfo;
 	double			workLevel_object;		// 객체의 작업 층 높이
 
 	// 보, 기둥, 벽, 슬래브 정보 저장
@@ -1883,6 +1884,24 @@ GSErrCode	placeQuantityPlywoodAutomatic(void)
 	GS::Array<API_Guid>	elemList_Column;
 	GS::Array<API_Guid>	elemList_Wall;
 	GS::Array<API_Guid>	elemList_Slab;
+
+	long nBeams;
+	long nColumns;
+	long nWalls;
+	long nSlabs;
+
+	// 요소의 위치, 크기 정보
+	double leftBottomX;
+	double leftBottomY;
+	double leftBottomZ;
+	double rightTopX;
+	double rightTopY;
+	double dx;
+	double dy;
+	double ang;
+	double len1;
+	double len2;
+	double len3;
 
 
 	// 그룹화 일시정지 ON
@@ -1940,7 +1959,6 @@ GSErrCode	placeQuantityPlywoodAutomatic(void)
 	for (short mm = 1; mm <= nVisibleLayers; ++mm) {
 		BNZeroMemory(&attrib, sizeof(API_Attribute));
 		attrib.layer.head.typeID = API_LayerID;
-		//attrib.layer.head.index = visLayerList [mm-1];
 		attrib.layer.head.index = layerList[mm - 1].layerInd;
 		err = ACAPI_Attribute_Get(&attrib);
 
@@ -1963,37 +1981,316 @@ GSErrCode	placeQuantityPlywoodAutomatic(void)
 			ACAPI_Element_GetElemList(API_WallID, &elemList_Wall, APIFilt_OnVisLayer);		// 보이는 레이어에 있음
 			ACAPI_Element_GetElemList(API_SlabID, &elemList_Slab, APIFilt_OnVisLayer);		// 보이는 레이어에 있음
 
-			// 레이어 이름 가져옴
-			sprintf(fullLayerName, "%s", attrib.layer.head.name);
-			fullLayerName[strlen(fullLayerName)] = '\0';
-			GS::UniString fullLayerNameUniStr = (fullLayerName);
-			GS::UniString newFullLayerNameUniStr;
+			nBeams = elemList_Beam.GetSize();
+			nColumns = elemList_Column.GetSize();
+			nWalls = elemList_Wall.GetSize();
+			nSlabs = elemList_Slab.GetSize();
 
-			// 레이어 이름이 "01-S"로 시작할 경우, "07-Q"로 치환한 레이어 이름을 생성할 것 (그 외의 경우 "기존 레이어 이름 - 물량합판" 레이어 생성할 것)
-			if (fullLayerNameUniStr.Contains("01-S") == TRUE) {
-				fullLayerNameUniStr.ReplaceFirst("01-S", "07-Q");
+			// 보, 기둥, 벽, 슬래브 중 하나라도 있을 경우 레이어 생성하기
+			if ((!elemList_Beam.IsEmpty() || !elemList_Column.IsEmpty() || !elemList_Wall.IsEmpty() || !elemList_Slab.IsEmpty()) == true) {
+				// 레이어 이름 가져옴
+				sprintf(fullLayerName, "%s", attrib.layer.head.name);
+				fullLayerName[strlen(fullLayerName)] = '\0';
+				GS::UniString fullLayerNameUniStr = (fullLayerName);
+				GS::UniString newFullLayerNameUniStr;
+
+				// 레이어 이름이 "01-S"로 시작할 경우, "07-Q"로 치환한 레이어 이름을 생성할 것 (그 외의 경우 "기존 레이어 이름 - 물량합판" 레이어 생성할 것)
+				if (fullLayerNameUniStr.Contains("01-S") == TRUE) {
+					fullLayerNameUniStr.ReplaceFirst("01-S", "07-Q");
+				}
+				else {
+					fullLayerNameUniStr = fullLayerNameUniStr + L" - 물량합판";
+				}
+
+				newFullLayerNameUniStr = fullLayerNameUniStr.ToUStr().Get();
+
+				BNZeroMemory(&attrib_new, sizeof(API_Attribute));
+				BNZeroMemory(&defs_new, sizeof(API_AttributeDef));
+
+				attrib_new.header.typeID = API_LayerID;
+				attrib_new.layer.conClassId = 1;
+				if ((attrib_new.layer.head.flags & APILay_Hidden) == true)	attrib_new.layer.head.flags ^= APILay_Hidden;
+				attrib_new.header.uniStringNamePtr = &fullLayerNameUniStr;
+				ACAPI_Attribute_Create(&attrib_new, &defs_new);
+
+				ACAPI_DisposeAttrDefsHdls(&defs_new);
+
+				// 보의 경우
+				for (int i = 0; i < nBeams; i++) {
+					// 요소 정보 가져오기
+					BNZeroMemory(&elem, sizeof(API_Element));
+					BNZeroMemory(&memo, sizeof(API_ElementMemo));
+					elem.header.guid = elemList_Beam.Pop();
+					ACAPI_Element_Get(&elem);
+
+					// 층 정보 가져오기
+					workLevel_object = getWorkLevel(elem.header.floorInd);
+
+					// 객체의 원점 및 크기 정보 가져오기
+					leftBottomX = elem.beam.begC.x;
+					leftBottomY = elem.beam.begC.y;
+					leftBottomZ = elem.beam.level - elem.beam.height;
+					dx = elem.beam.endC.x - elem.beam.begC.x;
+					dy = elem.beam.endC.y - elem.beam.begC.y;
+					ang = atan2(dy, dx);
+					len1 = GetDistance(elem.beam.begC, elem.beam.endC);
+					len2 = elem.beam.width;
+					len3 = elem.beam.height;
+
+					// 물량합판 부착하기
+					EasyObjectPlacement qPlywood;
+					qPlywood.init(L"물량합판(핫스팟축소).gsm", attrib_new.layer.head.index, elem.header.floorInd, leftBottomX, leftBottomY, leftBottomZ, ang);
+					moveIn3D('y', qPlywood.radAng, -len2/2 + elem.beam.offset, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "보",
+						"PANEL_MAT", APIParT_Mater, "78",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "바닥깔기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len1).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len2).c_str());
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "보",
+						"PANEL_MAT", APIParT_Mater, "78",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "벽에 세우기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len1).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len3).c_str());
+					moveIn3D('y', qPlywood.radAng, len2, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.radAng -= DegreeToRad(90.0);
+					moveIn3D('y', qPlywood.radAng, len1, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.radAng -= DegreeToRad(90.0);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "보",
+						"PANEL_MAT", APIParT_Mater, "78",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "벽에 세우기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len1).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len3).c_str());
+				}
+
+				// 기둥의 경우
+				for (int i = 0; i < nColumns; i++) {
+					// 요소 정보 가져오기
+					BNZeroMemory(&elem, sizeof(API_Element));
+					BNZeroMemory(&memo, sizeof(API_ElementMemo));
+					elem.header.guid = elemList_Column.Pop();
+					ACAPI_Element_Get(&elem);
+
+					// 층 정보 가져오기
+					workLevel_object = getWorkLevel(elem.header.floorInd);
+
+					// 객체의 원점 및 크기 정보 가져오기
+					leftBottomX = elem.column.origoPos.x;
+					leftBottomY = elem.column.origoPos.y;
+					leftBottomZ = elem.column.bottomOffset;
+					ang = elem.column.angle + elem.column.slantDirectionAngle;
+					len1 = elem.column.coreWidth;
+					len2 = elem.column.coreDepth;
+					len3 = elem.column.height;
+
+					// 물량합판 부착하기
+					EasyObjectPlacement qPlywood;
+					qPlywood.init(L"물량합판(핫스팟축소).gsm", attrib_new.layer.head.index, elem.header.floorInd, leftBottomX, leftBottomY, leftBottomZ, ang);
+					moveIn3D('x', qPlywood.radAng, -len1 / 2, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					moveIn3D('y', qPlywood.radAng, -len2 / 2, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "기둥(독립)",
+						"PANEL_MAT", APIParT_Mater, "20",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "벽에 세우기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len1).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len3).c_str());
+					moveIn3D('y', qPlywood.radAng, len2, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.radAng -= DegreeToRad(90.0);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "기둥(독립)",
+						"PANEL_MAT", APIParT_Mater, "20",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "벽에 세우기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len2).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len3).c_str());
+					moveIn3D('y', qPlywood.radAng, len1, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.radAng -= DegreeToRad(90.0);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "기둥(독립)",
+						"PANEL_MAT", APIParT_Mater, "20",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "벽에 세우기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len1).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len3).c_str());
+					moveIn3D('y', qPlywood.radAng, len2, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.radAng -= DegreeToRad(90.0);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "기둥(독립)",
+						"PANEL_MAT", APIParT_Mater, "20",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "벽에 세우기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len2).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len3).c_str());
+				}
+
+				// 벽의 경우
+				for (int i = 0; i < nWalls; i++) {
+					// 요소 정보 가져오기
+					BNZeroMemory(&elem, sizeof(API_Element));
+					BNZeroMemory(&memo, sizeof(API_ElementMemo));
+					elem.header.guid = elemList_Wall.Pop();
+					ACAPI_Element_Get(&elem);
+
+					// 층 정보 가져오기
+					workLevel_object = getWorkLevel(elem.header.floorInd);
+
+					// 객체의 원점 및 크기 정보 가져오기
+					leftBottomX = elem.wall.begC.x;
+					leftBottomY = elem.wall.begC.y;
+					leftBottomZ = elem.wall.bottomOffset;
+					dx = elem.wall.endC.x - elem.wall.begC.x;
+					dy = elem.wall.endC.y - elem.wall.begC.y;
+					ang = atan2(dy, dx);
+					len1 = GetDistance(elem.wall.begC, elem.wall.endC);
+					len2 = elem.wall.thickness;
+					len3 = elem.wall.height;
+
+					// 물량합판 부착하기
+					EasyObjectPlacement qPlywood;
+					qPlywood.init(L"물량합판(핫스팟축소).gsm", attrib_new.layer.head.index, elem.header.floorInd, leftBottomX, leftBottomY, leftBottomZ, ang);
+					moveIn3D('y', qPlywood.radAng, -elem.wall.offsetFromOutside, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "벽체(내벽)",
+						"PANEL_MAT", APIParT_Mater, "75",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "벽에 세우기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len1).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len3).c_str());
+					moveIn3D('y', qPlywood.radAng, len2, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.radAng -= DegreeToRad(90.0);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "벽체(내벽)",
+						"PANEL_MAT", APIParT_Mater, "75",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "벽에 세우기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len2).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len3).c_str());
+					moveIn3D('y', qPlywood.radAng, len1, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.radAng -= DegreeToRad(90.0);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "벽체(내벽)",
+						"PANEL_MAT", APIParT_Mater, "75",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "벽에 세우기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len1).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len3).c_str());
+					moveIn3D('y', qPlywood.radAng, len2, &qPlywood.posX, &qPlywood.posY, &qPlywood.posZ);
+					qPlywood.radAng -= DegreeToRad(90.0);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "벽체(내벽)",
+						"PANEL_MAT", APIParT_Mater, "75",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "벽에 세우기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len2).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len3).c_str());
+				}
+
+				// 슬래브의 경우
+				for (int i = 0; i < nSlabs; i++) {
+					// 요소 정보 가져오기
+					BNZeroMemory(&elem, sizeof(API_Element));
+					BNZeroMemory(&memo, sizeof(API_ElementMemo));
+					elem.header.guid = elemList_Slab.Pop();
+					ACAPI_Element_Get(&elem);
+					ACAPI_Element_GetMemo(elem.header.guid, &memo);
+
+					// 층 정보 가져오기
+					workLevel_object = getWorkLevel(elem.header.floorInd);
+
+					// 가장 작은 X, Y 점을 찾아냄
+					leftBottomX = 0.0;
+					leftBottomY = 0.0;
+					rightTopX = 0.0;
+					rightTopY = 0.0;
+					for (int j = 1; j < elem.slab.poly.nCoords; j++) {
+						if (j == 1) {
+							leftBottomX = memo.coords[0][j].x;
+							leftBottomY = memo.coords[0][j].y;
+							rightTopX = memo.coords[0][j].x;
+							rightTopY = memo.coords[0][j].y;
+						}
+						else {
+							if (leftBottomX > memo.coords[0][j].x)	leftBottomX = memo.coords[0][j].x;
+							if (leftBottomY > memo.coords[0][j].y)	leftBottomY = memo.coords[0][j].y;
+							if (rightTopX < memo.coords[0][j].x)	rightTopX = memo.coords[0][j].x;
+							if (rightTopY < memo.coords[0][j].y)	rightTopY = memo.coords[0][j].y;
+						}
+					}
+
+					// 객체의 원점 및 크기 정보 가져오기
+					leftBottomZ = elem.slab.level + elem.slab.offsetFromTop - elem.slab.thickness;
+					ang = 0.0;
+					len1 = rightTopX - leftBottomX;
+					len2 = rightTopY - leftBottomY;
+					len3 = elem.slab.thickness;
+
+					// 물량합판 부착하기
+					EasyObjectPlacement qPlywood;
+					qPlywood.init(L"물량합판(핫스팟축소).gsm", attrib_new.layer.head.index, elem.header.floorInd, leftBottomX, leftBottomY, leftBottomZ, ang);
+					qPlywood.placeObject(10,
+						"sup_type", APIParT_CString, "물량합판",
+						"m_type", APIParT_CString, "스라브(RC)",
+						"PANEL_MAT", APIParT_Mater, "100",
+						"m_size", APIParT_CString, "12",
+						"m_size1", APIParT_CString, "비규격",
+						"m_size2", APIParT_CString, "합판면적",
+						"CONS_DR", APIParT_CString, "바닥깔기",
+						"mir", APIParT_Boolean, "0.0",
+						"NO_WD", APIParT_Length, format_string("%f", len1).c_str(),
+						"no_lg1", APIParT_Length, format_string("%f", len2).c_str());
+				}
 			}
-			else {
-				fullLayerNameUniStr = fullLayerNameUniStr + L" - 물량합판";
-			}
-
-			newFullLayerNameUniStr = fullLayerNameUniStr.ToUStr().Get();
-
-			BNZeroMemory(&attrib, sizeof(API_Attribute));
-			BNZeroMemory(&defs, sizeof(API_AttributeDef));
-
-			attrib.header.typeID = API_LayerID;
-			attrib.layer.conClassId = 1;
-			attrib.header.uniStringNamePtr = &fullLayerNameUniStr;
-			err = ACAPI_Attribute_Create(&attrib, &defs);
-
-			ACAPI_DisposeAttrDefsHdls(&defs);
-
-			// ...
 			
-			//// 레이어 이름
-			//sprintf(buffer, "\n\n<< 레이어 : %s >>\n", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
-
 			// 레이어 숨기기
 			attrib.layer.head.flags |= APILay_Hidden;
 			ACAPI_Attribute_Modify(&attrib, NULL);
@@ -2016,13 +2313,6 @@ GSErrCode	placeQuantityPlywoodAutomatic(void)
 
 	// 그룹화 일시정지 OFF
 	suspendGroups(false);
-
-	// 4개 타입만 사용: 보, 기둥(독립), 벽체(내벽), 슬래브(RC)
-	// 층: 구조와 동일한 층으로 지정
-	// 레이어: 01-S-기타-F01-기타-기타-기타-COLU --> 07-Q-... 로 변환 (만약 레이어 형식이 다를 경우, <레이어명> - 물량)
-
-	// 1. 모든 레이어를 순회함, 구조 요소 검색
-	// 2. 보, 기둥, 벽체, 슬래브를 찾으면 6면에 붙이기
 
 	return err;
 }

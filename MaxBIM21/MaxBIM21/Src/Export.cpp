@@ -289,7 +289,7 @@ int		quantityPlusN(vector<vector<string>>* db, vector<string> record, int n)
 	return n;
 }
 
-// 선택한 부재 정보 내보내기 (Single 모드)
+// 선택한 부재 정보 내보내기 (선택한 부재에 한해)
 GSErrCode	exportSelectedElementInfo(void)
 {
 	GSErrCode	err = NoError;
@@ -1647,7 +1647,7 @@ GSErrCode	exportSelectedElementInfo(void)
 	return	err;
 }
 
-// 선택한 부재 정보 내보내기 (Multi 모드)
+// 선택한 부재 정보 내보내기 (보이는 레이어에 한해)
 GSErrCode	exportElementInfoOnVisibleLayers(void)
 {
 	GSErrCode	err = NoError;
@@ -3864,7 +3864,7 @@ GSErrCode	calcTableformArea(void)
 	return err;
 }
 
-// 모든 입면도 PDF로 내보내기 (Single 모드)
+// 모든 입면도 PDF로 내보내기 (현재 보이는 화면에 한해)
 GSErrCode	exportAllElevationsToPDFSingleMode(void)
 {
 	GSErrCode	err = NoError;
@@ -3957,7 +3957,7 @@ GSErrCode	exportAllElevationsToPDFSingleMode(void)
 	return err;
 }
 
-// 모든 입면도 PDF로 내보내기 (Multi 모드)
+// 모든 입면도 PDF로 내보내기 (보이는 레이어 각각)
 GSErrCode	exportAllElevationsToPDFMultiMode(void)
 {
 	GSErrCode	err = NoError;
