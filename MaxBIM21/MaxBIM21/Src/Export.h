@@ -188,6 +188,9 @@ GSErrCode	exportBeamTableformInformation(void);											// 보 테이블폼 물량 정
 
 GSErrCode	calcTableformArea(void);														// 테이블폼 면적 계산
 
+GSErrCode	exportSelectedQuantityPlywoodArea(void);										// 물량합판 면적 계산 (선택한 부재에 한해)
+GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void);									// 물량합판 면적 계산 (보이는 레이어에 한해)
+
 GSErrCode	exportAllElevationsToPDFSingleMode(void);										// 모든 입면도 PDF로 내보내기 (현재 보이는 화면에 한해)
 GSErrCode	exportAllElevationsToPDFMultiMode(void);										// 모든 입면도 PDF로 내보내기 (보이는 레이어 각각)
 

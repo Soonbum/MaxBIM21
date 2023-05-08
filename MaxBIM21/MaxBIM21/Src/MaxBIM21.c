@@ -127,10 +127,10 @@ GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 					err = calcTableformArea();
 					break;
 				case 6:		// 물량합판 면적 계산 (선택한 부재에 한해)
-					// ...
+					err = exportSelectedQuantityPlywoodArea();
 					break;
 				case 7:		// 물량합판 면적 계산 (보이는 레이어에 한해)
-					// ...
+					err = exportQuantityPlywoodAreaOnVisibleLayers();
 					break;
 				case 8:		// 모든 입면도 PDF로 내보내기 (현재 뷰만)
 					err = exportAllElevationsToPDFSingleMode();

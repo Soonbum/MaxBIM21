@@ -3864,6 +3864,326 @@ GSErrCode	calcTableformArea(void)
 	return err;
 }
 
+// 물량합판 면적 계산 (선택한 부재에 한해)
+GSErrCode	exportSelectedQuantityPlywoodArea(void)
+{
+	GSErrCode	err = NoError;
+
+	GS::Array<API_Guid>		objects;
+	long					nObjects = 0;
+
+	API_Element			elem;
+	API_ElementMemo		memo;
+
+	// GS::Array 반복자
+	GS::Array<API_Guid>::Iterator	iterObj;
+	API_Guid	curGuid;
+
+	double total_area = 0.0;
+
+
+	// 그룹화 일시정지 ON
+	suspendGroups(true);
+
+	// 선택한 요소 가져오기
+	if (getGuidsOfSelection(&objects, API_ObjectID, &nObjects) != NoError) {
+		DGAlert(DG_ERROR, L"오류", L"요소들을 선택해야 합니다.", "", L"확인", "", "");
+		return err;
+	}
+
+	iterObj = objects.Enumerate();
+
+	while (iterObj != NULL) {
+		BNZeroMemory(&elem, sizeof(API_Element));
+		BNZeroMemory(&memo, sizeof(API_ElementMemo));
+		curGuid = *iterObj;
+		elem.header.guid = curGuid;
+		err = ACAPI_Element_Get(&elem);
+
+		if (err == NoError && elem.header.hasMemo) {
+			err = ACAPI_Element_GetMemo(elem.header.guid, &memo);
+
+			if (err == NoError) {
+				try {
+					const char* sup_type = getParameterStringByName(&memo, "sup_type");
+
+					if (my_strcmp(sup_type, "물량합판") == 0) {
+						const char* area_str = getParameterStringByName(&memo, "gs_list_custom4");
+						total_area += atof(area_str);
+					}
+				}
+				catch (exception& ex) {
+					WriteReport_Alert("객체 정보 수집에서 오류 발생: %s", ex.what());
+				}
+			}
+
+			ACAPI_DisposeElemMemoHdls(&memo);
+		}
+
+		++iterObj;
+	}
+
+	char totalArea[128];
+	sprintf(totalArea, "%.3f", total_area);
+	GS::UniString totalAreaStr = charToWchar(totalArea);
+	GS::UniString infoStr = L"물량합판 총 면적은 " + totalAreaStr + L"㎡ 입니다.";
+	DGAlert(DG_INFORMATION, L"물량합판 면적 합계", infoStr, "", L"확인", "", "");
+
+	return err;
+}
+
+// 물량합판 면적 계산 (보이는 레이어에 한해)
+GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void)
+{
+	GSErrCode	err = NoError;
+	short		result;
+
+	GS::Array<API_Guid>		objects;
+	long					nObjects = 0;
+
+	API_Element			elem;
+	API_ElementMemo		memo;
+
+	double total_area;
+
+	// 레이어 관련 변수
+	short			nLayers;
+	API_Attribute	attrib;
+	API_AttributeDef  defs;
+	short			nVisibleLayers = 0;
+	short			visLayerList[1024];
+	char			fullLayerName[512];
+	vector<LayerList>	layerList;
+
+	// 기타
+	char			buffer[512];
+	char			filename[512];
+	GS::UniString	inputFilename;
+	GS::UniString	madeFilename;
+
+	// 진행바를 표현하기 위한 변수
+	GS::UniString       title(L"내보내기 진행 상황");
+	GS::UniString       subtitle(L"진행중...");
+	short	nPhase;
+	Int32	cur, total;
+
+	// 파일 저장을 위한 변수
+	FILE* fp;
+	FILE* fp_unite;
+
+
+	// 그룹화 일시정지 ON
+	suspendGroups(true);
+
+	result = DGBlankModalDialog(300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData)&inputFilename);
+
+	if (inputFilename.GetLength() <= 0)
+		inputFilename = "notitle";
+
+	madeFilename = inputFilename + L" (통합).csv";
+	strcpy(filename, wcharToChar(madeFilename.ToUStr().Get()));
+
+	// 프로젝트 내 레이어 개수를 알아냄
+	nLayers = getLayerCount();
+
+	// 보이는 레이어들의 목록 저장하기
+	for (short xx = 1; xx <= nLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = xx;
+		err = ACAPI_Attribute_Get(&attrib);
+		if (err == NoError) {
+			if (!((attrib.layer.head.flags & APILay_Hidden) == true)) {
+				visLayerList[nVisibleLayers++] = attrib.layer.head.index;
+			}
+		}
+	}
+
+	// 레이어 이름과 인덱스 저장
+	for (short xx = 0; xx < nVisibleLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = visLayerList[xx];
+		err = ACAPI_Attribute_Get(&attrib);
+
+		sprintf(fullLayerName, "%s", attrib.layer.head.name);
+		fullLayerName[strlen(fullLayerName)] = '\0';
+
+		LayerList newLayerItem;
+		newLayerItem.layerInd = visLayerList[xx];
+		newLayerItem.layerName = fullLayerName;
+
+		layerList.push_back(newLayerItem);
+	}
+
+	// 레이어 이름 기준으로 정렬하여 레이어 인덱스 순서 변경
+	sort(layerList.begin(), layerList.end(), compareLayerName);		// 레이어 이름 기준 오름차순 정렬
+
+	// 일시적으로 모든 레이어 숨기기
+	for (short xx = 1; xx <= nLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = xx;
+		err = ACAPI_Attribute_Get(&attrib);
+		if (err == NoError) {
+			attrib.layer.head.flags |= APILay_Hidden;
+			ACAPI_Attribute_Modify(&attrib, NULL);
+		}
+	}
+
+	fp_unite = fopen(filename, "w+");
+
+	if (fp_unite == NULL) {
+		DGAlert(DG_ERROR, L"오류", L"통합 버전 엑셀파일을 만들 수 없습니다.", "", L"확인", "", "");
+		return	NoError;
+	}
+
+	// 진행 상황 표시하는 기능 - 초기화
+	nPhase = 1;
+	cur = 1;
+	total = nVisibleLayers;
+	ACAPI_Interface(APIIo_InitProcessWindowID, &title, &nPhase);
+	ACAPI_Interface(APIIo_SetNextProcessPhaseID, &subtitle, &total);
+
+	// 보이는 레이어들을 하나씩 순회
+	for (short mm = 1; mm <= nVisibleLayers; ++mm) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = layerList[mm - 1].layerInd;
+		err = ACAPI_Attribute_Get(&attrib);
+
+		// 초기화
+		objects.Clear();
+		nObjects = 0;
+
+		if (err == NoError) {
+			// 레이어 보이기
+			if ((attrib.layer.head.flags & APILay_Hidden) == true) {
+				attrib.layer.head.flags ^= APILay_Hidden;
+				ACAPI_Attribute_Modify(&attrib, NULL);
+			}
+
+			// 모든 요소 가져오기
+			ACAPI_Element_GetElemList(API_ObjectID, &objects, APIFilt_OnVisLayer);	// 보이는 레이어에 있음, 객체 타입만
+			nObjects = objects.GetSize();
+
+			if (nObjects == 0)
+				continue;
+			
+			// 레이어 이름 가져옴
+			sprintf(fullLayerName, "%s", attrib.layer.head.name);
+			fullLayerName[strlen(fullLayerName)] = '\0';
+
+			madeFilename = inputFilename + L" - " + fullLayerName + L".csv";
+			strcpy(filename, wcharToChar(madeFilename.ToUStr().Get()));
+			fp = fopen(filename, "w+");
+
+			if (fp == NULL) {
+				GS::UniString warningStr = L"레이어 " + GS::UniString(fullLayerName) + "은(는) 파일명이 될 수 없으므로 생략합니다.";
+				DGAlert(DG_ERROR, L"오류", warningStr, "", L"확인", "", "");
+				continue;
+			}
+
+			// 레이어 이름
+			sprintf(buffer, "\n\n<< 레이어 : %s >>\n", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
+			fprintf(fp, buffer);
+			fprintf(fp_unite, buffer);
+
+			sprintf(buffer, "%s\n", getExplanationOfLayerCode(fullLayerName));
+			fprintf(fp, buffer);
+			fprintf(fp_unite, buffer);
+
+			for (short xx = 0; xx < nObjects; ++xx) {
+				BNZeroMemory(&elem, sizeof(API_Element));
+				BNZeroMemory(&memo, sizeof(API_ElementMemo));
+				elem.header.guid = objects.Pop();
+				err = ACAPI_Element_Get(&elem);
+
+				if (err == NoError && elem.header.hasMemo) {
+					err = ACAPI_Element_GetMemo(elem.header.guid, &memo);
+
+					if (err == NoError) {
+						try {
+							const char* sup_type = getParameterStringByName(&memo, "sup_type");
+
+							if (my_strcmp(sup_type, "물량합판") == 0) {
+								const char* area_str = getParameterStringByName(&memo, "gs_list_custom4");
+								total_area += atof(area_str);
+							}
+						}
+						catch (exception& ex) {
+							WriteReport_Alert("출력 함수에서 오류 발생: %s", ex.what());
+						}
+					}
+
+					ACAPI_DisposeElemMemoHdls(&memo);
+				}
+			}
+
+			sprintf(buffer, "물량합판 총 면적(㎡): %.3f", total_area);
+			fprintf(fp, buffer);
+			fprintf(fp_unite, buffer);
+
+			fclose(fp);
+
+			// 레이어 숨기기
+			attrib.layer.head.flags |= APILay_Hidden;
+			ACAPI_Attribute_Modify(&attrib, NULL);
+		}
+
+		// 진행 상황 표시하는 기능 - 진행
+		cur = mm;
+		ACAPI_Interface(APIIo_SetProcessValueID, &cur, NULL);
+		if (ACAPI_Interface(APIIo_IsProcessCanceledID, NULL, NULL) == APIERR_CANCEL)
+			break;
+	}
+
+	// 진행 상황 표시하는 기능 - 마무리
+	ACAPI_Interface(APIIo_CloseProcessWindowID, NULL, NULL);
+
+	char path[1024];
+	char* ptr;
+	GetFullPathName(filename, 1024, path, &ptr);
+
+	// 마지막 디렉토리 구분자의 위치를 찾음
+	ptr = strrstr(path, "\\");
+	if (ptr == NULL) {
+		ptr = strrstr(path, "/");
+		if (ptr == NULL) {
+			// 디렉토리 구분자가 없음
+			return 1;
+		}
+	}
+
+	// 마지막 디렉토리 구분자 이후의 문자열을 제거함
+	*ptr = '\0';
+
+	GS::UniString infoStr = L"다음 경로에 파일이 저장되었습니다.\n" + GS::UniString(charToWchar(path));
+
+	fclose(fp_unite);
+
+	// 모든 프로세스를 마치면 처음에 수집했던 보이는 레이어들을 다시 켜놓을 것
+	for (short xx = 1; xx <= nVisibleLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = visLayerList[xx - 1];
+		err = ACAPI_Attribute_Get(&attrib);
+		if (err == NoError) {
+			if ((attrib.layer.head.flags & APILay_Hidden) == true) {
+				attrib.layer.head.flags ^= APILay_Hidden;
+				ACAPI_Attribute_Modify(&attrib, NULL);
+			}
+		}
+	}
+
+	// 그룹화 일시정지 OFF
+	suspendGroups(false);
+
+	DGAlert(DG_INFORMATION, L"알림", infoStr, "", L"확인", "", "");
+
+	return err;
+}
+
 // 모든 입면도 PDF로 내보내기 (현재 보이는 화면에 한해)
 GSErrCode	exportAllElevationsToPDFSingleMode(void)
 {
