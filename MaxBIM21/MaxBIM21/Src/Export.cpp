@@ -3879,7 +3879,41 @@ GSErrCode	exportSelectedQuantityPlywoodArea(void)
 	GS::Array<API_Guid>::Iterator	iterObj;
 	API_Guid	curGuid;
 
+	const char* sup_type;
+	const char* m_type;
+	const char* area_str;
+	
+	double area_value;
 	double total_area = 0.0;
+	double total_area_beam = 0.0;				// 보
+	double total_area_column_isolation = 0.0;	// 기둥(독립)
+	double total_area_column_in_wall = 0.0;		// 기둥(벽체)
+	double total_area_column_circular = 0.0;	// 기둥(원형)
+	double total_area_wall_inside = 0.0;		// 벽체(내벽)
+	double total_area_wall_outside = 0.0;		// 벽체(외벽)
+	double total_area_wall_basement = 0.0;		// 벽체(합벽)
+	double total_area_wall_parapet = 0.0;		// 벽체(파라펫)
+	double total_area_wall_water_block = 0.0;	// 벽체(방수턱)
+	double total_area_slab_basement = 0.0;		// 스라브(기초)
+	double total_area_slab_rc = 0.0;			// 스라브(RC)
+	double total_area_slab_deck = 0.0;			// 스라브(데크)
+	double total_area_slab_ramp = 0.0;			// 스라브(램프)
+	double total_area_stair = 0.0;				// 계단
+
+	bool bBeam = false;
+	bool bColumnIsolation = false;
+	bool bColumnInWall = false;
+	bool bColumnCircular = false;
+	bool bWallInside = false;
+	bool bWallOutside = false;
+	bool bWallBasement = false;
+	bool bWallParapet = false;
+	bool bWallWaterBlock = false;
+	bool bSlabBasement = false;
+	bool bSlabRC = false;
+	bool bSlabDeck = false;
+	bool bSlabRamp = false;
+	bool bStair = false;
 
 
 	// 그룹화 일시정지 ON
@@ -3905,11 +3939,72 @@ GSErrCode	exportSelectedQuantityPlywoodArea(void)
 
 			if (err == NoError) {
 				try {
-					const char* sup_type = getParameterStringByName(&memo, "sup_type");
+					sup_type = getParameterStringByName(&memo, "sup_type");
 
 					if (my_strcmp(sup_type, "물량합판") == 0) {
-						const char* area_str = getParameterStringByName(&memo, "gs_list_custom4");
-						total_area += atof(area_str);
+						area_str = getParameterStringByName(&memo, "gs_list_custom4");
+						area_value = atof(area_str);
+
+						m_type = getParameterStringByName(&memo, "m_type");
+
+						if (my_strcmp(m_type, "보") == 0) {
+							total_area_beam += area_value;
+							bBeam = true;
+						}
+						else if (my_strcmp(m_type, "기둥(독립)") == 0) {
+							total_area_column_isolation += area_value;
+							bColumnIsolation = true;
+						}
+						else if (my_strcmp(m_type, "기둥(벽체)") == 0) {
+							total_area_column_in_wall += area_value;
+							bColumnInWall = true;
+						}
+						else if (my_strcmp(m_type, "기둥(원형)") == 0) {
+							total_area_column_circular += area_value;
+							bColumnCircular = true;
+						}
+						else if (my_strcmp(m_type, "벽체(내벽)") == 0) {
+							total_area_wall_inside += area_value;
+							bWallInside = true;
+						}
+						else if (my_strcmp(m_type, "벽체(외벽)") == 0) {
+							total_area_wall_outside += area_value;
+							bWallOutside = true;
+						}
+						else if (my_strcmp(m_type, "벽체(합벽)") == 0) {
+							total_area_wall_basement += area_value;
+							bWallBasement = true;
+						}
+						else if (my_strcmp(m_type, "벽체(파라펫)") == 0) {
+							total_area_wall_parapet += area_value;
+							bWallParapet = true;
+						}
+						else if (my_strcmp(m_type, "벽체(방수턱)") == 0) {
+							total_area_wall_water_block += area_value;
+							bWallWaterBlock = true;
+						}
+						else if (my_strcmp(m_type, "스라브(기초)") == 0) {
+							total_area_slab_basement += area_value;
+							bSlabBasement = true;
+						}
+						else if (my_strcmp(m_type, "스라브(RC)") == 0) {
+							total_area_slab_rc += area_value;
+							bSlabRC = true;
+						}
+						else if (my_strcmp(m_type, "스라브(데크)") == 0) {
+							total_area_slab_deck += area_value;
+							bSlabDeck = true;
+						}
+						else if (my_strcmp(m_type, "스라브(램프)") == 0) {
+							total_area_slab_ramp += area_value;
+							bSlabRamp = true;
+						}
+						else if (my_strcmp(m_type, "계단") == 0) {
+							total_area_stair += area_value;
+							bStair = true;
+						}
+
+						total_area += area_value;
 					}
 				}
 				catch (exception& ex) {
@@ -3924,9 +4019,67 @@ GSErrCode	exportSelectedQuantityPlywoodArea(void)
 	}
 
 	char totalArea[128];
+
 	sprintf(totalArea, "%.3f", total_area);
 	GS::UniString totalAreaStr = charToWchar(totalArea);
-	GS::UniString infoStr = L"물량합판 총 면적은 " + totalAreaStr + L"㎡ 입니다.";
+	sprintf(totalArea, "%.3f", total_area_beam);
+	GS::UniString totalAreaBeamStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_column_isolation);
+	GS::UniString totalAreaColumnIsolationStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_column_in_wall);
+	GS::UniString totalAreaColumnInWallStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_column_circular);
+	GS::UniString totalAreaColumnCircularStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_wall_inside);
+	GS::UniString totalAreaWallInsideStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_wall_outside);
+	GS::UniString totalAreaWallOutsideStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_wall_basement);
+	GS::UniString totalAreaWallBasementStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_wall_parapet);
+	GS::UniString totalAreaWallParapetStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_wall_water_block);
+	GS::UniString totalAreaWallWaterBlockStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_slab_basement);
+	GS::UniString totalAreaSlabBasementStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_slab_rc);
+	GS::UniString totalAreaSlabRCStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_slab_deck);
+	GS::UniString totalAreaSlabDeckStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_slab_ramp);
+	GS::UniString totalAreaSlabRampStr = charToWchar(totalArea);
+	sprintf(totalArea, "%.3f", total_area_stair);
+	GS::UniString totalAreaStairStr = charToWchar(totalArea);
+
+	GS::UniString infoStr = L"물량합판 총 면적은 " + totalAreaStr + L"㎡ 입니다." + "\n";
+	if (bBeam == true)
+		infoStr += L"보: " + totalAreaBeamStr + "\n";
+	if (bColumnIsolation == true)
+		infoStr += L"기둥(독립): " + totalAreaColumnIsolationStr + "\n";
+	if (bColumnInWall == true)
+		infoStr += L"기둥(벽체): " + totalAreaColumnInWallStr + "\n";
+	if (bColumnCircular == true)
+		infoStr += L"기둥(원형): " + totalAreaColumnCircularStr + "\n";
+	if (bWallInside == true)
+		infoStr += L"벽체(내벽): " + totalAreaWallInsideStr + "\n";
+	if (bWallOutside == true)
+		infoStr += L"벽체(외벽): " + totalAreaWallOutsideStr + "\n";
+	if (bWallBasement == true)
+		infoStr += L"벽체(합벽): " + totalAreaWallBasementStr + "\n";
+	if (bWallParapet == true)
+		infoStr += L"벽체(파라펫): " + totalAreaWallParapetStr + "\n";
+	if (bWallWaterBlock == true)
+		infoStr += L"벽체(방수턱): " + totalAreaWallWaterBlockStr + "\n";
+	if (bSlabBasement == true)
+		infoStr += L"슬래브(기초): " + totalAreaSlabBasementStr + "\n";
+	if (bSlabRC == true)
+		infoStr += L"슬래브(RC): " + totalAreaSlabRCStr + "\n";
+	if (bSlabDeck == true)
+		infoStr += L"슬래브(데크): " + totalAreaSlabDeckStr + "\n";
+	if (bSlabRamp == true)
+		infoStr += L"슬래브(램프): " + totalAreaSlabRampStr + "\n";
+	if (bStair == true)
+		infoStr += L"계단: " + totalAreaStairStr;
 	DGAlert(DG_INFORMATION, L"물량합판 면적 합계", infoStr, "", L"확인", "", "");
 
 	return err;
@@ -3944,7 +4097,41 @@ GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void)
 	API_Element			elem;
 	API_ElementMemo		memo;
 
-	double total_area;
+	const char* sup_type;
+	const char* area_str;
+	const char* m_type;
+	
+	double area_value;
+	double total_area = 0.0;
+	double total_area_beam = 0.0;				// 보
+	double total_area_column_isolation = 0.0;	// 기둥(독립)
+	double total_area_column_in_wall = 0.0;		// 기둥(벽체)
+	double total_area_column_circular = 0.0;	// 기둥(원형)
+	double total_area_wall_inside = 0.0;		// 벽체(내벽)
+	double total_area_wall_outside = 0.0;		// 벽체(외벽)
+	double total_area_wall_basement = 0.0;		// 벽체(합벽)
+	double total_area_wall_parapet = 0.0;		// 벽체(파라펫)
+	double total_area_wall_water_block = 0.0;	// 벽체(방수턱)
+	double total_area_slab_basement = 0.0;		// 스라브(기초)
+	double total_area_slab_rc = 0.0;			// 스라브(RC)
+	double total_area_slab_deck = 0.0;			// 스라브(데크)
+	double total_area_slab_ramp = 0.0;			// 스라브(램프)
+	double total_area_stair = 0.0;				// 계단
+
+	bool bBeam = false;
+	bool bColumnIsolation = false;
+	bool bColumnInWall = false;
+	bool bColumnCircular = false;
+	bool bWallInside = false;
+	bool bWallOutside = false;
+	bool bWallBasement = false;
+	bool bWallParapet = false;
+	bool bWallWaterBlock = false;
+	bool bSlabBasement = false;
+	bool bSlabRC = false;
+	bool bSlabDeck = false;
+	bool bSlabRamp = false;
+	bool bStair = false;
 
 	// 레이어 관련 변수
 	short			nLayers;
@@ -3956,10 +4143,25 @@ GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void)
 	vector<LayerList>	layerList;
 
 	// 기타
-	char			buffer[512];
+	char			buffer[1024];
 	char			filename[512];
 	GS::UniString	inputFilename;
 	GS::UniString	madeFilename;
+
+	char			buffer_01[32];
+	char			buffer_02[32];
+	char			buffer_03[32];
+	char			buffer_04[32];
+	char			buffer_05[32];
+	char			buffer_06[32];
+	char			buffer_07[32];
+	char			buffer_08[32];
+	char			buffer_09[32];
+	char			buffer_10[32];
+	char			buffer_11[32];
+	char			buffer_12[32];
+	char			buffer_13[32];
+	char			buffer_14[32];
 
 	// 진행바를 표현하기 위한 변수
 	GS::UniString       title(L"내보내기 진행 상황");
@@ -4056,6 +4258,37 @@ GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void)
 		objects.Clear();
 		nObjects = 0;
 
+		total_area = 0.0;
+		total_area_beam = 0.0;				// 보
+		total_area_column_isolation = 0.0;	// 기둥(독립)
+		total_area_column_in_wall = 0.0;	// 기둥(벽체)
+		total_area_column_circular = 0.0;	// 기둥(원형)
+		total_area_wall_inside = 0.0;		// 벽체(내벽)
+		total_area_wall_outside = 0.0;		// 벽체(외벽)
+		total_area_wall_basement = 0.0;		// 벽체(합벽)
+		total_area_wall_parapet = 0.0;		// 벽체(파라펫)
+		total_area_wall_water_block = 0.0;	// 벽체(방수턱)
+		total_area_slab_basement = 0.0;		// 스라브(기초)
+		total_area_slab_rc = 0.0;			// 스라브(RC)
+		total_area_slab_deck = 0.0;			// 스라브(데크)
+		total_area_slab_ramp = 0.0;			// 스라브(램프)
+		total_area_stair = 0.0;				// 계단
+
+		bBeam = false;
+		bColumnIsolation = false;
+		bColumnInWall = false;
+		bColumnCircular = false;
+		bWallInside = false;
+		bWallOutside = false;
+		bWallBasement = false;
+		bWallParapet = false;
+		bWallWaterBlock = false;
+		bSlabBasement = false;
+		bSlabRC = false;
+		bSlabDeck = false;
+		bSlabRamp = false;
+		bStair = false;
+
 		if (err == NoError) {
 			// 레이어 보이기
 			if ((attrib.layer.head.flags & APILay_Hidden) == true) {
@@ -4104,11 +4337,44 @@ GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void)
 
 					if (err == NoError) {
 						try {
-							const char* sup_type = getParameterStringByName(&memo, "sup_type");
+							sup_type = getParameterStringByName(&memo, "sup_type");
 
 							if (my_strcmp(sup_type, "물량합판") == 0) {
-								const char* area_str = getParameterStringByName(&memo, "gs_list_custom4");
-								total_area += atof(area_str);
+								area_str = getParameterStringByName(&memo, "gs_list_custom4");
+								area_value = atof(area_str);
+
+								m_type = getParameterStringByName(&memo, "m_type");
+
+								if (my_strcmp(m_type, "보") == 0)
+									total_area_beam += area_value;
+								else if (my_strcmp(m_type, "기둥(독립)") == 0)
+									total_area_column_isolation += area_value;
+								else if (my_strcmp(m_type, "기둥(벽체)") == 0)
+									total_area_column_in_wall += area_value;
+								else if (my_strcmp(m_type, "기둥(원형)") == 0)
+									total_area_column_circular += area_value;
+								else if (my_strcmp(m_type, "벽체(내벽)") == 0)
+									total_area_wall_inside += area_value;
+								else if (my_strcmp(m_type, "벽체(외벽)") == 0)
+									total_area_wall_outside += area_value;
+								else if (my_strcmp(m_type, "벽체(합벽)") == 0)
+									total_area_wall_basement += area_value;
+								else if (my_strcmp(m_type, "벽체(파라펫)") == 0)
+									total_area_wall_parapet += area_value;
+								else if (my_strcmp(m_type, "벽체(방수턱)") == 0)
+									total_area_wall_water_block += area_value;
+								else if (my_strcmp(m_type, "스라브(기초)") == 0)
+									total_area_slab_basement += area_value;
+								else if (my_strcmp(m_type, "스라브(RC)") == 0)
+									total_area_slab_rc += area_value;
+								else if (my_strcmp(m_type, "스라브(데크)") == 0)
+									total_area_slab_deck += area_value;
+								else if (my_strcmp(m_type, "스라브(램프)") == 0)
+									total_area_slab_ramp += area_value;
+								else if (my_strcmp(m_type, "계단") == 0)
+									total_area_stair += area_value;
+
+								total_area += area_value;
 							}
 						}
 						catch (exception& ex) {
@@ -4120,7 +4386,65 @@ GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void)
 				}
 			}
 
-			sprintf(buffer, "물량합판 총 면적(㎡): %.3f", total_area);
+			sprintf(buffer, "물량합판 총 면적(㎡): %.3f\n", total_area);
+
+			if (total_area_beam > EPS) {
+				sprintf(buffer_01, "보: %.3f\n", total_area_beam);
+				strcat(buffer, buffer_01);
+			}
+			if (total_area_column_isolation > EPS) {
+				sprintf(buffer_02, "기둥(독립): %.3f\n", total_area_column_isolation);
+				strcat(buffer, buffer_02);
+			}
+			if (total_area_column_in_wall > EPS) {
+				sprintf(buffer_03, "기둥(벽체): %.3f\n", total_area_column_in_wall);
+				strcat(buffer, buffer_03);
+			}
+			if (total_area_column_circular > EPS) {
+				sprintf(buffer_04, "기둥(원형): %.3f\n", total_area_column_circular);
+				strcat(buffer, buffer_04);
+			}
+			if (total_area_wall_inside > EPS) {
+				sprintf(buffer_05, "벽체(내벽): %.3f\n", total_area_wall_inside);
+				strcat(buffer, buffer_05);
+			}
+			if (total_area_wall_outside > EPS) {
+				sprintf(buffer_06, "벽체(외벽): %.3f\n", total_area_wall_outside);
+				strcat(buffer, buffer_06);
+			}
+			if (total_area_wall_basement > EPS) {
+				sprintf(buffer_07, "벽체(합벽): %.3f\n", total_area_wall_basement);
+				strcat(buffer, buffer_07);
+			}
+			if (total_area_wall_parapet > EPS) {
+				sprintf(buffer_08, "벽체(파라펫): %.3f\n", total_area_wall_parapet);
+				strcat(buffer, buffer_08);
+			}
+			if (total_area_wall_water_block > EPS) {
+				sprintf(buffer_09, "벽체(방수턱): %.3f\n", total_area_wall_water_block);
+				strcat(buffer, buffer_09);
+			}
+			if (total_area_slab_basement > EPS) {
+				sprintf(buffer_10, "슬래브(기초): %.3f\n", total_area_slab_basement);
+				strcat(buffer, buffer_10);
+			}
+			if (total_area_slab_rc > EPS) {
+				sprintf(buffer_11, "슬래브(RC): %.3f\n", total_area_slab_rc);
+				strcat(buffer, buffer_11);
+			}
+			if (total_area_slab_deck > EPS) {
+				sprintf(buffer_12, "슬래브(데크): %.3f\n", total_area_slab_deck);
+				strcat(buffer, buffer_12);
+			}
+			if (total_area_slab_ramp > EPS) {
+				sprintf(buffer_13, "슬래브(램프): %.3f\n", total_area_slab_ramp);
+				strcat(buffer, buffer_13);
+			}
+			if (total_area_stair > EPS) {
+				sprintf(buffer_14, "계단: %.3f\n", total_area_stair);
+				strcat(buffer, buffer_14);
+			}
+
 			fprintf(fp, buffer);
 			fprintf(fp_unite, buffer);
 
