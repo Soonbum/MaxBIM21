@@ -111,31 +111,31 @@ GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 		// 내보내기
 		case 32007:
 			switch(menuParams->menuItemRef.itemIndex) {
-				case 1:		// 부재 정보 내보내기 (현재 선택한 것만)
+				case 1:		// 가설재 품목별 수량 내보내기 (선택한 가설재)
 					err = exportSelectedElementInfo();
 					break;
-				case 2:		// 부재 정보 내보내기 (보이는 레이어 별로)
+				case 2:		// 가설재 품목별 수량 내보내기 (켜져 있는 레이어 전부)
 					err = exportElementInfoOnVisibleLayers();
 					break;
-				case 3:		// 부재별 선택 후 보여주기
+				case 3:		// 선택한 객체(부재/가설재)만 보여주기
 					err = filterSelection();
 					break;
-				case 4:		// 보 테이블폼 물량표 작성
+				case 4:		// 보 테이블폼 가설재 배치도 내보내기
 					err = exportBeamTableformInformation();
 					break;
-				case 5:		// 테이블폼 면적 계산
+				case 5:		// 테이블 단위별 거푸집 면적 내보내기
 					err = calcTableformArea();
 					break;
-				case 6:		// 물량합판 면적 계산 (선택한 부재에 한해)
+				case 6:		// 선택한 물량합판 면적 보여주기
 					err = exportSelectedQuantityPlywoodArea();
 					break;
-				case 7:		// 물량합판 면적 계산 (보이는 레이어에 한해)
+				case 7:		// 물량합판 면적 내보내기 (켜져 있는 레이어 전부)
 					err = exportQuantityPlywoodAreaOnVisibleLayers();
 					break;
-				case 8:		// 모든 입면도 PDF로 내보내기 (현재 뷰만)
+				case 8:		// 모든 입면도 PDF로 내보내기 (현재 보이는 화면에 한해)
 					err = exportAllElevationsToPDFSingleMode();
 					break;
-				case 9:		// 모든 입면도 PDF로 내보내기 (보이는 레이어 별로)
+				case 9:		// 모든 입면도 PDF로 내보내기 (켜져 있는 레이어 각각)
 					err = exportAllElevationsToPDFMultiMode();
 					break;
 			}
