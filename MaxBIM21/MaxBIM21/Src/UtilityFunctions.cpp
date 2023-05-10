@@ -2039,6 +2039,474 @@ char* getExplanationOfLayerCode(char* layerName, bool bConstructionCode, bool bD
 	return retStr;
 }
 
+// 레이어 이름이 레이어 체계에 맞는 이름인지 확인함
+bool verifyLayerName(const char* layerName)
+{
+	char	buffer[256];	// 레이어 이름을 저장할 버퍼
+	char* token;			// 읽어온 문자열의 토큰
+
+	short	nBaseFields;
+	short	nExtendFields;
+	bool	success;
+	bool	extSuccess;
+	char	tempStr[128];
+	char	tok1[32];
+	char	tok2[32];
+	char	tok3[32];
+	char	tok4[32];
+	char	tok5[32];
+	char	tok6[32];
+	char	tok7[32];
+	char	tok8[32];
+	char	tok9[32];
+	char	tok10[32];
+	char	constructionCode[8];
+
+	bool	bValidLayerName;	// 유효한 레이어 이름인가?
+	short	nValidCountBase;
+	short	nValidCountExtend;
+
+	LayerNameSystem	layerInfo;
+
+	// 레이어 정보 파일 가져오기
+	importLayerInfo(&layerInfo);
+
+	int i = 1;
+	success = false;
+	extSuccess = false;
+	nBaseFields = 0;
+	nExtendFields = 0;
+	// 예시(기본): 05-T-0000-F01-01-01-01-WALL
+	// 예시(확장): 05-T-0000-F01-01-01-01-WALL-현장제작-001
+	// 레이어 이름을 "-" 문자 기준으로 쪼개기
+	strcpy(buffer, layerName);
+	token = strtok(buffer, "-");
+	while (token != NULL) {
+		// 내용 및 길이 확인
+		// 1차 (일련번호) - 필수 (2글자, 숫자)
+		if (i == 1) {
+			strcpy(tempStr, token);
+			if (strlen(tempStr) == 2) {
+				strcpy(tok1, tempStr);
+				success = true;
+				nBaseFields++;
+			}
+			else {
+				i = 100;
+				success = false;
+			}
+		}
+		// 2차 (공사 구분) - 필수 (1글자, 문자)
+		else if (i == 2) {
+			strcpy(tempStr, token);
+			if (strlen(tempStr) == 1) {
+				strcpy(tok2, tempStr);
+				success = true;
+				nBaseFields++;
+			}
+			else {
+				i = 100;
+				success = false;
+			}
+		}
+		// 3차 (동 구분) - 필수 (4글자)
+		else if (i == 3) {
+			strcpy(tempStr, token);
+			if (isStringDouble(tempStr) == TRUE) {
+				// 숫자인 경우
+				sprintf(tok3, "%04d", atoi(tempStr));
+			}
+			else {
+				// 문자열인 경우
+				strcpy(tok3, tempStr);
+			}
+			success = true;
+			nBaseFields++;
+		}
+		// 4차 (층 구분) - 필수 (3글자)
+		else if (i == 4) {
+			strcpy(tempStr, token);
+			if (strlen(tempStr) == 3) {
+				strcpy(tok4, tempStr);
+				success = true;
+				nBaseFields++;
+			}
+			else {
+				i = 100;
+				success = false;
+			}
+		}
+		// 5차 (타설번호) - 필수 (2글자, 숫자)
+		else if (i == 5) {
+			strcpy(tempStr, token);
+			if (isStringDouble(tempStr) == TRUE) {
+				// 숫자인 경우
+				sprintf(tok5, "%02d", atoi(tempStr));
+			}
+			else {
+				// 문자열인 경우
+				strcpy(tok5, tempStr);
+			}
+			success = true;
+			nBaseFields++;
+		}
+		// 6차 (CJ 구간) - 필수 (2글자, 숫자)
+		else if (i == 6) {
+			strcpy(tempStr, token);
+			if (isStringDouble(tempStr) == TRUE) {
+				// 숫자인 경우
+				sprintf(tok6, "%02d", atoi(tempStr));
+			}
+			else {
+				// 문자열인 경우
+				strcpy(tok6, tempStr);
+			}
+			success = true;
+			nBaseFields++;
+		}
+		// 7차 (CJ 속 시공순서) - 필수 (2글자, 숫자)
+		else if (i == 7) {
+			strcpy(tempStr, token);
+			if (isStringDouble(tempStr) == TRUE) {
+				// 숫자인 경우
+				sprintf(tok7, "%02d", atoi(tempStr));
+			}
+			else {
+				// 문자열인 경우
+				strcpy(tok7, tempStr);
+			}
+			success = true;
+			nBaseFields++;
+		}
+		// 8차 (부재 구분) - 필수 (3글자 이상)
+		else if (i == 8) {
+			strcpy(tempStr, token);
+			if (strlen(tempStr) >= 3) {
+				strcpy(tok8, tempStr);
+				success = true;
+				nBaseFields++;
+			}
+			else {
+				i = 100;
+				success = false;
+			}
+		}
+		// 9차 (제작처 구분) - 선택 (한글 4글자..)
+		else if (i == 9) {
+			strcpy(tempStr, token);
+			if (strlen(tempStr) >= 4) {
+				strcpy(tok9, tempStr);
+				extSuccess = true;
+				nExtendFields++;
+			}
+			else {
+				i = 100;
+				extSuccess = false;
+			}
+		}
+		// 10차 (제작 번호) - 필수 (3글자, 숫자)
+		else if (i == 10) {
+			strcpy(tempStr, token);
+			if (isStringDouble(tempStr) == TRUE) {
+				// 숫자인 경우
+				sprintf(tok10, "%03d", atoi(tempStr));
+			}
+			else {
+				// 문자열인 경우
+				strcpy(tok10, tempStr);
+			}
+			extSuccess = true;
+			nExtendFields++;
+		}
+		++i;
+		token = strtok(NULL, "-");
+	}
+
+	// 8단계 또는 10단계까지 성공적으로 완료되면
+	bValidLayerName = false;
+	nValidCountBase = 0;
+	nValidCountExtend = 0;
+	int yy;
+	if ((success == true) && (nBaseFields == 8)) {
+		// 일련 번호와 공사 구분 문자를 합침
+		sprintf(constructionCode, "%s-%s", tok1, tok2);
+
+		// 기본형
+		for (yy = 0; yy < layerInfo.code_name.size(); ++yy) {
+			GS::UniString	operand1 = constructionCode;
+			GS::UniString	operand2 = charToWchar(layerInfo.code_name.at(yy).c_str());
+			if (operand1.Compare(operand2) == true)
+				++nValidCountBase;
+		}
+		for (yy = 0; yy < layerInfo.dong_name.size(); ++yy) {
+			GS::UniString	operand1 = tok3;
+			GS::UniString	operand2 = charToWchar(layerInfo.dong_name.at(yy).c_str());
+			if (operand1.Compare(operand2) == true)
+				++nValidCountBase;
+		}
+		for (yy = 0; yy < layerInfo.floor_name.size(); ++yy) {
+			GS::UniString	operand1 = tok4;
+			GS::UniString	operand2 = charToWchar(layerInfo.floor_name.at(yy).c_str());
+			if (operand1.Compare(operand2) == true)
+				++nValidCountBase;
+		}
+		for (yy = 0; yy < layerInfo.cast_name.size(); ++yy) {
+			GS::UniString	operand1 = tok5;
+			GS::UniString	operand2 = charToWchar(layerInfo.cast_name.at(yy).c_str());
+			if (operand1.Compare(operand2) == true)
+				++nValidCountBase;
+		}
+		for (yy = 0; yy < layerInfo.CJ_name.size(); ++yy) {
+			GS::UniString	operand1 = tok6;
+			GS::UniString	operand2 = charToWchar(layerInfo.CJ_name.at(yy).c_str());
+			if (operand1.Compare(operand2) == true)
+				++nValidCountBase;
+		}
+		for (yy = 0; yy < layerInfo.orderInCJ_name.size(); ++yy) {
+			GS::UniString	operand1 = tok7;
+			GS::UniString	operand2 = charToWchar(layerInfo.orderInCJ_name.at(yy).c_str());
+			if (operand1.Compare(operand2) == true)
+				++nValidCountBase;
+		}
+		for (yy = 0; yy < layerInfo.obj_name.size(); ++yy) {
+			GS::UniString	operand1 = tok8;
+			GS::UniString	operand2 = charToWchar(layerInfo.obj_name.at(yy).c_str());
+			if (operand1.Compare(operand2) == true)
+				++nValidCountBase;
+		}
+
+		if ((extSuccess == true) && (nExtendFields == 2)) {
+			// 확장형
+			for (yy = 0; yy < layerInfo.productSite_name.size(); ++yy) {
+				GS::UniString	operand1 = tok9;
+				GS::UniString	operand2 = charToWchar(layerInfo.productSite_name.at(yy).c_str());
+				if (operand1.Compare(operand2) == true)
+					++nValidCountExtend;
+			}
+			for (yy = 0; yy < layerInfo.productNum_name.size(); ++yy) {
+				GS::UniString	operand1 = tok10;
+				GS::UniString	operand2 = charToWchar(layerInfo.productNum_name.at(yy).c_str());
+				if (operand1.Compare(operand2) == true)
+					++nValidCountExtend;
+			}
+		}
+
+		// 유효한 레이어 이름인가?
+		if (((extSuccess == false) && (nValidCountBase == 7) && (nValidCountExtend == 0)) || ((extSuccess == true) && (nValidCountBase == 7) && (nValidCountExtend == 2)))
+			bValidLayerName = true;
+	}
+
+	// 유효하지 않은 레이어 이름일 경우
+	if (bValidLayerName == false)
+		return false;
+	else
+		return true;
+}
+
+// 레이어 이름에서 n번째 코드의 문자열을 가져옴
+const char* getLayerCode(const char* layerName, short nth_code)
+{
+	const char* retStr = NULL;
+
+	if (verifyLayerName(layerName) == true) {
+		char	buffer[256];	// 레이어 이름을 저장할 버퍼
+		char* token;			// 읽어온 문자열의 토큰
+
+		short	nBaseFields;
+		short	nExtendFields;
+		bool	success;
+		bool	extSuccess;
+		char	tempStr[128];
+		char	tok1[32];
+		char	tok2[32];
+		char	tok3[32];
+		char	tok4[32];
+		char	tok5[32];
+		char	tok6[32];
+		char	tok7[32];
+		char	tok8[32];
+		char	tok9[32];
+		char	tok10[32];
+
+		int i = 1;
+		success = false;
+		extSuccess = false;
+		nBaseFields = 0;
+		nExtendFields = 0;
+		// 예시(기본): 05-T-0000-F01-01-01-01-WALL
+		// 예시(확장): 05-T-0000-F01-01-01-01-WALL-현장제작-001
+		// 레이어 이름을 "-" 문자 기준으로 쪼개기
+		strcpy(buffer, layerName);
+		token = strtok(buffer, "-");
+		while (token != NULL) {
+			// 내용 및 길이 확인
+			// 1차 (일련번호) - 필수 (2글자, 숫자)
+			if (i == 1) {
+				strcpy(tempStr, token);
+				if (strlen(tempStr) == 2) {
+					strcpy(tok1, tempStr);
+					success = true;
+					nBaseFields++;
+				}
+				else {
+					i = 100;
+					success = false;
+				}
+			}
+			// 2차 (공사 구분) - 필수 (1글자, 문자)
+			else if (i == 2) {
+				strcpy(tempStr, token);
+				if (strlen(tempStr) == 1) {
+					strcpy(tok2, tempStr);
+					success = true;
+					nBaseFields++;
+				}
+				else {
+					i = 100;
+					success = false;
+				}
+			}
+			// 3차 (동 구분) - 필수 (4글자)
+			else if (i == 3) {
+				strcpy(tempStr, token);
+				if (isStringDouble(tempStr) == TRUE) {
+					// 숫자인 경우
+					sprintf(tok3, "%04d", atoi(tempStr));
+				}
+				else {
+					// 문자열인 경우
+					strcpy(tok3, tempStr);
+				}
+				success = true;
+				nBaseFields++;
+			}
+			// 4차 (층 구분) - 필수 (3글자)
+			else if (i == 4) {
+				strcpy(tempStr, token);
+				if (strlen(tempStr) == 3) {
+					strcpy(tok4, tempStr);
+					success = true;
+					nBaseFields++;
+				}
+				else {
+					i = 100;
+					success = false;
+				}
+			}
+			// 5차 (타설번호) - 필수 (2글자, 숫자)
+			else if (i == 5) {
+				strcpy(tempStr, token);
+				if (isStringDouble(tempStr) == TRUE) {
+					// 숫자인 경우
+					sprintf(tok5, "%02d", atoi(tempStr));
+				}
+				else {
+					// 문자열인 경우
+					strcpy(tok5, tempStr);
+				}
+				success = true;
+				nBaseFields++;
+			}
+			// 6차 (CJ 구간) - 필수 (2글자, 숫자)
+			else if (i == 6) {
+				strcpy(tempStr, token);
+				if (isStringDouble(tempStr) == TRUE) {
+					// 숫자인 경우
+					sprintf(tok6, "%02d", atoi(tempStr));
+				}
+				else {
+					// 문자열인 경우
+					strcpy(tok6, tempStr);
+				}
+				success = true;
+				nBaseFields++;
+			}
+			// 7차 (CJ 속 시공순서) - 필수 (2글자, 숫자)
+			else if (i == 7) {
+				strcpy(tempStr, token);
+				if (isStringDouble(tempStr) == TRUE) {
+					// 숫자인 경우
+					sprintf(tok7, "%02d", atoi(tempStr));
+				}
+				else {
+					// 문자열인 경우
+					strcpy(tok7, tempStr);
+				}
+				success = true;
+				nBaseFields++;
+			}
+			// 8차 (부재 구분) - 필수 (3글자 이상)
+			else if (i == 8) {
+				strcpy(tempStr, token);
+				if (strlen(tempStr) >= 3) {
+					strcpy(tok8, tempStr);
+					success = true;
+					nBaseFields++;
+				}
+				else {
+					i = 100;
+					success = false;
+				}
+			}
+			// 9차 (제작처 구분) - 선택 (한글 4글자..)
+			else if (i == 9) {
+				strcpy(tempStr, token);
+				if (strlen(tempStr) >= 4) {
+					strcpy(tok9, tempStr);
+					extSuccess = true;
+					nExtendFields++;
+				}
+				else {
+					i = 100;
+					extSuccess = false;
+				}
+			}
+			// 10차 (제작 번호) - 필수 (3글자, 숫자)
+			else if (i == 10) {
+				strcpy(tempStr, token);
+				if (isStringDouble(tempStr) == TRUE) {
+					// 숫자인 경우
+					sprintf(tok10, "%03d", atoi(tempStr));
+				}
+				else {
+					// 문자열인 경우
+					strcpy(tok10, tempStr);
+				}
+				extSuccess = true;
+				nExtendFields++;
+			}
+			++i;
+			token = strtok(NULL, "-");
+		}
+
+		if (nth_code == 1)
+			retStr = tok1;
+		else if (nth_code == 2)
+			retStr = tok2;
+		else if (nth_code == 3)
+			retStr = tok3;
+		else if (nth_code == 4)
+			retStr = tok4;
+		else if (nth_code == 5)
+			retStr = tok5;
+		else if (nth_code == 6)
+			retStr = tok6;
+		else if (nth_code == 7)
+			retStr = tok7;
+		else if (nth_code == 8)
+			retStr = tok8;
+		else if (nth_code == 9)
+			retStr = tok9;
+		else if (nth_code == 10)
+			retStr = tok10;
+
+		return	retStr;
+	}
+
+	retStr = "";
+	return	retStr;
+}
+
 ////////////////////////////////////////////////// 정보 수집
 // 선택한 요소들 중에서 요소 ID가 elemType인 객체들의 GUID를 가져옴, 가져온 수량을 리턴함
 GSErrCode	getGuidsOfSelection(GS::Array<API_Guid>* guidList, API_ElemTypeID elemType, long* nElem)
