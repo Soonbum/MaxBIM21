@@ -289,7 +289,7 @@ int		quantityPlusN(vector<vector<string>>* db, vector<string> record, int n)
 	return n;
 }
 
-// 선택한 부재 정보 내보내기 (선택한 부재에 한해)
+// 가설재 품목별 수량 내보내기 (선택한 가설재)
 GSErrCode	exportSelectedElementInfo(void)
 {
 	GSErrCode	err = NoError;
@@ -1647,7 +1647,7 @@ GSErrCode	exportSelectedElementInfo(void)
 	return	err;
 }
 
-// 선택한 부재 정보 내보내기 (보이는 레이어에 한해)
+// 가설재 품목별 수량 내보내기 (켜져 있는 레이어 전부)
 GSErrCode	exportElementInfoOnVisibleLayers(void)
 {
 	GSErrCode	err = NoError;
@@ -2448,7 +2448,7 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 	return	err;
 }
 
-// 부재별 선택 후 보여주기
+// 선택한 객체(부재/가설재)만 보여주기
 GSErrCode	filterSelection(void)
 {
 	GSErrCode	err = NoError;
@@ -2731,7 +2731,7 @@ void BeamTableformCellArray::init()
 	}
 }
 
-// 보 테이블폼 물량 정보 내보내기
+// 보 테이블폼 가설재 배치도 내보내기
 GSErrCode	exportBeamTableformInformation(void)
 {
 	GSErrCode	err = NoError;
@@ -3586,7 +3586,7 @@ GSErrCode	exportBeamTableformInformation(void)
 	return err;
 }
 
-// 테이블폼 면적 계산
+// 테이블 단위별 거푸집 면적 내보내기
 GSErrCode	calcTableformArea(void)
 {
 	GSErrCode	err = NoError;
@@ -3626,9 +3626,9 @@ GSErrCode	calcTableformArea(void)
 	// 파일 저장을 위한 변수
 	FILE* fp_unite;
 
-	bool	bTargetObject;		// 대상이 되는 객체인가?
-	double	totalArea;			// 총 면적값
-	double	totalAreaAll;		// 총 면적값 (모든 레이어 합산)
+	double	extractedValue;
+	double	totalArea = 0.0;		// 총 면적값 (각 레이어 합산)
+	double	totalAreaAll = 0.0;		// 총 면적값 (모든 레이어 합산)
 
 
 	// 그룹화 일시정지 ON
@@ -3704,7 +3704,7 @@ GSErrCode	calcTableformArea(void)
 	ACAPI_Interface(APIIo_SetNextProcessPhaseID, &subtitle, &total);
 
 	totalAreaAll = 0.0;
-	sprintf(buffer, "안내: 면적 값의 단위는 m2(제곱미터)입니다.\n고려되는 객체: 유로폼 / 합판 / 아웃코너판넬 / 인코너판넬 / 변각인코너판넬 / 인코너M형판넬 / 목재\n\n");
+	sprintf(buffer, "안내: 면적 값의 단위는 m2(제곱미터)입니다.\n고려되는 객체: 유로폼 / 합판 / 아웃코너판넬 / 인코너판넬 / 변각인코너판넬 / 인코너M형판넬 / 목재 / 매직바(합판) / 매직아웃코너(합판) / 매직인코너(합판)\n\n");
 	fprintf(fp_unite, buffer);
 
 	// 보이는 레이어들을 하나씩 순회하면서 전체 요소들을 선택한 후 테이블폼의 면적 값을 가진 객체들의 변수 값을 가져와서 계산함
@@ -3761,36 +3761,55 @@ GSErrCode	calcTableformArea(void)
 					ACAPI_Database(APIDb_RefreshElementID, &elem.header, &bForce);
 
 					if (err == NoError) {
-						bTargetObject = false;
+						extractedValue = 0.0;
 
 						if (my_strcmp(getParameterStringByName(&memo, "u_comp"), "유로폼") == 0) {
-							bTargetObject = true;
-						}
-						else if (my_strcmp(getParameterStringByName(&memo, "g_comp"), "합판") == 0) {
-							bTargetObject = true;
-						}
-						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "아웃코너판넬") == 0) {
-							bTargetObject = true;
-						}
-						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "인코너판넬") == 0) {
-							bTargetObject = true;
-						}
-						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "변각인코너판넬") == 0) {
-							bTargetObject = true;
-						}
-						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "인코너M형판넬") == 0) {
-							bTargetObject = true;
-						}
-						else if (my_strcmp(getParameterStringByName(&memo, "w_comp"), "목재") == 0) {
-							bTargetObject = true;
-						}
-
-						if (bTargetObject == true) {
 							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
 							removeCharInStr(buffer, ',');
-							totalArea += atof(buffer);
-							totalAreaAll += totalArea;
+							extractedValue = atof(buffer);
 						}
+						else if (my_strcmp(getParameterStringByName(&memo, "g_comp"), "합판") == 0) {
+							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
+							removeCharInStr(buffer, ',');
+							extractedValue = atof(buffer);
+						}
+						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "아웃코너판넬") == 0) {
+							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
+							removeCharInStr(buffer, ',');
+							extractedValue = atof(buffer);
+						}
+						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "인코너판넬") == 0) {
+							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
+							removeCharInStr(buffer, ',');
+							extractedValue = atof(buffer);
+						}
+						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "변각인코너판넬") == 0) {
+							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
+							removeCharInStr(buffer, ',');
+							extractedValue = atof(buffer);
+						}
+						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "인코너M형판넬") == 0) {
+							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
+							removeCharInStr(buffer, ',');
+							extractedValue = atof(buffer);
+						}
+						else if (my_strcmp(getParameterStringByName(&memo, "w_comp"), "목재") == 0) {
+							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
+							removeCharInStr(buffer, ',');
+							extractedValue = atof(buffer);
+						}
+						else if (my_strcmp(getParameterStringByName(&memo, "sup_type"), "매직바") == 0) {
+							extractedValue = getParameterValueByName(&memo, "plywoodArea");
+						}
+						else if (my_strcmp(getParameterStringByName(&memo, "sup_type"), "매직아웃코너") == 0) {
+							extractedValue = getParameterValueByName(&memo, "plywoodArea");
+						}
+						else if (my_strcmp(getParameterStringByName(&memo, "sup_type"), "매직인코너") == 0) {
+							extractedValue = getParameterValueByName(&memo, "plywoodArea");
+						}
+
+						totalArea += extractedValue;
+						totalAreaAll += extractedValue;
 					}
 
 					ACAPI_DisposeElemMemoHdls(&memo);
@@ -3798,7 +3817,7 @@ GSErrCode	calcTableformArea(void)
 			}
 
 			// 면적 값 출력하기
-			sprintf(buffer, "%lf\n", totalArea);
+			sprintf(buffer, "%f\n", totalArea);
 			fprintf(fp_unite, buffer);
 
 			// 레이어 숨기기
@@ -3814,7 +3833,7 @@ GSErrCode	calcTableformArea(void)
 	}
 
 	// 모든 레이어의 면적 값을 합산한 값도 표시함
-	sprintf(buffer, "\n모든 면적 값 합산값: %lf\n", totalAreaAll);
+	sprintf(buffer, "\n모든 면적 값 합산값: %f\n", totalAreaAll);
 	fprintf(fp_unite, buffer);
 
 	// 진행 상황 표시하는 기능 - 마무리
@@ -3864,7 +3883,7 @@ GSErrCode	calcTableformArea(void)
 	return err;
 }
 
-// 물량합판 면적 계산 (선택한 부재에 한해)
+// 선택한 물량합판 면적 보여주기
 GSErrCode	exportSelectedQuantityPlywoodArea(void)
 {
 	GSErrCode	err = NoError;
@@ -4085,7 +4104,7 @@ GSErrCode	exportSelectedQuantityPlywoodArea(void)
 	return err;
 }
 
-// 물량합판 면적 계산 (보이는 레이어에 한해)
+// 물량합판 면적 내보내기 (켜져 있는 레이어 전부)
 GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void)
 {
 	GSErrCode	err = NoError;
@@ -4601,7 +4620,7 @@ GSErrCode	exportAllElevationsToPDFSingleMode(void)
 	return err;
 }
 
-// 모든 입면도 PDF로 내보내기 (보이는 레이어 각각)
+// 모든 입면도 PDF로 내보내기 (켜져 있는 레이어 각각)
 GSErrCode	exportAllElevationsToPDFMultiMode(void)
 {
 	GSErrCode	err = NoError;

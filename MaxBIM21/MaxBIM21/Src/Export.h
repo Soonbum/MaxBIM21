@@ -178,21 +178,21 @@ bool		compareVectorString(const vector<string>& a, const vector<string>& b);			/
 
 int			quantityPlusN(vector<vector<string>>* db, vector<string> record, int n);		// 객체의 레코드 수량 n 증가
 
-GSErrCode	exportSelectedElementInfo(void);												// 선택한 부재 정보 내보내기 (선택한 부재에 한해)
-GSErrCode	exportElementInfoOnVisibleLayers(void);											// 선택한 부재 정보 내보내기 (보이는 레이어에 한해)
+GSErrCode	exportSelectedElementInfo(void);												// 가설재 품목별 수량 내보내기 (선택한 가설재)
+GSErrCode	exportElementInfoOnVisibleLayers(void);											// 가설재 품목별 수량 내보내기 (켜져 있는 레이어 전부)
 
-GSErrCode	filterSelection(void);															// 부재별 선택 후 보여주기
+GSErrCode	filterSelection(void);															// 선택한 객체(부재/가설재)만 보여주기
 short		DGCALLBACK filterSelectionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);		// [다이얼로그] 다이얼로그에서 보이는 레이어 상에 있는 객체들의 종류를 보여주고, 체크한 종류의 객체들만 선택 후 보여줌
 
-GSErrCode	exportBeamTableformInformation(void);											// 보 테이블폼 물량 정보 내보내기
+GSErrCode	exportBeamTableformInformation(void);											// 보 테이블폼 가설재 배치도 내보내기
 
-GSErrCode	calcTableformArea(void);														// 테이블폼 면적 계산
+GSErrCode	calcTableformArea(void);														// 테이블 단위별 거푸집 면적 내보내기
 
-GSErrCode	exportSelectedQuantityPlywoodArea(void);										// 물량합판 면적 계산 (선택한 부재에 한해)
-GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void);									// 물량합판 면적 계산 (보이는 레이어에 한해)
+GSErrCode	exportSelectedQuantityPlywoodArea(void);										// 선택한 물량합판 면적 보여주기
+GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void);									// 물량합판 면적 내보내기 (켜져 있는 레이어 전부)
 
 GSErrCode	exportAllElevationsToPDFSingleMode(void);										// 모든 입면도 PDF로 내보내기 (현재 보이는 화면에 한해)
-GSErrCode	exportAllElevationsToPDFMultiMode(void);										// 모든 입면도 PDF로 내보내기 (보이는 레이어 각각)
+GSErrCode	exportAllElevationsToPDFMultiMode(void);										// 모든 입면도 PDF로 내보내기 (켜져 있는 레이어 각각)
 
 short DGCALLBACK scaleQuestionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);			// [다이얼로그] 사용자가 축척 값을 직접 입력할 수 있도록 함
 short DGCALLBACK filenameQuestionHandler(short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);		// [다이얼로그] 파일명을 입력할 수 있도록 함
