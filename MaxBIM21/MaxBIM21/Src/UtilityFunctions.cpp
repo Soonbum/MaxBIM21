@@ -2303,10 +2303,11 @@ bool verifyLayerName(const char* layerName)
 		return true;
 }
 
-// 레이어 이름에서 n번째 코드의 문자열을 가져옴
-const char* getLayerCode(const char* layerName, short nth_code)
+// 레이어 이름에서 n번째 코드의 문자열을 가져옴 (1-공사코드, 2-동, 3-층, 4-타설번호, 5-CJ, 6-시공순서, 7-부재명, 8-제작처, 9-제작번호)
+char* getLayerCode(const char* layerName, short nth_code)
 {
-	const char* retStr = NULL;
+	static char retStr[512];
+	strcpy(retStr, "");
 
 	if (verifyLayerName(layerName) == true) {
 		char	buffer[256];	// 레이어 이름을 저장할 버퍼
@@ -2336,7 +2337,7 @@ const char* getLayerCode(const char* layerName, short nth_code)
 		// 예시(기본): 05-T-0000-F01-01-01-01-WALL
 		// 예시(확장): 05-T-0000-F01-01-01-01-WALL-현장제작-001
 		// 레이어 이름을 "-" 문자 기준으로 쪼개기
-		strcpy(buffer, layerName);
+		strcpy(buffer, wcharToChar(GS::UniString(layerName).ToUStr().Get()));
 		token = strtok(buffer, "-");
 		while (token != NULL) {
 			// 내용 및 길이 확인
@@ -2479,31 +2480,31 @@ const char* getLayerCode(const char* layerName, short nth_code)
 			token = strtok(NULL, "-");
 		}
 
-		if (nth_code == 1)
-			retStr = tok1;
+		if (nth_code == 1) {
+			strcpy(retStr, tok1);
+			strcat(retStr, "-");
+			strcat(retStr, tok2);
+		}
 		else if (nth_code == 2)
-			retStr = tok2;
+			strcpy(retStr, tok3);
 		else if (nth_code == 3)
-			retStr = tok3;
+			strcpy(retStr, tok4);
 		else if (nth_code == 4)
-			retStr = tok4;
+			strcpy(retStr, tok5);
 		else if (nth_code == 5)
-			retStr = tok5;
+			strcpy(retStr, tok6);
 		else if (nth_code == 6)
-			retStr = tok6;
+			strcpy(retStr, tok7);
 		else if (nth_code == 7)
-			retStr = tok7;
+			strcpy(retStr, tok8);
 		else if (nth_code == 8)
-			retStr = tok8;
+			strcpy(retStr, tok9);
 		else if (nth_code == 9)
-			retStr = tok9;
-		else if (nth_code == 10)
-			retStr = tok10;
+			strcpy(retStr, tok10);
 
 		return	retStr;
 	}
 
-	retStr = "";
 	return	retStr;
 }
 
@@ -2765,7 +2766,7 @@ void	selectElements(GS::Array<API_Guid> elemList)
 }
 
 // 그룹화 일시정지 활성화/비활성화
-void		suspendGroups(bool on)
+void	suspendGroups(bool on)
 {
 	bool	suspGrp;
 

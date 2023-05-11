@@ -3590,7 +3590,7 @@ GSErrCode	exportBeamTableformInformation(void)
 GSErrCode	calcTableformArea(void)
 {
 	GSErrCode	err = NoError;
-	unsigned short		xx;
+	unsigned short		xx, yy;
 	short	result;
 	short	mm;
 
@@ -3626,9 +3626,15 @@ GSErrCode	calcTableformArea(void)
 	// 파일 저장을 위한 변수
 	FILE* fp_unite;
 
+	// 면적 값 저장
 	double	extractedValue;
 	double	totalArea = 0.0;		// 총 면적값 (각 레이어 합산)
 	double	totalAreaAll = 0.0;		// 총 면적값 (모든 레이어 합산)
+
+	// 레이어 체계에 따라 면적값을 보기 쉽게 표로 만들기 위한 변수
+	GS::Array<std::string>	table[4];	// [0] 동, [1] 층, [2] 부재명, [3] 면적
+	bool	bFound;
+	char	areaValueStr[16];
 
 
 	// 그룹화 일시정지 ON
@@ -3762,54 +3768,101 @@ GSErrCode	calcTableformArea(void)
 
 					if (err == NoError) {
 						extractedValue = 0.0;
+						bFound = false;
 
 						if (my_strcmp(getParameterStringByName(&memo, "u_comp"), "유로폼") == 0) {
 							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
 							removeCharInStr(buffer, ',');
 							extractedValue = atof(buffer);
+
+							bFound = true;
 						}
 						else if (my_strcmp(getParameterStringByName(&memo, "g_comp"), "합판") == 0) {
 							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
 							removeCharInStr(buffer, ',');
 							extractedValue = atof(buffer);
+
+							bFound = true;
 						}
 						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "아웃코너판넬") == 0) {
 							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
 							removeCharInStr(buffer, ',');
 							extractedValue = atof(buffer);
+
+							bFound = true;
 						}
 						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "인코너판넬") == 0) {
 							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
 							removeCharInStr(buffer, ',');
 							extractedValue = atof(buffer);
+
+							bFound = true;
 						}
 						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "변각인코너판넬") == 0) {
 							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
 							removeCharInStr(buffer, ',');
 							extractedValue = atof(buffer);
+
+							bFound = true;
 						}
 						else if (my_strcmp(getParameterStringByName(&memo, "in_comp"), "인코너M형판넬") == 0) {
 							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
 							removeCharInStr(buffer, ',');
 							extractedValue = atof(buffer);
+
+							bFound = true;
 						}
 						else if (my_strcmp(getParameterStringByName(&memo, "w_comp"), "목재") == 0) {
 							sprintf(buffer, "%s", getParameterStringByName(&memo, "gs_list_custom04"));
 							removeCharInStr(buffer, ',');
 							extractedValue = atof(buffer);
+
+							bFound = true;
 						}
 						else if (my_strcmp(getParameterStringByName(&memo, "sup_type"), "매직바") == 0) {
 							extractedValue = getParameterValueByName(&memo, "plywoodArea");
+
+							bFound = true;
 						}
 						else if (my_strcmp(getParameterStringByName(&memo, "sup_type"), "매직아웃코너") == 0) {
 							extractedValue = getParameterValueByName(&memo, "plywoodArea");
+
+							bFound = true;
 						}
 						else if (my_strcmp(getParameterStringByName(&memo, "sup_type"), "매직인코너") == 0) {
 							extractedValue = getParameterValueByName(&memo, "plywoodArea");
+
+							bFound = true;
 						}
 
-						totalArea += extractedValue;
-						totalAreaAll += extractedValue;
+						if (bFound == true) {
+							totalArea += extractedValue;
+							totalAreaAll += extractedValue;
+
+							// 레이어 체계에 속한 레이어의 경우, 표로 정리해서 면적 값을 표시할 것
+							if (verifyLayerName(fullLayerName) == true) {
+								// 기존 필드를 검색해보고 존재할 경우 면적을 합산함
+								for (yy = 0; yy < table[0].GetSize(); yy++) {
+									if ((my_strcmp(table[0][yy].c_str(), getLayerCode(fullLayerName, 2)) == 0) &&
+										(my_strcmp(table[1][yy].c_str(), getLayerCode(fullLayerName, 3)) == 0) &&
+										(my_strcmp(table[2][yy].c_str(), getLayerCode(fullLayerName, 7)) == 0)) {
+										sprintf(areaValueStr, "%.3f", atof(table[3][yy].c_str()) + extractedValue);
+										table[3][yy] = areaValueStr;
+										break;
+									}
+								}
+
+								// 기존 필드가 없으면 새로운 필드 생성
+								if (yy == table[0].GetSize()) {
+									table[0].Push(getLayerCode(fullLayerName, 2));
+									table[1].Push(getLayerCode(fullLayerName, 3));
+									table[2].Push(getLayerCode(fullLayerName, 7));
+
+									sprintf(areaValueStr, "%.3f", extractedValue);
+									table[3].Push(areaValueStr);
+								}
+							}
+						}
 					}
 
 					ACAPI_DisposeElemMemoHdls(&memo);
@@ -3835,6 +3888,14 @@ GSErrCode	calcTableformArea(void)
 	// 모든 레이어의 면적 값을 합산한 값도 표시함
 	sprintf(buffer, "\n모든 면적 값 합산값: %f\n", totalAreaAll);
 	fprintf(fp_unite, buffer);
+
+	// !!! 표 내용 출력하기
+	sprintf(buffer, "\n동,층,부재명,면적");
+	fprintf(fp_unite, buffer);
+	for (yy = 0; yy < table[0].GetSize(); yy++) {
+		sprintf(buffer, "\n%s,%s,%s,%s", table[0][yy].c_str(), table[1][yy].c_str(), table[2][yy].c_str(), table[3][yy].c_str());
+		fprintf(fp_unite, buffer);
+	}
 
 	// 진행 상황 표시하는 기능 - 마무리
 	ACAPI_Interface(APIIo_CloseProcessWindowID, NULL, NULL);
