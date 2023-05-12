@@ -3635,6 +3635,7 @@ GSErrCode	calcTableformArea(void)
 	GS::Array<std::string>	table[4];	// [0] 동, [1] 층, [2] 부재명, [3] 면적
 	bool	bFound;
 	char	areaValueStr[16];
+	char	codeStr[9][16];
 
 
 	// 그룹화 일시정지 ON
@@ -3751,7 +3752,9 @@ GSErrCode	calcTableformArea(void)
 
 			// 레이어 이름이 체계에 맞을 경우
 			if (verifyLayerName(fullLayerName) == true) {
-				sprintf(buffer, "%s,%s,%s,%s,%s,%s,%s,%s,%s,", getLayerCode(fullLayerName, 1), getLayerCode(fullLayerName, 2), getLayerCode(fullLayerName, 3), getLayerCode(fullLayerName, 4), getLayerCode(fullLayerName, 5), getLayerCode(fullLayerName, 6), getLayerCode(fullLayerName, 7), getLayerCode(fullLayerName, 8), getLayerCode(fullLayerName, 9));
+				for (yy = 0; yy < 9; yy++)
+					strcpy(codeStr[yy], getLayerCode(fullLayerName, yy + 1));
+				sprintf(buffer, "%s,%s,%s,%s,%s,%s,%s,%s,%s,", codeStr[0], codeStr[1], codeStr[2], codeStr[3], codeStr[4], codeStr[5], codeStr[6], codeStr[7], codeStr[8]);
 				fprintf(fp_unite, buffer);
 			}
 			// 레이어 이름이 체계에 맞지 않을 경우
@@ -3857,7 +3860,7 @@ GSErrCode	calcTableformArea(void)
 									if ((my_strcmp(table[0][yy].c_str(), getLayerCode(fullLayerName, 2)) == 0) &&
 										(my_strcmp(table[1][yy].c_str(), getLayerCode(fullLayerName, 3)) == 0) &&
 										(my_strcmp(table[2][yy].c_str(), getLayerCode(fullLayerName, 7)) == 0)) {
-										sprintf(areaValueStr, "%.3f", atof(table[3][yy].c_str()) + extractedValue);
+										sprintf(areaValueStr, "%.2f", atof(table[3][yy].c_str()) + extractedValue);
 										table[3][yy] = areaValueStr;
 										break;
 									}
@@ -3869,7 +3872,7 @@ GSErrCode	calcTableformArea(void)
 									table[1].Push(getLayerCode(fullLayerName, 3));
 									table[2].Push(getLayerCode(fullLayerName, 7));
 
-									sprintf(areaValueStr, "%.3f", extractedValue);
+									sprintf(areaValueStr, "%.2f", extractedValue);
 									table[3].Push(areaValueStr);
 								}
 							}
@@ -3881,7 +3884,7 @@ GSErrCode	calcTableformArea(void)
 			}
 
 			// 면적 값 출력하기
-			sprintf(buffer, "%f,", totalArea);
+			sprintf(buffer, "%.2f,", totalArea);
 			fprintf(fp_unite, buffer);
 
 			// 레이어 이름이 체계에 맞지 않을 경우
@@ -3906,7 +3909,7 @@ GSErrCode	calcTableformArea(void)
 	}
 
 	// 모든 레이어의 면적 값을 합산한 값도 표시함
-	sprintf(buffer, "\n모든 면적 값 합산값: %f\n", totalAreaAll);
+	sprintf(buffer, "\n모든 면적 값 합산값: %.2f\n", totalAreaAll);
 	fprintf(fp_unite, buffer);
 
 	// !!! 표 내용 출력하기

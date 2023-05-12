@@ -2480,27 +2480,32 @@ char* getLayerCode(const char* layerName, short nth_code)
 			token = strtok(NULL, "-");
 		}
 
-		if (nth_code == 1) {
-			strcpy(retStr, tok1);
-			strcat(retStr, "-");
-			strcat(retStr, tok2);
+		if (success == true) {
+			if (nth_code == 1) {
+				strcpy(retStr, tok1);
+				strcat(retStr, "-");
+				strcat(retStr, tok2);
+			}
+			if (nth_code == 2)
+				strcpy(retStr, tok3);
+			if (nth_code == 3)
+				strcpy(retStr, tok4);
+			if (nth_code == 4)
+				strcpy(retStr, tok5);
+			if (nth_code == 5)
+				strcpy(retStr, tok6);
+			if (nth_code == 6)
+				strcpy(retStr, tok7);
+			if (nth_code == 7)
+				strcpy(retStr, tok8);
 		}
-		else if (nth_code == 2)
-			strcpy(retStr, tok3);
-		else if (nth_code == 3)
-			strcpy(retStr, tok4);
-		else if (nth_code == 4)
-			strcpy(retStr, tok5);
-		else if (nth_code == 5)
-			strcpy(retStr, tok6);
-		else if (nth_code == 6)
-			strcpy(retStr, tok7);
-		else if (nth_code == 7)
-			strcpy(retStr, tok8);
-		else if (nth_code == 8)
-			strcpy(retStr, tok9);
-		else if (nth_code == 9)
-			strcpy(retStr, tok10);
+
+		if (extSuccess == true) {
+			if (nth_code == 8)
+				strcpy(retStr, tok9);
+			if (nth_code == 9)
+				strcpy(retStr, tok10);
+		}
 
 		return	retStr;
 	}

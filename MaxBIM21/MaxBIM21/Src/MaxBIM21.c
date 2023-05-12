@@ -232,6 +232,9 @@ GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 				case 4:		// 카메라 위치 저장하기/불러오기
 					err = manageCameraInfo();
 					break;
+				case 5:		// 간섭 체크 발견하기
+					//
+					break;
 			}
 			break;
 	}

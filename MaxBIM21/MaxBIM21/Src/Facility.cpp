@@ -1085,3 +1085,13 @@ short DGCALLBACK cameraPosManagerHandler (short message, short dialogID, short i
 
 	return	result;
 }
+
+// 간섭 체크 발견하기
+GSErrCode	interferenceCheck(void)
+{
+	GSErrCode	err = NoError;
+
+	// !!!
+
+	return err;
+}

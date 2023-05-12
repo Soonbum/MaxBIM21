@@ -59,4 +59,6 @@ GSErrCode	loadDialogStatus_bubble (CircularBubble	*cbInfo);		// 원형 버블 설정 �
 GSErrCode	manageCameraInfo (void);				// 카메라 위치 저장하기/불러오기
 short DGCALLBACK cameraPosManagerHandler (short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);	// [다이얼로그 박스] 카메라 위치 관리하기
 
+GSErrCode	interferenceCheck(void);				// 간섭 체크 발견하기
+
 #endif
