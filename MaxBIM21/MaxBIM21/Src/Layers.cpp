@@ -3614,7 +3614,7 @@ GSErrCode	assignLayerEasily(void)
 										}
 										else {
 											// 레이어가 존재하지 않으면,
-											result = DGAlert(DG_INFORMATION, "레이어가 존재하지 않음", "지정한 레이어가 존재하지 않습니다.\n새로 만드시겠습니까?", "", "예", "아니오", "");
+											result = DGAlert(DG_INFORMATION, L"레이어가 존재하지 않음", L"지정한 레이어가 존재하지 않습니다.\n새로 만드시겠습니까?", "", L"예", L"아니오", "");
 
 											if (result == DG_OK) {
 												// 레이어를 새로 생성함

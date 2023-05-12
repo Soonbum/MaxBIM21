@@ -3713,6 +3713,10 @@ GSErrCode	calcTableformArea(void)
 	sprintf(buffer, "안내: 면적 값의 단위는 m2(제곱미터)입니다.\n고려되는 객체: 유로폼 / 합판 / 아웃코너판넬 / 인코너판넬 / 변각인코너판넬 / 인코너M형판넬 / 목재 / 매직바(합판) / 매직아웃코너(합판) / 매직인코너(합판)\n\n");
 	fprintf(fp_unite, buffer);
 
+	// 헤더 출력
+	sprintf(buffer, "공사코드,동,층,타설번호,CJ,시공순서,부재,제작처,제작번호,면적,비고\n");
+	fprintf(fp_unite, buffer);
+
 	// 보이는 레이어들을 하나씩 순회하면서 전체 요소들을 선택한 후 테이블폼의 면적 값을 가진 객체들의 변수 값을 가져와서 계산함
 	for (mm = 1; mm <= nVisibleLayers; ++mm) {
 		BNZeroMemory(&attrib, sizeof(API_Attribute));
@@ -3745,10 +3749,17 @@ GSErrCode	calcTableformArea(void)
 			sprintf(fullLayerName, "%s", attrib.layer.head.name);
 			fullLayerName[strlen(fullLayerName)] = '\0';
 
-			// 레이어 이름
-			sprintf(buffer, "<< 레이어 : %s >> : ", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
-			fprintf(fp_unite, buffer);
-
+			// 레이어 이름이 체계에 맞을 경우
+			if (verifyLayerName(fullLayerName) == true) {
+				sprintf(buffer, "%s,%s,%s,%s,%s,%s,%s,%s,%s,", getLayerCode(fullLayerName, 1), getLayerCode(fullLayerName, 2), getLayerCode(fullLayerName, 3), getLayerCode(fullLayerName, 4), getLayerCode(fullLayerName, 5), getLayerCode(fullLayerName, 6), getLayerCode(fullLayerName, 7), getLayerCode(fullLayerName, 8), getLayerCode(fullLayerName, 9));
+				fprintf(fp_unite, buffer);
+			}
+			// 레이어 이름이 체계에 맞지 않을 경우
+			else {
+				sprintf(buffer, "레이어: %s,,,,,,,,,", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
+				fprintf(fp_unite, buffer);
+			}
+			
 			totalArea = 0.0;
 
 			// 객체에서 면적 값 가져와서 합산하기
@@ -3870,7 +3881,16 @@ GSErrCode	calcTableformArea(void)
 			}
 
 			// 면적 값 출력하기
-			sprintf(buffer, "%f\n", totalArea);
+			sprintf(buffer, "%f,", totalArea);
+			fprintf(fp_unite, buffer);
+
+			// 레이어 이름이 체계에 맞지 않을 경우
+			if (verifyLayerName(fullLayerName) == false) {
+				sprintf(buffer, "레이어 이름 체크할 것,");
+				fprintf(fp_unite, buffer);
+			}
+			
+			sprintf(buffer, "\n", totalArea);
 			fprintf(fp_unite, buffer);
 
 			// 레이어 숨기기
