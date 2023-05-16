@@ -3751,17 +3751,17 @@ GSErrCode	calcTableformArea(void)
 			fullLayerName[strlen(fullLayerName)] = '\0';
 
 			// 레이어 이름이 체계에 맞을 경우
-			if (verifyLayerName(fullLayerName) == true) {
+			//if (verifyLayerName(fullLayerName) == true) {
 				for (yy = 0; yy < 9; yy++)
 					strcpy(codeStr[yy], getLayerCode(fullLayerName, yy + 1));
 				sprintf(buffer, "%s,%s,%s,%s,%s,%s,%s,%s,%s,", codeStr[0], codeStr[1], codeStr[2], codeStr[3], codeStr[4], codeStr[5], codeStr[6], codeStr[7], codeStr[8]);
 				fprintf(fp_unite, buffer);
-			}
+			//}
 			// 레이어 이름이 체계에 맞지 않을 경우
-			else {
-				sprintf(buffer, "레이어: %s,,,,,,,,,", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
-				fprintf(fp_unite, buffer);
-			}
+			//else {
+			//	sprintf(buffer, "레이어: %s,,,,,,,,,", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
+			//	fprintf(fp_unite, buffer);
+			//}
 			
 			totalArea = 0.0;
 
@@ -3854,27 +3854,25 @@ GSErrCode	calcTableformArea(void)
 							totalAreaAll += extractedValue;
 
 							// 레이어 체계에 속한 레이어의 경우, 표로 정리해서 면적 값을 표시할 것
-							if (verifyLayerName(fullLayerName) == true) {
-								// 기존 필드를 검색해보고 존재할 경우 면적을 합산함
-								for (yy = 0; yy < table[0].GetSize(); yy++) {
-									if ((my_strcmp(table[0][yy].c_str(), getLayerCode(fullLayerName, 2)) == 0) &&
-										(my_strcmp(table[1][yy].c_str(), getLayerCode(fullLayerName, 3)) == 0) &&
-										(my_strcmp(table[2][yy].c_str(), getLayerCode(fullLayerName, 7)) == 0)) {
-										sprintf(areaValueStr, "%.2f", atof(table[3][yy].c_str()) + extractedValue);
-										table[3][yy] = areaValueStr;
-										break;
-									}
+							// 기존 필드를 검색해보고 존재할 경우 면적을 합산함
+							for (yy = 0; yy < table[0].GetSize(); yy++) {
+								if ((my_strcmp(table[0][yy].c_str(), getLayerCode(fullLayerName, 2)) == 0) &&
+									(my_strcmp(table[1][yy].c_str(), getLayerCode(fullLayerName, 3)) == 0) &&
+									(my_strcmp(table[2][yy].c_str(), getLayerCode(fullLayerName, 7)) == 0)) {
+									sprintf(areaValueStr, "%.2f", atof(table[3][yy].c_str()) + extractedValue);
+									table[3][yy] = areaValueStr;
+									break;
 								}
+							}
 
-								// 기존 필드가 없으면 새로운 필드 생성
-								if (yy == table[0].GetSize()) {
-									table[0].Push(getLayerCode(fullLayerName, 2));
-									table[1].Push(getLayerCode(fullLayerName, 3));
-									table[2].Push(getLayerCode(fullLayerName, 7));
+							// 기존 필드가 없으면 새로운 필드 생성
+							if (yy == table[0].GetSize()) {
+								table[0].Push(getLayerCode(fullLayerName, 2));
+								table[1].Push(getLayerCode(fullLayerName, 3));
+								table[2].Push(getLayerCode(fullLayerName, 7));
 
-									sprintf(areaValueStr, "%.2f", extractedValue);
-									table[3].Push(areaValueStr);
-								}
+								sprintf(areaValueStr, "%.2f", extractedValue);
+								table[3].Push(areaValueStr);
 							}
 						}
 					}
@@ -3886,12 +3884,6 @@ GSErrCode	calcTableformArea(void)
 			// 면적 값 출력하기
 			sprintf(buffer, "%.2f,", totalArea);
 			fprintf(fp_unite, buffer);
-
-			// 레이어 이름이 체계에 맞지 않을 경우
-			if (verifyLayerName(fullLayerName) == false) {
-				sprintf(buffer, "레이어 이름 체크할 것,");
-				fprintf(fp_unite, buffer);
-			}
 			
 			sprintf(buffer, "\n", totalArea);
 			fprintf(fp_unite, buffer);
