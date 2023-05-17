@@ -3592,6 +3592,7 @@ GSErrCode	calcTableformArea(void)
 	GSErrCode	err = NoError;
 	unsigned short		xx, yy;
 	short	result;
+	short	action_mode;
 	short	mm;
 
 	// 모든 객체, 보 저장
@@ -3703,6 +3704,8 @@ GSErrCode	calcTableformArea(void)
 		return	NoError;
 	}
 
+	action_mode = DGAlert(DG_INFORMATION, L"파일 출력 모드", L"레이어 이름을 구분해서 출력하시겠습니까?", "", L"예-느림", L"아니오-빠름", "");
+
 	// 진행 상황 표시하는 기능 - 초기화
 	nPhase = 1;
 	cur = 1;
@@ -3715,8 +3718,10 @@ GSErrCode	calcTableformArea(void)
 	fprintf(fp_unite, buffer);
 
 	// 헤더 출력
-	sprintf(buffer, "공사코드,동,층,타설번호,CJ,시공순서,부재,제작처,제작번호,면적,비고\n");
-	fprintf(fp_unite, buffer);
+	if (action_mode == 1) {
+		sprintf(buffer, "공사코드,동,층,타설번호,CJ,시공순서,부재,제작처,제작번호,면적,비고\n");
+		fprintf(fp_unite, buffer);
+	}
 
 	// 보이는 레이어들을 하나씩 순회하면서 전체 요소들을 선택한 후 테이블폼의 면적 값을 가진 객체들의 변수 값을 가져와서 계산함
 	for (mm = 1; mm <= nVisibleLayers; ++mm) {
@@ -3750,19 +3755,25 @@ GSErrCode	calcTableformArea(void)
 			sprintf(fullLayerName, "%s", attrib.layer.head.name);
 			fullLayerName[strlen(fullLayerName)] = '\0';
 
-			// 레이어 이름이 체계에 맞을 경우
-			//if (verifyLayerName(fullLayerName) == true) {
-				for (yy = 0; yy < 9; yy++)
-					strcpy(codeStr[yy], getLayerCode(fullLayerName, yy + 1));
-				sprintf(buffer, "%s,%s,%s,%s,%s,%s,%s,%s,%s,", codeStr[0], codeStr[1], codeStr[2], codeStr[3], codeStr[4], codeStr[5], codeStr[6], codeStr[7], codeStr[8]);
+			// 상세 모드 (느림)
+			if (action_mode == 1) {
+				if (verifyLayerName(fullLayerName) == true) {
+					for (yy = 0; yy < 9; yy++)
+						strcpy(codeStr[yy], getLayerCode(fullLayerName, yy + 1));
+					sprintf(buffer, "%s,%s,%s,%s,%s,%s,%s,%s,%s,", codeStr[0], codeStr[1], codeStr[2], codeStr[3], codeStr[4], codeStr[5], codeStr[6], codeStr[7], codeStr[8]);
+					fprintf(fp_unite, buffer);
+				}
+				else {
+					sprintf(buffer, "레이어: %s,,,,,,,,,", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
+					fprintf(fp_unite, buffer);
+				}
+			}
+			// 고속 모드 (빠름)
+			else {
+				sprintf(buffer, "레이어: %s,,,,,,,,,", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
 				fprintf(fp_unite, buffer);
-			//}
-			// 레이어 이름이 체계에 맞지 않을 경우
-			//else {
-			//	sprintf(buffer, "레이어: %s,,,,,,,,,", wcharToChar(GS::UniString(fullLayerName).ToUStr().Get()));
-			//	fprintf(fp_unite, buffer);
-			//}
-			
+			}
+
 			totalArea = 0.0;
 
 			// 객체에서 면적 값 가져와서 합산하기
@@ -3853,26 +3864,30 @@ GSErrCode	calcTableformArea(void)
 							totalArea += extractedValue;
 							totalAreaAll += extractedValue;
 
-							// 레이어 체계에 속한 레이어의 경우, 표로 정리해서 면적 값을 표시할 것
-							// 기존 필드를 검색해보고 존재할 경우 면적을 합산함
-							for (yy = 0; yy < table[0].GetSize(); yy++) {
-								if ((my_strcmp(table[0][yy].c_str(), getLayerCode(fullLayerName, 2)) == 0) &&
-									(my_strcmp(table[1][yy].c_str(), getLayerCode(fullLayerName, 3)) == 0) &&
-									(my_strcmp(table[2][yy].c_str(), getLayerCode(fullLayerName, 7)) == 0)) {
-									sprintf(areaValueStr, "%.2f", atof(table[3][yy].c_str()) + extractedValue);
-									table[3][yy] = areaValueStr;
-									break;
+							if (action_mode == 1) {
+								if (verifyLayerName(fullLayerName) == true) {
+									// 레이어 체계에 속한 레이어의 경우, 표로 정리해서 면적 값을 표시할 것
+									// 기존 필드를 검색해보고 존재할 경우 면적을 합산함
+									for (yy = 0; yy < table[0].GetSize(); yy++) {
+										if ((my_strcmp(table[0][yy].c_str(), getLayerCode(fullLayerName, 2)) == 0) &&
+											(my_strcmp(table[1][yy].c_str(), getLayerCode(fullLayerName, 3)) == 0) &&
+											(my_strcmp(table[2][yy].c_str(), getLayerCode(fullLayerName, 7)) == 0)) {
+											sprintf(areaValueStr, "%.2f", atof(table[3][yy].c_str()) + extractedValue);
+											table[3][yy] = areaValueStr;
+											break;
+										}
+									}
+
+									// 기존 필드가 없으면 새로운 필드 생성
+									if (yy == table[0].GetSize()) {
+										table[0].Push(getLayerCode(fullLayerName, 2));
+										table[1].Push(getLayerCode(fullLayerName, 3));
+										table[2].Push(getLayerCode(fullLayerName, 7));
+
+										sprintf(areaValueStr, "%.2f", extractedValue);
+										table[3].Push(areaValueStr);
+									}
 								}
-							}
-
-							// 기존 필드가 없으면 새로운 필드 생성
-							if (yy == table[0].GetSize()) {
-								table[0].Push(getLayerCode(fullLayerName, 2));
-								table[1].Push(getLayerCode(fullLayerName, 3));
-								table[2].Push(getLayerCode(fullLayerName, 7));
-
-								sprintf(areaValueStr, "%.2f", extractedValue);
-								table[3].Push(areaValueStr);
 							}
 						}
 					}
@@ -3904,12 +3919,14 @@ GSErrCode	calcTableformArea(void)
 	sprintf(buffer, "\n모든 면적 값 합산값: %.2f\n", totalAreaAll);
 	fprintf(fp_unite, buffer);
 
-	// !!! 표 내용 출력하기
-	sprintf(buffer, "\n동,층,부재명,면적");
-	fprintf(fp_unite, buffer);
-	for (yy = 0; yy < table[0].GetSize(); yy++) {
-		sprintf(buffer, "\n%s,%s,%s,%s", table[0][yy].c_str(), table[1][yy].c_str(), table[2][yy].c_str(), table[3][yy].c_str());
+	// 표 내용 출력하기
+	if (action_mode == 1) {
+		sprintf(buffer, "\n동,층,부재명,면적");
 		fprintf(fp_unite, buffer);
+		for (yy = 0; yy < table[0].GetSize(); yy++) {
+			sprintf(buffer, "\n%s,%s,%s,%s", table[0][yy].c_str(), table[1][yy].c_str(), table[2][yy].c_str(), table[3][yy].c_str());
+			fprintf(fp_unite, buffer);
+		}
 	}
 
 	// 진행 상황 표시하는 기능 - 마무리
