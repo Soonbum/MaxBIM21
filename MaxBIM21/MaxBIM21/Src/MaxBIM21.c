@@ -233,7 +233,10 @@ GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 					err = manageCameraInfo();
 					break;
 				case 5:		// 간섭 체크 발견하기
-					//
+					err = ACAPI_CallUndoableCommand(L"간섭 체크 발견하기", [&]() -> GSErrCode {
+						err = interferenceCheck();
+						return err;
+					});
 					break;
 			}
 			break;

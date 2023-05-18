@@ -2492,7 +2492,7 @@ GSErrCode	filterSelection(void)
 	ACAPI_Element_GetElemList(API_BeamID, &beams, APIFilt_OnVisLayer);		nBeams = beams.GetSize();		// 보이는 레이어 상의 보 타입만 가져오기
 	ACAPI_Element_GetElemList(API_SlabID, &slabs, APIFilt_OnVisLayer);		nSlabs = slabs.GetSize();		// 보이는 레이어 상의 슬래브 타입만 가져오기
 	ACAPI_Element_GetElemList(API_RoofID, &roofs, APIFilt_OnVisLayer);		nRoofs = roofs.GetSize();		// 보이는 레이어 상의 루프 타입만 가져오기
-	ACAPI_Element_GetElemList(API_MeshID, &meshes, APIFilt_OnVisLayer);	nMeshes = meshes.GetSize();	// 보이는 레이어 상의 메시 타입만 가져오기
+	ACAPI_Element_GetElemList(API_MeshID, &meshes, APIFilt_OnVisLayer);		nMeshes = meshes.GetSize();	// 보이는 레이어 상의 메시 타입만 가져오기
 	ACAPI_Element_GetElemList(API_MorphID, &morphs, APIFilt_OnVisLayer);	nMorphs = morphs.GetSize();	// 보이는 레이어 상의 모프 타입만 가져오기
 	ACAPI_Element_GetElemList(API_ShellID, &shells, APIFilt_OnVisLayer);	nShells = shells.GetSize();	// 보이는 레이어 상의 셸 타입만 가져오기
 

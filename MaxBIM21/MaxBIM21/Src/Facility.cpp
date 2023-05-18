@@ -1090,68 +1090,228 @@ short DGCALLBACK cameraPosManagerHandler (short message, short dialogID, short i
 GSErrCode	interferenceCheck(void)
 {
 	GSErrCode	err = NoError;
+	unsigned short xx, yy;
+	short mm;
 
-	// !!!
-	// 1. 켜져 있는 레이어들로부터 요소 GUID를 모두 수집함
-	// 2. 요소들의 기하 정보를 Array 리스트(1)로 전부 저장할 것
-	// 3-1. 리스트 i = 1 ~ n번 순회
-	// 3-2. 리스트 j = i+1 ~ n번 순회
-		// i번 요소와 j번 요소와의 충돌 체크 (충돌할 경우, i와 j번 요소의 요소 GUID를 Array 리스트(2)로 저장할 것)
-	// 4. Array 리스트(2)에서 중복 요소 제거하기
-	// 5. Array 리스트(2)에 있는 요소들 선택해서 보여주기
+	// 요소 관련 변수
+	API_Element			elem;
+	API_ElemInfo3D		info3D;
+
+	GS::Array<API_Guid>		elemList_Wall;
+	GS::Array<API_Guid>		elemList_Column;
+	GS::Array<API_Guid>		elemList_Beam;
+	GS::Array<API_Guid>		elemList_Slab;
+	GS::Array<API_Guid>		elemList_Stair;
+	GS::Array<API_Guid>		elemList_Object;
+	GS::Array<API_Guid>		elemList;
+
+	GS::Array<Rect>			allObjectList;
+	GS::Array<API_Guid>		interferenceObjectList;
+
+	// 레이어 관련 변수
+	short			nLayers;
+	API_Attribute	attrib;
+	short			nVisibleLayers = 0;
+	short			visLayerList[1024];
+	char			fullLayerName[512];
+	vector<LayerList>	layerList;
 
 
-	/* 샘플 코드
-	typedef struct Rect {
-		double x;	// 원점의 x 좌표
-		double y;	// 원점의 y 좌표
-		double z;	// 원점의 z 좌표
-		double width;	// 가로 길이
-		double height;	// 세로 길이
-		double height;	// 높이
-		double theta;	// 회전 각도
-	} RECT;
+	// 그룹화 일시정지 ON
+	suspendGroups(true);
 
-	// 두 객체 간에 충돌이 발생하면 0, 충돌하지 않으면 0, 입력이 유효하지 않으면 -1
-	int checkIntersect(RECT rect1, RECT rect2) {
-		// 1. 좌표 변환
-		double x1, y1, z1, x2, y2, z2;
-		double w1 = rect1.width, h1 = rect1.height, d1 = rect1.height;
-		double w2 = rect2.width, h2 = rect2.height, d2 = rect2.height;
-		double cosa1 = cos(rect1.theta), sina1 = sin(rect1.theta);
-		double cosa2 = cos(rect2.theta), sina2 = sin(rect2.theta);
-		x1 = rect1.x;
-		y1 = rect1.y;
-		z1 = rect1.z;
-		x2 = rect2.x;
-		y2 = rect2.y;
-		z2 = rect2.z;
+	// 프로젝트 내 레이어 개수를 알아냄
+	nLayers = getLayerCount();
 
-		// 2. 두 사각형의 유효성 확인
-		if (w1 <= 0.0 || h1 <= 0.0 || d1 <= 0.0 || w2 <= 0.0 || h2 <= 0.0 || d2 <= 0.0) {
-			return -1;	// 유효하지 않은 직육면체입니다.
+	// 보이는 레이어들의 목록 저장하기
+	for (xx = 1; xx <= nLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = xx;
+		err = ACAPI_Attribute_Get(&attrib);
+		if (err == NoError) {
+			if (!((attrib.layer.head.flags & APILay_Hidden) == true)) {
+				visLayerList[nVisibleLayers++] = attrib.layer.head.index;
+			}
 		}
-
-		// 3. 두 사각형의 x, y, z 축별 적절한 변환
-		double minx1 = x1 - (w1/2.0)*cosa1, miny1 = y1 - (w1/2.0)*sina1;
-		double maxx1 = x1 + (w1/2.0)*cosa1, maxy1 = y1 + (w1/2.0)*sina1;
-		double minx2 = x2 - (w2/2.0)*cosa2, miny2 = y2 - (w2/2.0)*sina2;
-		double maxx2 = x2 + (w2/2.0)*cosa2, maxy2 = y2 + (w2/2.0)*sina2;
-
-		// 4. 두 객체가 x-y 평면에서 충돌하는 지 검사
-		if (maxx1 < minx2 || minx1 > maxx2) return 0;
-		if (maxy1 < miny2 || miny1 > maxy2) return 0;
-
-		// 5. z 축 방향으로도 충돌하는 지 검사
-		double z1_max = z1 + d1/2.0;
-		double z1_min = z1 - d1/2.0;
-		double z2_max = z2 + d2/2.0;
-		double z2_min = z2 - d2/2.0;
-		if (z1_max < z2_min || z1_min > z2_max)
-			return 0;
-		return 1;	// 두 객체가 충돌합니다.
 	}
-}	*/
+
+	// 레이어 이름과 인덱스 저장
+	for (xx = 0; xx < nVisibleLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = visLayerList[xx];
+		err = ACAPI_Attribute_Get(&attrib);
+
+		sprintf(fullLayerName, "%s", attrib.layer.head.name);
+		fullLayerName[strlen(fullLayerName)] = '\0';
+
+		LayerList newLayerItem;
+		newLayerItem.layerInd = visLayerList[xx];
+		newLayerItem.layerName = fullLayerName;
+
+		layerList.push_back(newLayerItem);
+	}
+
+	// 레이어 이름 기준으로 정렬하여 레이어 인덱스 순서 변경
+	sort(layerList.begin(), layerList.end(), compareLayerName);		// 레이어 이름 기준 오름차순 정렬
+
+	// 일시적으로 모든 레이어 숨기기
+	for (xx = 1; xx <= nLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = xx;
+		err = ACAPI_Attribute_Get(&attrib);
+		if (err == NoError) {
+			attrib.layer.head.flags |= APILay_Hidden;
+			ACAPI_Attribute_Modify(&attrib, NULL);
+		}
+	}
+
+	elemList.Clear();
+
+	// 보이는 레이어들을 하나씩 순회하면서 전체 요소들을 가져옴
+	for (mm = 1; mm <= nVisibleLayers; ++mm) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		//attrib.layer.head.index = visLayerList [mm-1];
+		attrib.layer.head.index = layerList[mm - 1].layerInd;
+		err = ACAPI_Attribute_Get(&attrib);
+
+		if (err == NoError) {
+			// 레이어 보이기
+			if ((attrib.layer.head.flags & APILay_Hidden) == true) {
+				attrib.layer.head.flags ^= APILay_Hidden;
+				ACAPI_Attribute_Modify(&attrib, NULL);
+			}
+
+			elemList_Wall.Clear();
+			elemList_Column.Clear();
+			elemList_Beam.Clear();
+			elemList_Slab.Clear();
+			elemList_Stair.Clear();
+			elemList_Object.Clear();
+
+			// 요소 가져오기
+			ACAPI_Element_GetElemList(API_WallID, &elemList_Wall, APIFilt_OnVisLayer);		// 보이는 레이어에 있음, 벽
+			ACAPI_Element_GetElemList(API_ColumnID, &elemList_Column, APIFilt_OnVisLayer);	// 보이는 레이어에 있음, 기둥
+			ACAPI_Element_GetElemList(API_BeamID, &elemList_Beam, APIFilt_OnVisLayer);		// 보이는 레이어에 있음, 보
+			ACAPI_Element_GetElemList(API_SlabID, &elemList_Slab, APIFilt_OnVisLayer);		// 보이는 레이어에 있음, 슬래브
+			ACAPI_Element_GetElemList(API_StairID, &elemList_Stair, APIFilt_OnVisLayer);	// 보이는 레이어에 있음, 계단
+			ACAPI_Element_GetElemList(API_ObjectID, &elemList_Object, APIFilt_OnVisLayer);	// 보이는 레이어에 있음, 객체
+
+			// 타입에 상관없이 모든 요소의 GUID를 한 곳에 보관함
+			while (!elemList_Wall.IsEmpty())	elemList.Push(elemList_Wall.Pop());
+			while (!elemList_Column.IsEmpty())	elemList.Push(elemList_Column.Pop());
+			while (!elemList_Beam.IsEmpty())	elemList.Push(elemList_Beam.Pop());
+			while (!elemList_Slab.IsEmpty())	elemList.Push(elemList_Slab.Pop());
+			while (!elemList_Stair.IsEmpty())	elemList.Push(elemList_Stair.Pop());
+			while (!elemList_Object.IsEmpty())	elemList.Push(elemList_Object.Pop());
+		}
+	}
+
+	// 모든 프로세스를 마치면 처음에 수집했던 보이는 레이어들을 다시 켜놓을 것
+	for (xx = 1; xx <= nVisibleLayers; ++xx) {
+		BNZeroMemory(&attrib, sizeof(API_Attribute));
+		attrib.layer.head.typeID = API_LayerID;
+		attrib.layer.head.index = visLayerList[xx - 1];
+		err = ACAPI_Attribute_Get(&attrib);
+		if (err == NoError) {
+			if ((attrib.layer.head.flags & APILay_Hidden) == true) {
+				attrib.layer.head.flags ^= APILay_Hidden;
+				ACAPI_Attribute_Modify(&attrib, NULL);
+			}
+		}
+	}
+
+	// 모든 객체의 기하 정보를 저장함
+	for (xx = 0; xx < elemList.GetSize(); ++xx) {
+		BNZeroMemory(&elem, sizeof(API_Element));
+		elem.header.guid = elemList[xx];
+		ACAPI_Element_Get(&elem);
+		ACAPI_Element_Get3DInfo(elem.header, &info3D);
+
+		Rect object;
+		object.guid = elemList[xx];
+		object.x = info3D.bounds.xMin;
+		object.y = info3D.bounds.yMin;
+		object.z = info3D.bounds.zMin;
+		object.horLen = info3D.bounds.xMax - info3D.bounds.xMin;
+		object.verLen = info3D.bounds.yMax - info3D.bounds.yMin;
+		object.height = info3D.bounds.zMax - info3D.bounds.zMin;
+		object.radAng = 0;
+
+		// !!! 좌표 및 크기 정보가 올바르지 않은 것 같다
+		//if (xx == 0) {
+		//	placeCoordinateLabel(object.x, object.y, object.z);
+		//	placeCoordinateLabel(object.x + object.horLen, object.y + object.verLen, object.z + object.height);
+		//}
+
+		allObjectList.Push(object);
+	}
+
+	// 충돌 요소 찾기
+	for (xx = 0; xx < allObjectList.GetSize(); xx++) {
+		for (yy = xx + 1; yy < allObjectList.GetSize(); yy++) {
+			if (checkIntersect(allObjectList[xx], allObjectList[yy]) == TRUE) {
+				interferenceObjectList.Push(allObjectList[xx].guid);
+				interferenceObjectList.Push(allObjectList[yy].guid);
+			}
+		}
+	}
+
+	// 중복된 요소 제거하기
+	// !!!
+
+	// 충돌 요소 선택하기
+	selectElements(interferenceObjectList);
+
+	//DGAlert(DG_INFORMATION, L"알림", L"간섭이 발생하는 요소들을 선택하였습니다.", "", L"확인", "", "");
+	
+	// 그룹화 일시정지 OFF
+	suspendGroups(false);
 
 	return err;
+}
+
+// 두 객체 간에 충돌이 발생하면 0, 충돌하지 않으면 0, 입력이 유효하지 않으면 -1
+int checkIntersect(Rect rect1, Rect rect2) {
+	// 1. 좌표 변환
+	double x1, y1, z1, x2, y2, z2;
+	double w1 = rect1.horLen, h1 = rect1.verLen, d1 = rect1.height;
+	double w2 = rect2.horLen, h2 = rect2.verLen, d2 = rect2.height;
+	double cosa1 = cos(rect1.radAng), sina1 = sin(rect1.radAng);
+	double cosa2 = cos(rect2.radAng), sina2 = sin(rect2.radAng);
+	x1 = rect1.x;
+	y1 = rect1.y;
+	z1 = rect1.z;
+	x2 = rect2.x;
+	y2 = rect2.y;
+	z2 = rect2.z;
+
+	// 2. 두 사각형의 유효성 확인
+	if (w1 <= EPS || h1 <= EPS || d1 <= EPS || w2 <= EPS || h2 <= EPS || d2 <= EPS) {
+		return -1;	// 유효하지 않은 직육면체입니다.
+	}
+
+	// 3. 두 사각형의 x, y, z축 별 적절한 변환
+	double minx1 = x1 - (w1/2.0)*cosa1, miny1 = y1 - (w1/2.0)*sina1;
+	double maxx1 = x1 + (w1/2.0)*cosa1, maxy1 = y1 + (w1/2.0)*sina1;
+	double minx2 = x2 - (w2/2.0)*cosa2, miny2 = y2 - (w2/2.0)*sina2;
+	double maxx2 = x2 + (w2/2.0)*cosa2, maxy2 = y2 + (w2/2.0)*sina2;
+
+	// 4. 두 객체가 x-y 평면에서 충돌하는지 검사
+	if (maxx1 < minx2 || minx1 > maxx2) return 0;
+	if (maxy1 < miny2 || miny1 > maxy2) return 0;
+
+	// 5. z축 방향으로도 충돌하는지 검사
+	double z1_max = z1 + d1/2.0;
+	double z1_min = z1 - d1/2.0;
+	double z2_max = z2 + d2/2.0;
+	double z2_min = z2 - d2/2.0;
+
+	if (z1_max < z2_min || z1_min > z2_max)
+		return 0;
+
+	return 1;	// 두 객체가 충돌합니다.
 }

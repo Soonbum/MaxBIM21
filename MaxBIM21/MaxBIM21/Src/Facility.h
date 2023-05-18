@@ -47,6 +47,17 @@ struct CircularBubble
 	double	lenWithdrawal;	// 인출선 길이 (오프셋)
 };
 
+struct Rect {
+	API_Guid guid;	// 객체의 GUID
+	double x;		// 원점의 x 좌표
+	double y;		// 원점의 y 좌표
+	double z;		// 원점의 z 좌표
+	double horLen;	// 가로 길이
+	double verLen;	// 세로 길이
+	double height;	// 높이
+	double radAng;	// 회전 각도
+};
+
 GSErrCode	select3DQuality (void);					// 3D 품질/속도 조정하기
 GSErrCode	attach3DLabelOnZone (void);				// 영역에 3D 라벨 붙이기
 short DGCALLBACK selectLayerHandler (short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);	// [다이얼로그 박스] 레이어 선택
@@ -60,5 +71,6 @@ GSErrCode	manageCameraInfo (void);				// 카메라 위치 저장하기/불러오기
 short DGCALLBACK cameraPosManagerHandler (short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);	// [다이얼로그 박스] 카메라 위치 관리하기
 
 GSErrCode	interferenceCheck(void);				// 간섭 체크 발견하기
+int checkIntersect(Rect rect1, Rect rect2);			// 두 객체 간에 충돌이 발생하면 0, 충돌하지 않으면 0, 입력이 유효하지 않으면 -1
 
 #endif
