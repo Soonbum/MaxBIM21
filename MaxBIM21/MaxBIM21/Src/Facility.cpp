@@ -1241,32 +1241,34 @@ GSErrCode	interferenceCheck(void)
 		object.height = info3D.bounds.zMax - info3D.bounds.zMin;
 		object.radAng = 0;
 
-		// !!! 좌표 및 크기 정보가 올바르지 않은 것 같다
-		//if (xx == 0) {
-		//	placeCoordinateLabel(object.x, object.y, object.z);
-		//	placeCoordinateLabel(object.x + object.horLen, object.y + object.verLen, object.z + object.height);
-		//}
+		// 크기가 0이면 생략
+		if ((abs(object.horLen) < EPS) | (abs(object.verLen) < EPS) | (abs(object.height) < EPS))
+			continue;
 
-		allObjectList.Push(object);
+		// 중복 요소는 넣지 않음
+		bool bSameObjectDetected = false;
+		for (yy = 0; yy < allObjectList.GetSize(); yy++) {
+			if (allObjectList[yy].guid == object.guid) {
+				bSameObjectDetected = true;
+				break;
+			}
+		}
+		if (bSameObjectDetected == false)
+			allObjectList.Push(object);
 	}
-
+		
 	// 충돌 요소 찾기
-	for (xx = 0; xx < allObjectList.GetSize(); xx++) {
+	for (xx = 0; xx < allObjectList.GetSize() - 1; xx++) {
 		for (yy = xx + 1; yy < allObjectList.GetSize(); yy++) {
-			if (checkIntersect(allObjectList[xx], allObjectList[yy]) == TRUE) {
+			if (checkIntersect(allObjectList[xx], allObjectList[yy]) == 1) {
 				interferenceObjectList.Push(allObjectList[xx].guid);
 				interferenceObjectList.Push(allObjectList[yy].guid);
 			}
 		}
 	}
 
-	// 중복된 요소 제거하기
-	// !!!
-
 	// 충돌 요소 선택하기
 	selectElements(interferenceObjectList);
-
-	//DGAlert(DG_INFORMATION, L"알림", L"간섭이 발생하는 요소들을 선택하였습니다.", "", L"확인", "", "");
 	
 	// 그룹화 일시정지 OFF
 	suspendGroups(false);
@@ -1274,44 +1276,28 @@ GSErrCode	interferenceCheck(void)
 	return err;
 }
 
-// 두 객체 간에 충돌이 발생하면 0, 충돌하지 않으면 0, 입력이 유효하지 않으면 -1
+// 두 객체 간에 충돌이 발생하면 1, 충돌하지 않으면 0, 입력이 유효하지 않으면 -1
 int checkIntersect(Rect rect1, Rect rect2) {
-	// 1. 좌표 변환
-	double x1, y1, z1, x2, y2, z2;
-	double w1 = rect1.horLen, h1 = rect1.verLen, d1 = rect1.height;
-	double w2 = rect2.horLen, h2 = rect2.verLen, d2 = rect2.height;
-	double cosa1 = cos(rect1.radAng), sina1 = sin(rect1.radAng);
-	double cosa2 = cos(rect2.radAng), sina2 = sin(rect2.radAng);
-	x1 = rect1.x;
-	y1 = rect1.y;
-	z1 = rect1.z;
-	x2 = rect2.x;
-	y2 = rect2.y;
-	z2 = rect2.z;
+	double minx1 = rect1.x;
+	double maxx1 = rect1.x + rect1.horLen;
+	double miny1 = rect1.y;
+	double maxy1 = rect1.y + rect1.verLen;
+	double minz1 = rect1.z;
+	double maxz1 = rect1.z + rect1.height;
 
-	// 2. 두 사각형의 유효성 확인
-	if (w1 <= EPS || h1 <= EPS || d1 <= EPS || w2 <= EPS || h2 <= EPS || d2 <= EPS) {
+	double minx2 = rect2.x;
+	double maxx2 = rect2.x + rect2.horLen;
+	double miny2 = rect2.y;
+	double maxy2 = rect2.y + rect2.verLen;
+	double minz2 = rect2.z;
+	double maxz2 = rect2.z + rect2.height;
+
+	if ((abs(maxx1 - minx1) < EPS) || (abs(maxy1 - miny1) < EPS) || (abs(maxy1 - miny1) < EPS) || (abs(maxx2 - minx2) < EPS) || (abs(maxy2 - miny2) < EPS) || (abs(maxy2 - miny2) < EPS)) {
 		return -1;	// 유효하지 않은 직육면체입니다.
 	}
 
-	// 3. 두 사각형의 x, y, z축 별 적절한 변환
-	double minx1 = x1 - (w1/2.0)*cosa1, miny1 = y1 - (w1/2.0)*sina1;
-	double maxx1 = x1 + (w1/2.0)*cosa1, maxy1 = y1 + (w1/2.0)*sina1;
-	double minx2 = x2 - (w2/2.0)*cosa2, miny2 = y2 - (w2/2.0)*sina2;
-	double maxx2 = x2 + (w2/2.0)*cosa2, maxy2 = y2 + (w2/2.0)*sina2;
+	if ((maxx1 < minx2 || minx1 > maxx2) || (maxy1 < miny2 || miny1 > maxy2) || (maxz1 < minz2 || minz1 > maxz2))
+				return 0;
 
-	// 4. 두 객체가 x-y 평면에서 충돌하는지 검사
-	if (maxx1 < minx2 || minx1 > maxx2) return 0;
-	if (maxy1 < miny2 || miny1 > maxy2) return 0;
-
-	// 5. z축 방향으로도 충돌하는지 검사
-	double z1_max = z1 + d1/2.0;
-	double z1_min = z1 - d1/2.0;
-	double z2_max = z2 + d2/2.0;
-	double z2_min = z2 - d2/2.0;
-
-	if (z1_max < z2_min || z1_min > z2_max)
-		return 0;
-
-	return 1;	// 두 객체가 충돌합니다.
+	return 1;
 }
