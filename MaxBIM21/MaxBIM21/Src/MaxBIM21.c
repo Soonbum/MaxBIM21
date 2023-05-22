@@ -238,6 +238,14 @@ GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 						return err;
 					});
 					break;
+				case 6:		// 여러 객체 동시에 회전시키기
+					// !!!
+					/*
+					* 1. 호를 그리는 인터페이스 함수 구현하기 -> 중심점 찍고 시작점과 끝점을 찍으면, 원점과 회전각도(+ 또는 -) 값을 얻을 수 있음
+					* 2. 선택한 객체들의 GUID를 수집함
+					* 3. 객체를 원점으로 이동시킨 후, 회전각도만큼 회전시키고 다시 이동한 만큼 원래 자리로 이동한다.
+					*/
+					break;
 			}
 			break;
 	}
