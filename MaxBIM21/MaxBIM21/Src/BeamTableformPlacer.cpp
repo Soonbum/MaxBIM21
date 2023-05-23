@@ -336,7 +336,7 @@ SECOND:
 	// [DIALOG] 2번째 다이얼로그에서 유로폼 배치를 수정합니다.
 	clickedOKButton = false;
 	clickedPrevButton = false;
-	result = DGBlankModalDialog (500, 360, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, beamTableformPlacerHandler2, 0);
+	result = DGBlankModalDialog (600, 360, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, beamTableformPlacerHandler2, 0);
 	//
 	// 이전 버튼을 누르면 1번째 다이얼로그 다시 실행
 	if (clickedPrevButton == true)
@@ -838,13 +838,26 @@ GSErrCode	BeamTableformPlacingZone::placeBasicObjects (BeamTableformPlacingZone*
 
 		if ((placingZone->cellsAtLSide [0][xx].objType == EUROFORM) && (placingZone->cellsAtLSide [0][xx].perLen > EPS) && (placingZone->cellsAtLSide [0][xx].dirLen > EPS)) {
 			moveIn3DSlope ('x', euroform.radAng, placingZone->slantAngle, placingZone->cellsAtLSide [0][xx].dirLen, &euroform.posX, &euroform.posY, &euroform.posZ);
-			elemList_Tableform [getAreaSeqNumOfCell (placingZone, true, true, xx)].Push (euroform.placeObject (6,
-				"eu_stan_onoff", APIParT_Boolean, "1.0",
-				"eu_wid", APIParT_CString, format_string ("%.0f", placingZone->cellsAtLSide [0][xx].perLen * 1000.0).c_str(),
-				"eu_hei", APIParT_CString, format_string ("%.0f", placingZone->cellsAtLSide [0][xx].dirLen * 1000.0).c_str(),
-				"u_ins", APIParT_CString, "벽눕히기",
-				"ang_x", APIParT_Angle, format_string ("%f", DegreeToRad (90.0)).c_str(),
-				"ang_y", APIParT_Angle, format_string ("%f", DegreeToRad (90.0) + placingZone->slantAngle).c_str()));
+
+			double dirLen = placingZone->cellsAtLSide[0][xx].dirLen;
+			if ((abs(dirLen - 1.200) < EPS) || (abs(dirLen - 0.900) < EPS) || (abs(dirLen - 0.600) < EPS)) {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObject(6,
+					"eu_stan_onoff", APIParT_Boolean, "1.0",
+					"eu_wid", APIParT_CString, format_string("%.0f", placingZone->cellsAtLSide[0][xx].perLen * 1000.0).c_str(),
+					"eu_hei", APIParT_CString, format_string("%.0f", placingZone->cellsAtLSide[0][xx].dirLen * 1000.0).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
+			else {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObject(6,
+					"eu_stan_onoff", APIParT_Boolean, "0.0",
+					"eu_wid2", APIParT_Length, format_string("%f", placingZone->cellsAtLSide[0][xx].perLen).c_str(),
+					"eu_hei2", APIParT_Length, format_string("%f", placingZone->cellsAtLSide[0][xx].dirLen).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
 		}
 	}
 
@@ -896,13 +909,26 @@ GSErrCode	BeamTableformPlacingZone::placeBasicObjects (BeamTableformPlacingZone*
 
 		if ((placingZone->cellsAtLSide [2][xx].objType == EUROFORM) && (placingZone->cellsAtLSide [2][xx].perLen > EPS) && (placingZone->cellsAtLSide [2][xx].dirLen > EPS)) {
 			moveIn3DSlope ('x', euroform.radAng, placingZone->slantAngle, placingZone->cellsAtLSide [2][xx].dirLen, &euroform.posX, &euroform.posY, &euroform.posZ);
-			elemList_Tableform [getAreaSeqNumOfCell (placingZone, true, true, xx)].Push (euroform.placeObject (6,
-				"eu_stan_onoff", APIParT_Boolean, "1.0",
-				"eu_wid", APIParT_CString, format_string ("%.0f", placingZone->cellsAtLSide [2][xx].perLen * 1000.0).c_str(),
-				"eu_hei", APIParT_CString, format_string ("%.0f", placingZone->cellsAtLSide [2][xx].dirLen * 1000.0).c_str(),
-				"u_ins", APIParT_CString, "벽눕히기",
-				"ang_x", APIParT_Angle, format_string ("%f", DegreeToRad (90.0)).c_str(),
-				"ang_y", APIParT_Angle, format_string ("%f", DegreeToRad (90.0) + placingZone->slantAngle).c_str()));
+
+			double dirLen = placingZone->cellsAtLSide[2][xx].dirLen;
+			if ((abs(dirLen - 1.200) < EPS) || (abs(dirLen - 0.900) < EPS) || (abs(dirLen - 0.600) < EPS)) {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObject(6,
+					"eu_stan_onoff", APIParT_Boolean, "1.0",
+					"eu_wid", APIParT_CString, format_string("%.0f", placingZone->cellsAtLSide[2][xx].perLen * 1000.0).c_str(),
+					"eu_hei", APIParT_CString, format_string("%.0f", placingZone->cellsAtLSide[2][xx].dirLen * 1000.0).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
+			else {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObject(6,
+					"eu_stan_onoff", APIParT_Boolean, "0.0",
+					"eu_wid2", APIParT_Length, format_string("%f", placingZone->cellsAtLSide[2][xx].perLen).c_str(),
+					"eu_hei2", APIParT_Length, format_string("%f", placingZone->cellsAtLSide[2][xx].dirLen).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
 		}
 	}
 
@@ -1101,13 +1127,26 @@ GSErrCode	BeamTableformPlacingZone::placeBasicObjects (BeamTableformPlacingZone*
 		if ((placingZone->cellsAtRSide [0][xx].objType == EUROFORM) && (placingZone->cellsAtRSide [0][xx].perLen > EPS) && (placingZone->cellsAtRSide [0][xx].dirLen > EPS)) {
 			moveIn3DSlope ('x', euroform.radAng, placingZone->slantAngle, placingZone->cellsAtRSide [0][xx].dirLen, &euroform.posX, &euroform.posY, &euroform.posZ);
 			euroform.radAng += DegreeToRad (180.0);
-			elemList_Tableform [getAreaSeqNumOfCell (placingZone, true, true, xx)].Push (euroform.placeObjectMirrored (6,
-				"eu_stan_onoff", APIParT_Boolean, "1.0",
-				"eu_wid", APIParT_CString, format_string ("%.0f", placingZone->cellsAtRSide [0][xx].perLen * 1000.0).c_str(),
-				"eu_hei", APIParT_CString, format_string ("%.0f", placingZone->cellsAtRSide [0][xx].dirLen * 1000.0).c_str(),
-				"u_ins", APIParT_CString, "벽눕히기",
-				"ang_x", APIParT_Angle, format_string ("%f", DegreeToRad (90.0)).c_str(),
-				"ang_y", APIParT_Angle, format_string ("%f", DegreeToRad (90.0) + placingZone->slantAngle).c_str()));
+
+			double dirLen = placingZone->cellsAtRSide[0][xx].dirLen;
+			if ((abs(dirLen - 1.200) < EPS) || (abs(dirLen - 0.900) < EPS) || (abs(dirLen - 0.600) < EPS)) {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObjectMirrored(6,
+					"eu_stan_onoff", APIParT_Boolean, "1.0",
+					"eu_wid", APIParT_CString, format_string("%.0f", placingZone->cellsAtRSide[0][xx].perLen * 1000.0).c_str(),
+					"eu_hei", APIParT_CString, format_string("%.0f", placingZone->cellsAtRSide[0][xx].dirLen * 1000.0).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
+			else {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObjectMirrored(6,
+					"eu_stan_onoff", APIParT_Boolean, "0.0",
+					"eu_wid2", APIParT_Length, format_string("%f", placingZone->cellsAtRSide[0][xx].perLen).c_str(),
+					"eu_hei2", APIParT_Length, format_string("%f", placingZone->cellsAtRSide[0][xx].dirLen).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
 		}
 	}
 
@@ -1162,13 +1201,26 @@ GSErrCode	BeamTableformPlacingZone::placeBasicObjects (BeamTableformPlacingZone*
 		if ((placingZone->cellsAtRSide [2][xx].objType == EUROFORM) && (placingZone->cellsAtRSide [2][xx].perLen > EPS) && (placingZone->cellsAtRSide [2][xx].dirLen > EPS)) {
 			moveIn3DSlope ('x', euroform.radAng, placingZone->slantAngle, placingZone->cellsAtRSide [2][xx].dirLen, &euroform.posX, &euroform.posY, &euroform.posZ);
 			euroform.radAng += DegreeToRad (180.0);
-			elemList_Tableform [getAreaSeqNumOfCell (placingZone, true, true, xx)].Push (euroform.placeObjectMirrored (6,
-				"eu_stan_onoff", APIParT_Boolean, "1.0",
-				"eu_wid", APIParT_CString, format_string ("%.0f", placingZone->cellsAtRSide [2][xx].perLen * 1000.0).c_str(),
-				"eu_hei", APIParT_CString, format_string ("%.0f", placingZone->cellsAtRSide [2][xx].dirLen * 1000.0).c_str(),
-				"u_ins", APIParT_CString, "벽눕히기",
-				"ang_x", APIParT_Angle, format_string ("%f", DegreeToRad (90.0)).c_str(),
-				"ang_y", APIParT_Angle, format_string ("%f", DegreeToRad (90.0) + placingZone->slantAngle).c_str()));
+
+			double dirLen = placingZone->cellsAtRSide[2][xx].dirLen;
+			if ((abs(dirLen - 1.200) < EPS) || (abs(dirLen - 0.900) < EPS) || (abs(dirLen - 0.600) < EPS)) {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObjectMirrored(6,
+					"eu_stan_onoff", APIParT_Boolean, "1.0",
+					"eu_wid", APIParT_CString, format_string("%.0f", placingZone->cellsAtRSide[2][xx].perLen * 1000.0).c_str(),
+					"eu_hei", APIParT_CString, format_string("%.0f", placingZone->cellsAtRSide[2][xx].dirLen * 1000.0).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
+			else {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObjectMirrored(6,
+					"eu_stan_onoff", APIParT_Boolean, "0.0",
+					"eu_wid2", APIParT_Length, format_string("%f", placingZone->cellsAtRSide[2][xx].perLen).c_str(),
+					"eu_hei2", APIParT_Length, format_string("%f", placingZone->cellsAtRSide[2][xx].dirLen).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(90.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
 		}
 	}
 
@@ -1377,13 +1429,26 @@ GSErrCode	BeamTableformPlacingZone::placeBasicObjects (BeamTableformPlacingZone*
 		if ((placingZone->cellsAtBottom [0][xx].objType == EUROFORM) && (placingZone->cellsAtBottom [0][xx].perLen > EPS) && (placingZone->cellsAtBottom [0][xx].dirLen > EPS)) {
 			moveIn3DSlope ('x', euroform.radAng, placingZone->slantAngle, placingZone->cellsAtBottom [0][xx].dirLen, &euroform.posX, &euroform.posY, &euroform.posZ);
 			moveIn3D ('y', euroform.radAng, placingZone->cellsAtBottom [0][xx].perLen, &euroform.posX, &euroform.posY, &euroform.posZ);
-			elemList_Tableform [getAreaSeqNumOfCell (placingZone, true, true, xx)].Push (euroform.placeObject (6,
-				"eu_stan_onoff", APIParT_Boolean, "1.0",
-				"eu_wid", APIParT_CString, format_string ("%.0f", placingZone->cellsAtBottom [0][xx].perLen * 1000.0).c_str(),
-				"eu_hei", APIParT_CString, format_string ("%.0f", placingZone->cellsAtBottom [0][xx].dirLen * 1000.0).c_str(),
-				"u_ins", APIParT_CString, "벽눕히기",
-				"ang_x", APIParT_Angle, format_string ("%f", DegreeToRad (0.0)).c_str(),
-				"ang_y", APIParT_Angle, format_string ("%f", DegreeToRad (90.0) + placingZone->slantAngle).c_str()));
+
+			double dirLen = placingZone->cellsAtBottom[0][xx].dirLen;
+			if ((abs(dirLen - 1.200) < EPS) || (abs(dirLen - 0.900) < EPS) || (abs(dirLen - 0.600) < EPS)) {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObject(6,
+					"eu_stan_onoff", APIParT_Boolean, "1.0",
+					"eu_wid", APIParT_CString, format_string("%.0f", placingZone->cellsAtBottom[0][xx].perLen * 1000.0).c_str(),
+					"eu_hei", APIParT_CString, format_string("%.0f", placingZone->cellsAtBottom[0][xx].dirLen * 1000.0).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
+			else {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObject(6,
+					"eu_stan_onoff", APIParT_Boolean, "0.0",
+					"eu_wid2", APIParT_Length, format_string("%f", placingZone->cellsAtBottom[0][xx].perLen).c_str(),
+					"eu_hei2", APIParT_Length, format_string("%f", placingZone->cellsAtBottom[0][xx].dirLen).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
 		}
 	}
 
@@ -1438,13 +1503,26 @@ GSErrCode	BeamTableformPlacingZone::placeBasicObjects (BeamTableformPlacingZone*
 		if ((placingZone->cellsAtBottom [2][xx].objType == EUROFORM) && (placingZone->cellsAtBottom [2][xx].perLen > EPS) && (placingZone->cellsAtBottom [2][xx].dirLen > EPS)) {
 			moveIn3DSlope ('x', euroform.radAng, placingZone->slantAngle, placingZone->cellsAtBottom [2][xx].dirLen, &euroform.posX, &euroform.posY, &euroform.posZ);
 			moveIn3D ('y', euroform.radAng, placingZone->cellsAtBottom [2][xx].perLen, &euroform.posX, &euroform.posY, &euroform.posZ);
-			elemList_Tableform [getAreaSeqNumOfCell (placingZone, true, true, xx)].Push (euroform.placeObject (6,
-				"eu_stan_onoff", APIParT_Boolean, "1.0",
-				"eu_wid", APIParT_CString, format_string ("%.0f", placingZone->cellsAtBottom [2][xx].perLen * 1000.0).c_str(),
-				"eu_hei", APIParT_CString, format_string ("%.0f", placingZone->cellsAtBottom [2][xx].dirLen * 1000.0).c_str(),
-				"u_ins", APIParT_CString, "벽눕히기",
-				"ang_x", APIParT_Angle, format_string ("%f", DegreeToRad (0.0)).c_str(),
-				"ang_y", APIParT_Angle, format_string ("%f", DegreeToRad (90.0) + placingZone->slantAngle).c_str()));
+
+			double dirLen = placingZone->cellsAtBottom[2][xx].dirLen;
+			if ((abs(dirLen - 1.200) < EPS) || (abs(dirLen - 0.900) < EPS) || (abs(dirLen - 0.600) < EPS)) {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObject(6,
+					"eu_stan_onoff", APIParT_Boolean, "1.0",
+					"eu_wid", APIParT_CString, format_string("%.0f", placingZone->cellsAtBottom[2][xx].perLen * 1000.0).c_str(),
+					"eu_hei", APIParT_CString, format_string("%.0f", placingZone->cellsAtBottom[2][xx].dirLen * 1000.0).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
+			else {
+				elemList_Tableform[getAreaSeqNumOfCell(placingZone, true, true, xx)].Push(euroform.placeObject(6,
+					"eu_stan_onoff", APIParT_Boolean, "0.0",
+					"eu_wid2", APIParT_Length, format_string("%f", placingZone->cellsAtBottom[2][xx].perLen).c_str(),
+					"eu_hei2", APIParT_Length, format_string("%f", placingZone->cellsAtBottom[2][xx].dirLen).c_str(),
+					"u_ins", APIParT_CString, "벽눕히기",
+					"ang_x", APIParT_Angle, format_string("%f", DegreeToRad(0.0)).c_str(),
+					"ang_y", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str()));
+			}
 		}
 	}
 
@@ -6620,7 +6698,7 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 	short	itmPosX, itmPosY;
 	double	lengthDouble;
 	const short		maxCol = 50;		// 열 최대 개수
-	static short	dialogSizeX = 500;	// 현재 다이얼로그 크기 X
+	static short	dialogSizeX = 600;	// 현재 다이얼로그 크기 X
 	static short	dialogSizeY = 360;	// 현재 다이얼로그 크기 Y
 
 	switch (message) {
@@ -6714,7 +6792,7 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 			DGShowItem (dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END);
 			DGSetItemMinDouble (dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END, 0.090);
 			DGSetItemMaxDouble (dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END, 2.440);
-			DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END, 0.200);
+			DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END, 0.150);
 
 			// 일반 셀: 기본값은 유로폼
 			itmPosX = 120+70;
@@ -6745,20 +6823,31 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 				DGPopUpInsertItem (dialogID, placingZone.POPUP_WIDTH [xx], DG_POPUP_BOTTOM);
 				DGPopUpSetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DG_POPUP_BOTTOM, "1200");
 				DGPopUpInsertItem (dialogID, placingZone.POPUP_WIDTH [xx], DG_POPUP_BOTTOM);
+				DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM, "1050");
+				DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM);
 				DGPopUpSetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DG_POPUP_BOTTOM, "900");
 				DGPopUpInsertItem (dialogID, placingZone.POPUP_WIDTH [xx], DG_POPUP_BOTTOM);
+				DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM, "750");
+				DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM);
 				DGPopUpSetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DG_POPUP_BOTTOM, "600");
 				DGPopUpInsertItem (dialogID, placingZone.POPUP_WIDTH [xx], DG_POPUP_BOTTOM);
-				DGPopUpSetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DG_POPUP_BOTTOM, "0");
+				DGPopUpSetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DG_POPUP_BOTTOM, L"기타");
 				DGPopUpSelectItem (dialogID, placingZone.POPUP_WIDTH [xx], DG_POPUP_TOP);
 				DGShowItem (dialogID, placingZone.POPUP_WIDTH [xx]);
+
+				placingZone.EDITCONTROL_WIDTH_EUROFORM[xx] = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, itmPosY + 68 + 25, 70, 23);
+				DGShowItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+				DGDisableItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+				DGSetItemMinDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 0.050);
+				DGSetItemMaxDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 1.500);
+				DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 0.150);
 
 				// 너비 (Edit컨트롤컨트롤) - 처음에는 숨김
 				placingZone.EDITCONTROL_WIDTH [xx] = DGAppendDialogItem (dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, itmPosY + 68, 70, 23);
 				DGHideItem (dialogID, placingZone.EDITCONTROL_WIDTH [xx]);
 				DGSetItemMinDouble (dialogID, placingZone.EDITCONTROL_WIDTH [xx], 0.090);
 				DGSetItemMaxDouble (dialogID, placingZone.EDITCONTROL_WIDTH [xx], 2.440);
-				DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_WIDTH [xx], 0.200);
+				DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_WIDTH [xx], 0.150);
 
 				itmPosX += 70;
 			}
@@ -6774,7 +6863,7 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 			DGShowItem (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END);
 			DGSetItemMinDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 0.090);
 			DGSetItemMaxDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 2.440);
-			DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 0.200);
+			DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 0.150);
 
 			// 총 길이, 남은 길이 표시
 			DGSetItemValDouble (dialogID, EDITCONTROL_TOTAL_LENGTH, placingZone.beamLength);
@@ -6792,7 +6881,7 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 			DGDisableItem (dialogID, EDITCONTROL_REMAIN_LENGTH);
 
 			// 다이얼로그 크기 설정
-			dialogSizeX = 500;
+			dialogSizeX = 600;
 			dialogSizeY = 360;
 			if (placingZone.nCells >= 4) {
 				DGSetDialogSize (dialogID, DG_CLIENT, dialogSizeX + 70 * (placingZone.nCells - 3), dialogSizeY, DG_TOPLEFT, true);
@@ -6801,7 +6890,6 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 			break;
 
 		case DG_MSG_CHANGE:
-
 			// 여백 채우기 버튼 체크 유무
 			if (DGGetItemValLong (dialogID, placingZone.CHECKBOX_MARGIN_LEFT_END) == TRUE)
 				DGEnableItem (dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END);
@@ -6821,16 +6909,27 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 
 					// 없음이면 모두 숨김, 유로폼이면 팝업 표시, 합판이면 Edit컨트롤 표시
 					if (DGPopUpGetSelected (dialogID, placingZone.POPUP_OBJ_TYPE [xx]) == NONE + 1) {
-						DGHideItem (dialogID, placingZone.POPUP_WIDTH [xx]);
-						DGHideItem (dialogID, placingZone.EDITCONTROL_WIDTH [xx]);
+						DGHideItem(dialogID, placingZone.POPUP_WIDTH [xx]);
+						DGHideItem(dialogID, placingZone.EDITCONTROL_WIDTH [xx]);
+						DGHideItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
 					} else if (DGPopUpGetSelected (dialogID, placingZone.POPUP_OBJ_TYPE [xx]) == EUROFORM + 1) {
-						DGShowItem (dialogID, placingZone.POPUP_WIDTH [xx]);
-						DGHideItem (dialogID, placingZone.EDITCONTROL_WIDTH [xx]);
+						DGShowItem(dialogID, placingZone.POPUP_WIDTH [xx]);
+						DGHideItem(dialogID, placingZone.EDITCONTROL_WIDTH [xx]);
+						DGShowItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
 					} else if (DGPopUpGetSelected (dialogID, placingZone.POPUP_OBJ_TYPE [xx]) == PLYWOOD + 1) {
-						DGHideItem (dialogID, placingZone.POPUP_WIDTH [xx]);
-						DGShowItem (dialogID, placingZone.EDITCONTROL_WIDTH [xx]);
+						DGHideItem(dialogID, placingZone.POPUP_WIDTH [xx]);
+						DGShowItem(dialogID, placingZone.EDITCONTROL_WIDTH [xx]);
+						DGHideItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
 					}
 				}
+			}
+
+			// 유로폼의 너비 항목 변경시
+			for (xx = 0; xx < placingZone.nCells; ++xx) {
+				if (DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx]) == 6)
+					DGEnableItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+				else
+					DGDisableItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
 			}
 
 			// 남은 길이 표시
@@ -6838,8 +6937,12 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 			if (DGGetItemValLong (dialogID, placingZone.CHECKBOX_MARGIN_LEFT_END) == TRUE)	lengthDouble -= DGGetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END);
 			if (DGGetItemValLong (dialogID, placingZone.CHECKBOX_MARGIN_RIGHT_END) == TRUE)	lengthDouble -= DGGetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END);
 			for (xx = 0 ; xx < placingZone.nCells ; ++xx) {
-				if (DGPopUpGetSelected (dialogID, placingZone.POPUP_OBJ_TYPE [xx]) == EUROFORM + 1)
-					lengthDouble -= atof (DGPopUpGetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DGPopUpGetSelected (dialogID, placingZone.POPUP_WIDTH [xx])).ToCStr ().Get ()) / 1000.0;
+				if (DGPopUpGetSelected(dialogID, placingZone.POPUP_OBJ_TYPE[xx]) == EUROFORM + 1) {
+					if (DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx]) == 6)
+						lengthDouble -= DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+					else
+						lengthDouble -= atof(DGPopUpGetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx])).ToCStr().Get()) / 1000.0;
+				}
 				else if (DGPopUpGetSelected (dialogID, placingZone.POPUP_OBJ_TYPE [xx]) == PLYWOOD + 1)
 					lengthDouble -= DGGetItemValDouble (dialogID, placingZone.EDITCONTROL_WIDTH [xx]);
 			}
@@ -6924,7 +7027,10 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 							placingZone.cellsAtBottom [2][xx].perLen = 0.0;
 
 						} else if (DGPopUpGetSelected (dialogID, placingZone.POPUP_OBJ_TYPE [xx]) == EUROFORM + 1) {
-							lengthDouble = atof (DGPopUpGetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DGPopUpGetSelected (dialogID, placingZone.POPUP_WIDTH [xx])).ToCStr ().Get ()) / 1000.0;
+							if (DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx]) == 6)
+								lengthDouble = DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+							else
+								lengthDouble = atof (DGPopUpGetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DGPopUpGetSelected (dialogID, placingZone.POPUP_WIDTH [xx])).ToCStr ().Get ()) / 1000.0;
 
 							placingZone.cellsAtLSide [0][xx].dirLen = lengthDouble;
 							placingZone.cellsAtLSide [1][xx].dirLen = lengthDouble;
@@ -7021,20 +7127,31 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 						DGSetItemFont (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_IS_LARGE | DG_IS_PLAIN);
 						DGPopUpInsertItem (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_POPUP_BOTTOM);
 						DGPopUpSetItemText (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_POPUP_BOTTOM, "1200");
+						DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[placingZone.nCells], DG_POPUP_BOTTOM);
+						DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[placingZone.nCells], DG_POPUP_BOTTOM, "1050");
 						DGPopUpInsertItem (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_POPUP_BOTTOM);
 						DGPopUpSetItemText (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_POPUP_BOTTOM, "900");
+						DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[placingZone.nCells], DG_POPUP_BOTTOM);
+						DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[placingZone.nCells], DG_POPUP_BOTTOM, "750");
 						DGPopUpInsertItem (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_POPUP_BOTTOM);
 						DGPopUpSetItemText (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_POPUP_BOTTOM, "600");
 						DGPopUpInsertItem (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_POPUP_BOTTOM);
-						DGPopUpSetItemText (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_POPUP_BOTTOM, "0");
+						DGPopUpSetItemText (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_POPUP_BOTTOM, L"기타");
 						DGPopUpSelectItem (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], DG_POPUP_TOP);
 						DGShowItem (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells]);
 						DGSetItemMinDouble (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], 0.090);
 						DGSetItemMaxDouble (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells], 2.440);
 
+						placingZone.EDITCONTROL_WIDTH_EUROFORM[placingZone.nCells] = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, itmPosY + 68 + 25, 70, 23);
+						DGShowItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[placingZone.nCells]);
+						DGDisableItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[placingZone.nCells]);
+						DGSetItemMinDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[placingZone.nCells], 0.050);
+						DGSetItemMaxDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[placingZone.nCells], 1.500);
+						DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[placingZone.nCells], 0.150);
+
 						// 너비 (Edit컨트롤) - 처음에는 숨김
 						placingZone.EDITCONTROL_WIDTH [placingZone.nCells] = DGAppendDialogItem (dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, itmPosY + 68, 70, 23);
-						DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_WIDTH [placingZone.nCells], 0.200);
+						DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_WIDTH [placingZone.nCells], 0.150);
 
 						itmPosX += 70;
 
@@ -7050,7 +7167,7 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 						DGShowItem (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END);
 						DGSetItemMinDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 0.090);
 						DGSetItemMaxDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 2.440);
-						DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 0.200);
+						DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 0.150);
 
 						++placingZone.nCells;
 						
@@ -7060,14 +7177,17 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 						if (DGGetItemValLong (dialogID, placingZone.CHECKBOX_MARGIN_RIGHT_END) == TRUE)	lengthDouble -= DGGetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END);
 						for (xx = 0 ; xx < placingZone.nCells ; ++xx) {
 							if (DGPopUpGetSelected (dialogID, placingZone.POPUP_OBJ_TYPE [xx]) == EUROFORM + 1)
-								lengthDouble -= atof (DGPopUpGetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DGPopUpGetSelected (dialogID, placingZone.POPUP_WIDTH [xx])).ToCStr ().Get ()) / 1000.0;
+								if (DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx]) == 6)
+									lengthDouble -= DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+								else
+									lengthDouble -= atof (DGPopUpGetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DGPopUpGetSelected (dialogID, placingZone.POPUP_WIDTH [xx])).ToCStr ().Get ()) / 1000.0;
 							else if (DGPopUpGetSelected (dialogID, placingZone.POPUP_OBJ_TYPE [xx]) == PLYWOOD + 1)
 								lengthDouble -= DGGetItemValDouble (dialogID, placingZone.EDITCONTROL_WIDTH [xx]);
 						}
 						DGSetItemValDouble (dialogID, EDITCONTROL_REMAIN_LENGTH, lengthDouble);
 
 						// 다이얼로그 크기 설정
-						dialogSizeX = 500;
+						dialogSizeX = 600;
 						dialogSizeY = 360;
 						if (placingZone.nCells >= 4) {
 							DGSetDialogSize (dialogID, DG_CLIENT, dialogSizeX + 70 * (placingZone.nCells - 3), dialogSizeY, DG_TOPLEFT, true);
@@ -7089,6 +7209,7 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 						DGRemoveDialogItem (dialogID, placingZone.POPUP_OBJ_TYPE [placingZone.nCells - 1]);
 						DGRemoveDialogItem (dialogID, placingZone.POPUP_WIDTH [placingZone.nCells - 1]);
 						DGRemoveDialogItem (dialogID, placingZone.EDITCONTROL_WIDTH [placingZone.nCells - 1]);
+						DGRemoveDialogItem (dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM [placingZone.nCells - 1]);
 
 						// 오른쪽 끝 여백 채우기 버튼을 오른쪽 끝에 붙임
 						itmPosX = 120+70 + (70 * (placingZone.nCells - 1));
@@ -7102,7 +7223,7 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 						// 오른쪽 끝 여백 길이 (Edit컨트롤)
 						placingZone.EDITCONTROL_MARGIN_RIGHT_END = DGAppendDialogItem (dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, 140, 70, 25);
 						DGShowItem (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END);
-						DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 0.200);
+						DGSetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 0.150);
 
 						--placingZone.nCells;
 
@@ -7111,15 +7232,18 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 						if (DGGetItemValLong (dialogID, placingZone.CHECKBOX_MARGIN_LEFT_END) == TRUE)	lengthDouble -= DGGetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END);
 						if (DGGetItemValLong (dialogID, placingZone.CHECKBOX_MARGIN_RIGHT_END) == TRUE)	lengthDouble -= DGGetItemValDouble (dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END);
 						for (xx = 0 ; xx < placingZone.nCells ; ++xx) {
-							if (DGPopUpGetSelected (dialogID, placingZone.POPUP_OBJ_TYPE [xx]) == EUROFORM + 1)
-								lengthDouble -= atof (DGPopUpGetItemText (dialogID, placingZone.POPUP_WIDTH [xx], DGPopUpGetSelected (dialogID, placingZone.POPUP_WIDTH [xx])).ToCStr ().Get ()) / 1000.0;
+							if (DGPopUpGetSelected(dialogID, placingZone.POPUP_OBJ_TYPE[xx]) == EUROFORM + 1)
+								if (DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx]) == 6)
+									lengthDouble -= DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+								else
+									lengthDouble -= atof(DGPopUpGetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx])).ToCStr().Get()) / 1000.0;
 							else if (DGPopUpGetSelected (dialogID, placingZone.POPUP_OBJ_TYPE [xx]) == PLYWOOD + 1)
 								lengthDouble -= DGGetItemValDouble (dialogID, placingZone.EDITCONTROL_WIDTH [xx]);
 						}
 						DGSetItemValDouble (dialogID, EDITCONTROL_REMAIN_LENGTH, lengthDouble);
 
 						// 다이얼로그 크기 설정
-						dialogSizeX = 500;
+						dialogSizeX = 600;
 						dialogSizeY = 360;
 						if (placingZone.nCells >= 4) {
 							DGSetDialogSize (dialogID, DG_CLIENT, dialogSizeX + 70 * (placingZone.nCells - 3), dialogSizeY, DG_TOPLEFT, true);
