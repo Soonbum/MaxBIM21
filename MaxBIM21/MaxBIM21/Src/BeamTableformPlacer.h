@@ -122,8 +122,25 @@ namespace beamTableformPlacerDG {
 		POPUP_TABLEFORM_TYPE,
 		BUTTON_ADD_COL,
 		BUTTON_DEL_COL,
+		BUTTON_AUTO_ARRAY,
 
 		AFTER_ALL
+	};
+
+	enum	idxItems_2_AutoArray_forBeamPlacer {
+		LABEL_CENTER_FILLER = 3,
+		POPUP_CENTER_FILLER_TYPE,
+		POPUP_CENTER_FILLER_LENGTH,
+		EDITCONTROL_CENTER_FILLER_LENGTH,
+		GROUPBOX_USE_EUROFORM,
+		CHECKBOX_USE_EUROFORM_1200,
+		CHECKBOX_USE_EUROFORM_1050,
+		CHECKBOX_USE_EUROFORM_0900,
+		CHECKBOX_USE_EUROFORM_0750,
+		CHECKBOX_USE_EUROFORM_0600,
+		CHECKBOX_USE_EUROFORM_ETC,
+		GROUPBOX_USE_PLYWOOD,
+		CHECKBOX_USE_PLYWOOD
 	};
 
 	enum	idxItems_3_forBeamPlacer {
@@ -194,6 +211,25 @@ namespace beamTableformPlacerDG {
 		EDITCONTROL_INS_VERLEN,
 	};
 }
+
+// 자동배치 정보
+struct AutoArray
+{
+	// 센터필러 타입 및 길이
+	short	centerFiller_objType;	// 센터필러 타입: 없음, 유로폼, 합판
+	double	centerFiller_length;	// 센터필러 길이
+
+	// 사용할 유로폼 길이
+	bool	bUseEuroform_1200;		// 유로폼 1200 사용 여부
+	bool	bUseEuroform_1050;		// 유로폼 1050 사용 여부
+	bool	bUseEuroform_0900;		// 유로폼 900 사용 여부
+	bool	bUseEuroform_0750;		// 유로폼 750 사용 여부
+	bool	bUseEuroform_0600;		// 유로폼 600 사용 여부
+	bool	bUseEuroform_etc;		// 이형 유로폼 사용 여부
+
+	// 합판 사용 여부
+	bool	bUsePlywood;			// 합판 사용 여부
+};
 
 // 단열재
 struct insulElemForBeamTableform
@@ -342,6 +378,7 @@ public:
 GSErrCode	placeTableformOnBeam (void);		// 보에 테이블폼을 배치하는 통합 루틴
 short DGCALLBACK beamTableformPlacerHandler1 (short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);	// 1차 배치를 위한 질의를 요청하는 1차 다이얼로그
 short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);	// 1차 배치 후 수정을 요청하는 2차 다이얼로그
+short DGCALLBACK beamTableformPlacerHandler2_AutoArray (short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);		// 2차 다이얼로그에서 자동배치 버튼을 누를 때 배치 조건을 물어보는 다이얼로그
 short DGCALLBACK beamTableformPlacerHandler3 (short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);	// 동바리/멍에제 프리셋을 배치할지 여부를 물어봄
 short DGCALLBACK beamTableformPlacerHandler4_Insulation (short message, short dialogID, short item, DGUserData userData, DGMessageData msgData);	// 보과 테이블폼 사이에 단열재를 넣을지 여부를 물어보는 다이얼로그
 #endif
