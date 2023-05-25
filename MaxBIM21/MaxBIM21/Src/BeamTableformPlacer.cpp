@@ -6797,7 +6797,6 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 			autoArrayInfo.bUseEuroform_0750 = false;
 			autoArrayInfo.bUseEuroform_0600 = true;
 			autoArrayInfo.bUseEuroform_etc = false;
-			autoArrayInfo.bUsePlywood = false;
 
 			// 왼쪽 끝 여백 채우기 여부 (체크박스)
 			placingZone.CHECKBOX_MARGIN_LEFT_END = DGAppendDialogItem (dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 120, 70, 70, 70);
@@ -7275,7 +7274,163 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 					result = DGBlankModalDialog(380, 250, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, beamTableformPlacerHandler2_AutoArray, (DGUserData)&autoArrayInfo);
 
 					if (result == DG_OK) {
+						double	remainFullLength;
+						double	remainHalfLength;
+
+						int nEuroform_1200 = 0;
+						int nEuroform_1050 = 0;
+						int nEuroform_0900 = 0;
+						int nEuroform_0750 = 0;
+						int nEuroform_0600 = 0;
+						double endPlywoodLength = 0.150;
+
+						struct TempCell
+						{
+							short	objType;
+							double	dirLen;
+						};
+						TempCell	cells[50];
+						int			nCells;		// 셀 개수
+						TempCell	beginCell;	// 시작 셀 (합판)
+						TempCell	endCell;	// 끝 셀 (합판)
+
+						// 기존 배치도 제거하고
+						DGRemoveDialogItems(dialogID, AFTER_ALL);
+
+						remainFullLength = placingZone.beamLength;
+						remainHalfLength = remainFullLength / 2;
+
+						// 센터필러가 없을 경우
+						if (autoArrayInfo.centerFiller_objType == NONE) {
+							//
+						}
+						// 센터필러가 있을 경우
+						else {
+							//
+						}
+
 						// !!! userData 값을 활용하여 UI를 재배치함
+						
+						// 전체 길이: placingZone.beamLength
+						// 만약 센터필러를 고려하여 절반 길이 구함
+							// 센터필러가 EUROFORM 또는 PLYWOOD일 경우: remainHalfLength = (placingZone.beamLength - autoArrayInfo.centerFiller_length) / 2;
+							// 센터필러가 NONE일 경우: remainHalfLength = placingZone.beamLength / 2;
+						// 영역을 유로폼/합판으로 채우기 (양끝 합판의 길이는 기본 150, 100~250까지 가능)
+							// 센터필러가 NONE일 경우 (남은 길이: remainFullLength 기준)
+								// 남은 길이가 900 이상일 경우, remainFullLength에서 가장 큰 유로폼 길이부터 차감해 나가면서 유로폼 수량 증가
+								// 남은 길이가 900 미만 700 초과일 경우, 유로폼 600을 채우고 끝에는 합판을 배치할 것
+								// 남은 길이가 700 미만 500 초과일 경우, 이형유로폼을 채우고 끝에는 합판 150을 배치하거나(이형유로폼O), 합판(150 + ??? + 150)을 배치할 것(이형유로폼X)
+								// 남은 길이가 500 이하일 경우, 양끝에 합판을 배치할 것
+							// 센터필러가 EUROFORM 또는 PLYWOOD일 경우 (남은 길이: remainHalfLength 기준)
+								// 남은 길이가 700 이상일 경우, remainHalfLength에서 가장 큰 유로폼 길이부터 차감해 나가면서 유로폼 수량 증가
+								// 남은 길이가 700 미만 250 초과일 경우, 이형유로폼을 채우고 끝에는 합판 150을 배치하거나(이형유로폼O), 합판 2개(??? + 150)를 배치할 것(이형유로폼X)
+								// 남은 길이가 250 이하일 경우, 끝에 합판을 배치할 것
+
+			//			// 왼쪽 끝 여백 채우기 여부 (체크박스)
+			//			placingZone.CHECKBOX_MARGIN_LEFT_END = DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 120, 70, 70, 70);
+			//			DGSetItemFont(dialogID, placingZone.CHECKBOX_MARGIN_LEFT_END, DG_IS_LARGE | DG_IS_PLAIN);
+			//			DGSetItemText(dialogID, placingZone.CHECKBOX_MARGIN_LEFT_END, L"합판\n채우기");
+			//			DGShowItem(dialogID, placingZone.CHECKBOX_MARGIN_LEFT_END);
+			//			DGSetItemValLong(dialogID, placingZone.CHECKBOX_MARGIN_LEFT_END, TRUE);
+			//			// 왼쪽 끝 여백 길이 (Edit컨트롤)
+			//			placingZone.EDITCONTROL_MARGIN_LEFT_END = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, 120, 140, 70, 25);
+			//			DGShowItem(dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END);
+			//			DGSetItemMinDouble(dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END, 0.090);
+			//			DGSetItemMaxDouble(dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END, 2.440);
+			//			DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END, 0.150);
+
+			//			// 일반 셀: 기본값은 유로폼
+			//			itmPosX = 120 + 70;
+			//			itmPosY = 72;
+			//			for (xx = 0; xx < placingZone.nCells; ++xx) {
+			//				// 버튼
+			//				placingZone.BUTTON_OBJ[xx] = DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, itmPosX, itmPosY, 71, 66);
+			//				DGSetItemFont(dialogID, placingZone.BUTTON_OBJ[xx], DG_IS_LARGE | DG_IS_PLAIN);
+			//				DGSetItemText(dialogID, placingZone.BUTTON_OBJ[xx], L"유로폼");
+			//				DGShowItem(dialogID, placingZone.BUTTON_OBJ[xx]);
+			//				DGDisableItem(dialogID, placingZone.BUTTON_OBJ[xx]);
+
+			//				// 객체 타입 (팝업컨트롤)
+			//				placingZone.POPUP_OBJ_TYPE[xx] = itmIdx = DGAppendDialogItem(dialogID, DG_ITM_POPUPCONTROL, 50, 1, itmPosX, itmPosY - 25, 70, 23);
+			//				DGSetItemFont(dialogID, placingZone.POPUP_OBJ_TYPE[xx], DG_IS_EXTRASMALL | DG_IS_PLAIN);
+			//				DGPopUpInsertItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx], DG_POPUP_BOTTOM);
+			//				DGPopUpSetItemText(dialogID, placingZone.POPUP_OBJ_TYPE[xx], DG_POPUP_BOTTOM, L"없음");
+			//				DGPopUpInsertItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx], DG_POPUP_BOTTOM);
+			//				DGPopUpSetItemText(dialogID, placingZone.POPUP_OBJ_TYPE[xx], DG_POPUP_BOTTOM, L"유로폼");
+			//				DGPopUpInsertItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx], DG_POPUP_BOTTOM);
+			//				DGPopUpSetItemText(dialogID, placingZone.POPUP_OBJ_TYPE[xx], DG_POPUP_BOTTOM, L"합판");
+			//				DGPopUpSelectItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx], DG_POPUP_TOP + 1);
+			//				DGShowItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx]);
+
+			//				// 너비 (팝업컨트롤)
+			//				placingZone.POPUP_WIDTH[xx] = DGAppendDialogItem(dialogID, DG_ITM_POPUPCONTROL, 50, 1, itmPosX, itmPosY + 68, 70, 23);
+			//				DGSetItemFont(dialogID, placingZone.POPUP_WIDTH[xx], DG_IS_LARGE | DG_IS_PLAIN);
+			//				DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM);
+			//				DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM, "1200");
+			//				DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM);
+			//				DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM, "1050");
+			//				DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM);
+			//				DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM, "900");
+			//				DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM);
+			//				DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM, "750");
+			//				DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM);
+			//				DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM, "600");
+			//				DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM);
+			//				DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM, L"기타");
+			//				DGPopUpSelectItem(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_TOP);
+			//				DGShowItem(dialogID, placingZone.POPUP_WIDTH[xx]);
+
+			//				placingZone.EDITCONTROL_WIDTH_EUROFORM[xx] = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, itmPosY + 68 + 25, 70, 23);
+			//				DGShowItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+			//				DGDisableItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+			//				DGSetItemMinDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 0.050);
+			//				DGSetItemMaxDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 1.500);
+			//				DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 0.150);
+
+			//				// 너비 (Edit컨트롤컨트롤) - 처음에는 숨김
+			//				placingZone.EDITCONTROL_WIDTH[xx] = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, itmPosY + 68, 70, 23);
+			//				DGHideItem(dialogID, placingZone.EDITCONTROL_WIDTH[xx]);
+			//				DGSetItemMinDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx], 0.090);
+			//				DGSetItemMaxDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx], 2.440);
+			//				DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx], 0.150);
+
+			//				itmPosX += 70;
+			//			}
+
+			//			// 오른쪽 끝 여백 채우기 여부 (체크박스)
+			//			placingZone.CHECKBOX_MARGIN_RIGHT_END = DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, itmPosX, 70, 70, 70);
+			//			DGSetItemFont(dialogID, placingZone.CHECKBOX_MARGIN_RIGHT_END, DG_IS_LARGE | DG_IS_PLAIN);
+			//			DGSetItemText(dialogID, placingZone.CHECKBOX_MARGIN_RIGHT_END, L"합판\n채우기");
+			//			DGShowItem(dialogID, placingZone.CHECKBOX_MARGIN_RIGHT_END);
+			//			DGSetItemValLong(dialogID, placingZone.CHECKBOX_MARGIN_RIGHT_END, TRUE);
+			//			// 오른쪽 끝 여백 길이 (Edit컨트롤)
+			//			placingZone.EDITCONTROL_MARGIN_RIGHT_END = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, 140, 70, 25);
+			//			DGShowItem(dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END);
+			//			DGSetItemMinDouble(dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 0.090);
+			//			DGSetItemMaxDouble(dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 2.440);
+			//			DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END, 0.150);
+
+			//			// 총 길이, 남은 길이 표시
+			//			DGSetItemValDouble(dialogID, EDITCONTROL_TOTAL_LENGTH, placingZone.beamLength);
+			//			lengthDouble = placingZone.beamLength;
+			//			if (DGGetItemValLong(dialogID, placingZone.CHECKBOX_MARGIN_LEFT_END) == TRUE)	lengthDouble -= DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END);
+			//			if (DGGetItemValLong(dialogID, placingZone.CHECKBOX_MARGIN_RIGHT_END) == TRUE)	lengthDouble -= DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END);
+			//			for (xx = 0; xx < placingZone.nCells; ++xx) {
+			//				if (DGPopUpGetSelected(dialogID, placingZone.POPUP_OBJ_TYPE[xx]) == EUROFORM + 1)
+			//					lengthDouble -= atof(DGPopUpGetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx])).ToCStr().Get()) / 1000.0;
+			//				else if (DGPopUpGetSelected(dialogID, placingZone.POPUP_OBJ_TYPE[xx]) == PLYWOOD + 1)
+			//					lengthDouble -= DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx]);
+			//			}
+			//			DGSetItemValDouble(dialogID, EDITCONTROL_REMAIN_LENGTH, lengthDouble);
+			//			DGDisableItem(dialogID, EDITCONTROL_TOTAL_LENGTH);
+			//			DGDisableItem(dialogID, EDITCONTROL_REMAIN_LENGTH);
+
+			//			// 다이얼로그 크기 설정
+			//			dialogSizeX = 600;
+			//			dialogSizeY = 360;
+			//			if (placingZone.nCells >= 4) {
+			//				DGSetDialogSize(dialogID, DG_CLIENT, dialogSizeX + 70 * (placingZone.nCells - 3), dialogSizeY, DG_TOPLEFT, true);
+			//			}
 					}
 
 					break;
@@ -7307,13 +7462,13 @@ short DGCALLBACK beamTableformPlacerHandler2_AutoArray(short message, short dial
 		DGSetDialogTitle(dialogID, L"자동배치 옵션 설정");
 
 		// 확인 버튼
-		DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 110, 210, 70, 25);
+		DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 130, 210, 70, 25);
 		DGSetItemFont(dialogID, DG_OK, DG_IS_LARGE | DG_IS_PLAIN);
 		DGSetItemText(dialogID, DG_OK, L"확인");
 		DGShowItem(dialogID, DG_OK);
 
 		// 취소 버튼
-		DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 190, 210, 70, 25);
+		DGAppendDialogItem(dialogID, DG_ITM_BUTTON, DG_BT_ICONTEXT, 0, 210, 210, 70, 25);
 		DGSetItemFont(dialogID, DG_CANCEL, DG_IS_LARGE | DG_IS_PLAIN);
 		DGSetItemText(dialogID, DG_CANCEL, L"취소");
 		DGShowItem(dialogID, DG_CANCEL);
@@ -7363,60 +7518,47 @@ short DGCALLBACK beamTableformPlacerHandler2_AutoArray(short message, short dial
 		DGSetItemValDouble(dialogID, EDITCONTROL_CENTER_FILLER_LENGTH, autoArrayInfo->centerFiller_length);
 
 		// 그룹박스: 유로폼 사용여부
-		DGAppendDialogItem(dialogID, DG_ITM_GROUPBOX, DG_GT_PRIMARY, 0, 10, 60, 170, 125);
+		DGAppendDialogItem(dialogID, DG_ITM_GROUPBOX, DG_GT_PRIMARY, 0, 115, 60, 170, 125);
 		DGSetItemFont(dialogID, GROUPBOX_USE_EUROFORM, DG_IS_LARGE | DG_IS_PLAIN);
 		DGSetItemText(dialogID, GROUPBOX_USE_EUROFORM, L"유로폼 사용여부");
 		DGShowItem(dialogID, GROUPBOX_USE_EUROFORM);
 
 		// 유로폼 사용여부 (체크박스)
-		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 20, 90, 70, 25);
+		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 20 + 105, 90, 70, 25);
 		DGSetItemFont(dialogID, CHECKBOX_USE_EUROFORM_1200, DG_IS_LARGE | DG_IS_PLAIN);
 		DGSetItemText(dialogID, CHECKBOX_USE_EUROFORM_1200, "1200");
 		DGShowItem(dialogID, CHECKBOX_USE_EUROFORM_1200);
 		DGSetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_1200, autoArrayInfo->bUseEuroform_1200);
 
-		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 20, 120, 70, 25);
+		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 20 + 105, 120, 70, 25);
 		DGSetItemFont(dialogID, CHECKBOX_USE_EUROFORM_1050, DG_IS_LARGE | DG_IS_PLAIN);
 		DGSetItemText(dialogID, CHECKBOX_USE_EUROFORM_1050, "1050");
 		DGShowItem(dialogID, CHECKBOX_USE_EUROFORM_1050);
 		DGSetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_1050, autoArrayInfo->bUseEuroform_1050);
 
-		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 20, 150, 70, 25);
+		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 20 + 105, 150, 70, 25);
 		DGSetItemFont(dialogID, CHECKBOX_USE_EUROFORM_0900, DG_IS_LARGE | DG_IS_PLAIN);
 		DGSetItemText(dialogID, CHECKBOX_USE_EUROFORM_0900, "900");
 		DGShowItem(dialogID, CHECKBOX_USE_EUROFORM_0900);
 		DGSetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_0900, autoArrayInfo->bUseEuroform_0900);
 
-		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 100, 90, 70, 25);
+		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 100 + 105, 90, 70, 25);
 		DGSetItemFont(dialogID, CHECKBOX_USE_EUROFORM_0750, DG_IS_LARGE | DG_IS_PLAIN);
 		DGSetItemText(dialogID, CHECKBOX_USE_EUROFORM_0750, "750");
 		DGShowItem(dialogID, CHECKBOX_USE_EUROFORM_0750);
 		DGSetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_0750, autoArrayInfo->bUseEuroform_0750);
 
-		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 100, 120, 70, 25);
+		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 100 + 105, 120, 70, 25);
 		DGSetItemFont(dialogID, CHECKBOX_USE_EUROFORM_0600, DG_IS_LARGE | DG_IS_PLAIN);
 		DGSetItemText(dialogID, CHECKBOX_USE_EUROFORM_0600, "600");
 		DGShowItem(dialogID, CHECKBOX_USE_EUROFORM_0600);
 		DGSetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_0600, autoArrayInfo->bUseEuroform_0600);
 
-		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 100, 150, 70, 25);
+		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 100 + 105, 150, 70, 25);
 		DGSetItemFont(dialogID, CHECKBOX_USE_EUROFORM_ETC, DG_IS_LARGE | DG_IS_PLAIN);
 		DGSetItemText(dialogID, CHECKBOX_USE_EUROFORM_ETC, L"기타");
 		DGShowItem(dialogID, CHECKBOX_USE_EUROFORM_ETC);
 		DGSetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_ETC, autoArrayInfo->bUseEuroform_etc);
-
-		// 그룹박스: 합판 사용여부
-		DGAppendDialogItem(dialogID, DG_ITM_GROUPBOX, DG_GT_PRIMARY, 0, 190, 60, 160, 120);
-		DGSetItemFont(dialogID, GROUPBOX_USE_PLYWOOD, DG_IS_LARGE | DG_IS_PLAIN);
-		DGSetItemText(dialogID, GROUPBOX_USE_PLYWOOD, L"합판 사용여부");
-		DGShowItem(dialogID, GROUPBOX_USE_PLYWOOD);
-
-		// 합판 사용여부 (체크박스)
-		DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 200, 90, 70, 25);
-		DGSetItemFont(dialogID, CHECKBOX_USE_PLYWOOD, DG_IS_LARGE | DG_IS_PLAIN);
-		DGSetItemText(dialogID, CHECKBOX_USE_PLYWOOD, L"합판 사용");
-		DGShowItem(dialogID, CHECKBOX_USE_PLYWOOD);
-		DGSetItemValLong(dialogID, CHECKBOX_USE_PLYWOOD, autoArrayInfo->bUsePlywood);
 
 		break;
 
@@ -7444,7 +7586,30 @@ short DGCALLBACK beamTableformPlacerHandler2_AutoArray(short message, short dial
 	case DG_MSG_CLICK:
 		switch (item) {
 		case DG_OK:
-			// !!! autoArrayInfo 값을 변경함
+			autoArrayInfo->centerFiller_objType = DGPopUpGetSelected(dialogID, POPUP_CENTER_FILLER_TYPE) - 1;
+			
+			// 만약 NONE이면 0
+			if (autoArrayInfo->centerFiller_objType == NONE) {
+				autoArrayInfo->centerFiller_length = 0.0;
+			}
+			// EUROFORM이면 이형 사이즈인지 아닌지 여부에 따라 달라짐
+			else if (autoArrayInfo->centerFiller_objType == EUROFORM) {
+				if (DGPopUpGetSelected(dialogID, POPUP_CENTER_FILLER_LENGTH) == 6)
+					autoArrayInfo->centerFiller_length = DGGetItemValDouble(dialogID, EDITCONTROL_CENTER_FILLER_LENGTH);
+				else
+					autoArrayInfo->centerFiller_length = atof(DGPopUpGetItemText(dialogID, POPUP_CENTER_FILLER_LENGTH, DGPopUpGetSelected(dialogID, POPUP_CENTER_FILLER_LENGTH)).ToCStr().Get()) / 1000.0;
+			}
+			// PLYWOOD이면 Edit컨트롤의 값을 가져옴
+			else if (autoArrayInfo->centerFiller_objType == PLYWOOD) {
+				autoArrayInfo->centerFiller_length = DGGetItemValDouble(dialogID, EDITCONTROL_CENTER_FILLER_LENGTH);
+			}
+
+			autoArrayInfo->bUseEuroform_1200 = DGGetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_1200);
+			autoArrayInfo->bUseEuroform_1050 = DGGetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_1050);
+			autoArrayInfo->bUseEuroform_0900 = DGGetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_0900);
+			autoArrayInfo->bUseEuroform_0750 = DGGetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_0750);
+			autoArrayInfo->bUseEuroform_0600 = DGGetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_0600);
+			autoArrayInfo->bUseEuroform_etc = DGGetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_ETC);
 
 			break;
 

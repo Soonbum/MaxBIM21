@@ -226,9 +226,6 @@ struct AutoArray
 	bool	bUseEuroform_0750;		// 유로폼 750 사용 여부
 	bool	bUseEuroform_0600;		// 유로폼 600 사용 여부
 	bool	bUseEuroform_etc;		// 이형 유로폼 사용 여부
-
-	// 합판 사용 여부
-	bool	bUsePlywood;			// 합판 사용 여부
 };
 
 // 단열재
