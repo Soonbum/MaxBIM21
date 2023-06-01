@@ -73,4 +73,6 @@ short DGCALLBACK cameraPosManagerHandler (short message, short dialogID, short i
 GSErrCode	interferenceCheck(void);				// 간섭 체크 발견하기
 int checkIntersect(Rect rect1, Rect rect2);			// 두 객체 간에 충돌이 발생하면 1, 충돌하지 않으면 0, 입력이 유효하지 않으면 -1
 
+GSErrCode	rotateMultipleObjects(void);			// 여러 객체 동시에 회전시키기
+
 #endif

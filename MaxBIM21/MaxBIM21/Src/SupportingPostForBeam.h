@@ -842,9 +842,9 @@ GSErrCode	placeSupportingPostForBeam ()
 	API_GetLineType		lineInfo;
 
 	BNZeroMemory (&lineInfo, sizeof (API_GetLineType));
-	ClickAPoint ("시작 점을 클릭하십시오.", &c);
+	ClickAPoint (convertStr(GS::UniString(L"시작 점을 클릭하십시오.")), &c);
 
-	CHCopyC ("끝 점을 클릭하십시오. 라인을 따라 동바리 세트가 배치될 것입니다.", lineInfo.prompt);
+	CHCopyC (convertStr(GS::UniString(L"끝 점을 클릭하십시오. 라인을 따라 동바리 세트가 배치될 것입니다.")), lineInfo.prompt);
 	lineInfo.startCoord.x = c.x;
 	lineInfo.startCoord.y = c.y;
 	err = ACAPI_Interface (APIIo_GetLineID, &lineInfo, NULL);

@@ -147,14 +147,14 @@ GSErrCode	placeTableformOnSlabBottom (void)
 	
 	// 천장면의 하단 점 2개를 클릭
 	BNZeroMemory (&pointInfo, sizeof (API_GetPointType));
-	CHCopyC ("모프의 천장에 맞닿는 하단 라인의 왼쪽 점을 클릭하십시오.", pointInfo.prompt);
+	CHCopyC (convertStr(GS::UniString(L"모프의 천장에 맞닿는 하단 라인의 왼쪽 점을 클릭하십시오.")), pointInfo.prompt);
 	pointInfo.enableQuickSelection = true;
 	err = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 	point1 = pointInfo.pos;
 	firstClickPoint = point1;
 
 	BNZeroMemory (&pointInfo, sizeof (API_GetPointType));
-	CHCopyC ("모프의 천장에 맞닿는 하단 라인의 오른쪽 점을 클릭하십시오.", pointInfo.prompt);
+	CHCopyC (convertStr(GS::UniString(L"모프의 천장에 맞닿는 하단 라인의 오른쪽 점을 클릭하십시오.")), pointInfo.prompt);
 	pointInfo.enableQuickSelection = true;
 	err = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 	point2 = pointInfo.pos;
@@ -2051,7 +2051,8 @@ GSErrCode	SlabTableformPlacingZone::placeGirdersAndPosts (void)
 					}
 
 					// MRK 설치 (PERI 동바리에만 장착함) - case 2-1
-					// !!!
+					// 
+
 					for (yy = 0 ; yy <= girderCount ; ++yy) {
 						if ((placingZone.iSuppPostType == POST_TYPE_PERI_SUPPORT) && (xx < lineCount-1)) {
 							mrk.init (L("PERI동바리 수평재 v0.2.gsm"), layerInd_MRK, infoSlab.floorInd, placingZone.leftBottom.x, placingZone.leftBottom.y, placingZone.leftBottom.z, placingZone.ang);
@@ -2253,7 +2254,6 @@ GSErrCode	SlabTableformPlacingZone::placeGirdersAndPosts (void)
 					}
 
 					// MRK 설치 (PERI 동바리에만 장착함) - case 2-2
-					// !!!
 					for (yy = 0 ; yy <= girderCount ; ++yy) {
 						if ((placingZone.iSuppPostType == POST_TYPE_PERI_SUPPORT) && (xx < lineCount-1)) {
 							mrk.init (L("PERI동바리 수평재 v0.2.gsm"), layerInd_MRK, infoSlab.floorInd, placingZone.leftBottom.x, placingZone.leftBottom.y, placingZone.leftBottom.z, placingZone.ang);
@@ -2434,7 +2434,6 @@ GSErrCode	SlabTableformPlacingZone::placeGirdersAndPosts (void)
 					}
 
 					// MRK 설치 (PERI 동바리에만 장착함) - case 2-3
-					// !!!
 					for (yy = 0 ; yy <= girderCount ; ++yy) {
 						if ((placingZone.iSuppPostType == POST_TYPE_PERI_SUPPORT) && (xx < lineCount-1)) {
 							mrk.init (L("PERI동바리 수평재 v0.2.gsm"), layerInd_MRK, infoSlab.floorInd, placingZone.leftBottom.x, placingZone.leftBottom.y, placingZone.leftBottom.z, placingZone.ang);
@@ -2615,7 +2614,6 @@ GSErrCode	SlabTableformPlacingZone::placeGirdersAndPosts (void)
 					}
 
 					// MRK 설치 (PERI 동바리에만 장착함) - case 2-4
-					// !!!
 					for (yy = 0 ; yy <= girderCount ; ++yy) {
 						if ((placingZone.iSuppPostType == POST_TYPE_PERI_SUPPORT) && (xx < lineCount-1)) {
 							mrk.init (L("PERI동바리 수평재 v0.2.gsm"), layerInd_MRK, infoSlab.floorInd, placingZone.leftBottom.x, placingZone.leftBottom.y, placingZone.leftBottom.z, placingZone.ang);

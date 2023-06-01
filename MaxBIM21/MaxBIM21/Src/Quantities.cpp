@@ -247,21 +247,21 @@ static short DGCALLBACK qElemDlgCallBack (short message, short dialID, short ite
 						do {
 							BNZeroMemory (&pointInfo, sizeof (API_GetPointType));
 
-							CHCopyC ("다각형의 1번째 노드(좌하단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 1번째 노드(좌하단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p1.x = pointInfo.pos.x;
 							p1.y = pointInfo.pos.y;
 							p1.z = pointInfo.pos.z;
 
-							CHCopyC ("다각형의 2번째 노드(우하단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 2번째 노드(우하단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p2.x = pointInfo.pos.x;
 							p2.y = pointInfo.pos.y;
 							p2.z = pointInfo.pos.z;
 
-							CHCopyC ("다각형의 3번째 노드(우상단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 3번째 노드(우상단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p3.x = pointInfo.pos.x;
@@ -406,35 +406,35 @@ static short DGCALLBACK qElemDlgCallBack (short message, short dialID, short ite
 						do {
 							BNZeroMemory (&pointInfo, sizeof (API_GetPointType));
 
-							CHCopyC ("다각형의 1번째 노드(좌하단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 1번째 노드(좌하단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p1.x = pointInfo.pos.x;
 							p1.y = pointInfo.pos.y;
 							p1.z = pointInfo.pos.z;
 
-							CHCopyC ("다각형의 2번째 노드(우하단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 2번째 노드(우하단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p2.x = pointInfo.pos.x;
 							p2.y = pointInfo.pos.y;
 							p2.z = pointInfo.pos.z;
 
-							CHCopyC ("다각형의 3번째 노드(우상단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 3번째 노드(우상단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p3.x = pointInfo.pos.x;
 							p3.y = pointInfo.pos.y;
 							p3.z = pointInfo.pos.z;
 
-							CHCopyC ("다각형의 4번째 노드(개구부 좌하단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 4번째 노드(개구부 좌하단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p4.x = pointInfo.pos.x;
 							p4.y = pointInfo.pos.y;
 							p4.z = pointInfo.pos.z;
 
-							CHCopyC ("다각형의 5번째 노드(개구부 우상단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 5번째 노드(개구부 우상단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p5.x = pointInfo.pos.x;
@@ -795,21 +795,21 @@ static short DGCALLBACK insulElemDlgCallBack (short message, short dialID, short
 						do {
 							BNZeroMemory (&pointInfo, sizeof (API_GetPointType));
 
-							CHCopyC ("다각형의 1번째 노드(좌하단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 1번째 노드(좌하단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p1.x = pointInfo.pos.x;
 							p1.y = pointInfo.pos.y;
 							p1.z = pointInfo.pos.z;
 
-							CHCopyC ("다각형의 2번째 노드(우하단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 2번째 노드(우하단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p2.x = pointInfo.pos.x;
 							p2.y = pointInfo.pos.y;
 							p2.z = pointInfo.pos.z;
 
-							CHCopyC ("다각형의 3번째 노드(우상단)를 클릭하십시오.", pointInfo.prompt);
+							CHCopyC (convertStr(GS::UniString(L"다각형의 3번째 노드(우상단)를 클릭하십시오.")), pointInfo.prompt);
 							inputErr = ACAPI_Interface (APIIo_GetPointID, &pointInfo, NULL);
 							if (inputErr != NoError)	break;
 							p3.x = pointInfo.pos.x;

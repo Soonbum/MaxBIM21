@@ -1301,3 +1301,105 @@ int checkIntersect(Rect rect1, Rect rect2) {
 
 	return 1;
 }
+
+// 여러 객체 동시에 회전시키기
+GSErrCode	rotateMultipleObjects(void)
+{
+	GSErrCode	err = NoError;
+
+	API_GetPointType	pointInfo;
+	API_GetLineType		lineInfo;
+	API_GetArcType		arcInfo;
+	char				buffer[256];
+
+	BNZeroMemory(&pointInfo, sizeof(API_GetPointType));
+	BNZeroMemory(&lineInfo, sizeof(API_GetLineType));
+	BNZeroMemory(&arcInfo, sizeof(API_GetArcType));
+
+	CHCopyC(convertStr(GS::UniString(L"회전축의 중심점을 클릭하십시오.")), pointInfo.prompt);
+	pointInfo.changeCursorSet = true;
+
+	/* 중심점을 나타내는 교차 커서 표시하기 */
+	pointInfo.cursorSet.nothingOnCursor = APICursor_XPoint;
+	pointInfo.cursorSet.pointOnCursor = APICursor_ArrowXPoint;
+	pointInfo.cursorSet.lineOnCursor = APICursor_PencilXPoint;
+	pointInfo.cursorSet.refPointOnCursor = APICursor_ArrowXPoint;
+	pointInfo.cursorSet.refLineOnCursor = APICursor_PencilXPoint;
+	pointInfo.cursorSet.crossOnCursor = APICursor_ArrowXPoint;
+	pointInfo.cursorSet.normalOnCursor = APICursor_PencilXPoint;
+	pointInfo.cursorSet.tangentOnCursor = APICursor_ArrowXPoint;
+
+	err = ACAPI_Interface(APIIo_GetPointID, &pointInfo, NULL);
+
+	if (!err) {
+		CHCopyC(convertStr(GS::UniString(L"회전 시작점을 클릭하십시오.")), lineInfo.prompt);
+		lineInfo.startCoord = pointInfo.pos;
+		lineInfo.changeCursorSet = true;
+
+		/* 호의 반지름을 그리기 위한 손 커서를 사용함 */
+		lineInfo.cursorSet.nothingOnCursor = APICursor_Hand;
+		lineInfo.cursorSet.pointOnCursor = APICursor_MiniHand;
+		lineInfo.cursorSet.lineOnCursor = APICursor_MiniHand;
+		lineInfo.cursorSet.refPointOnCursor = APICursor_MiniHand;
+		lineInfo.cursorSet.refLineOnCursor = APICursor_MiniHand;
+		lineInfo.cursorSet.crossOnCursor = APICursor_MiniHand;
+		lineInfo.cursorSet.normalOnCursor = APICursor_MiniHand;
+		lineInfo.cursorSet.tangentOnCursor = APICursor_MiniHand;
+
+		err = ACAPI_Interface(APIIo_GetLineID, &lineInfo, NULL);
+	}
+
+	if (!err) {
+		CHCopyC(convertStr(GS::UniString(L"회전 끝점을 클릭하십시오.")), arcInfo.prompt);
+		arcInfo.origo = lineInfo.startCoord;
+		arcInfo.startCoord = lineInfo.pos;
+		arcInfo.startCoordGiven = true;
+		arcInfo.changeCursorSet = true;
+
+		/* 호를 가져오기 위해 눈 커서를 사용함 */
+		arcInfo.cursorSet.nothingOnCursor = APICursor_Eye;
+		arcInfo.cursorSet.pointOnCursor = APICursor_DoubleEye;
+		arcInfo.cursorSet.lineOnCursor = APICursor_DoubleEye;
+		arcInfo.cursorSet.refPointOnCursor = APICursor_DoubleEye;
+		arcInfo.cursorSet.refLineOnCursor = APICursor_DoubleEye;
+		arcInfo.cursorSet.crossOnCursor = APICursor_DoubleEye;
+		arcInfo.cursorSet.normalOnCursor = APICursor_DoubleEye;
+		arcInfo.cursorSet.tangentOnCursor = APICursor_DoubleEye;
+
+		err = ACAPI_Interface(APIIo_GetArcID, &arcInfo, NULL);
+	}
+
+	if (!err) {
+		// 원점, 시작점과 끝점, 회전각도(+,-) 값을 가져옴
+		API_Coord3D	origo, startCoord, endCoord;	// 중심점, 시작점, 끝점
+		double		radAng;							// 회전각도 (반시계방향 +, 시계방향 -)
+
+		origo.x = arcInfo.origo.x;
+		origo.y = arcInfo.origo.y;
+		origo.z = arcInfo.origo.z;
+
+		startCoord.x = arcInfo.startCoord.x;
+		startCoord.y = arcInfo.startCoord.y;
+		startCoord.z = arcInfo.startCoord.z;
+
+		endCoord.x = arcInfo.pos.x;
+		endCoord.y = arcInfo.pos.y;
+		endCoord.z = arcInfo.pos.z;
+
+		// !!!
+		// arcInfo.negArc : 시계방향이면 true, 반시계방향이면 false
+		// radAng
+		ACAPI_WriteReport("start: %lf, %lf", startCoord.x, startCoord.y, true);
+		ACAPI_WriteReport("end: %lf, %lf", endCoord.x, endCoord.y, true);
+	}
+	else if (err == APIERR_CANCEL)
+		DGAlert(DG_ERROR, L"오류", L"입력이 중지되었습니다.", "", L"확인", "", "");
+
+	// 선택한 객체들의 GUID를 수집함
+	// ...
+	
+	// 객체를 원점으로 이동시킨 후, 회전각도만큼 회전시키고 다시 이동한 만큼 원래 자리로 이동한다.
+	// ...
+
+	return err;
+}
