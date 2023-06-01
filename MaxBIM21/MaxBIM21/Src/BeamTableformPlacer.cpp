@@ -7274,8 +7274,8 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 					result = DGBlankModalDialog(380, 250, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, beamTableformPlacerHandler2_AutoArray, (DGUserData)&autoArrayInfo);
 
 					if (result == DG_OK) {
-						double	remainFullLength;
-						double	remainHalfLength;
+						double	remainFullLength = 0.0;
+						double	remainHalfLength = 0.0;
 
 						int nEuroform_1200 = 0;		int nEuroform_1200_init = 0;
 						int nEuroform_1050 = 0;		int nEuroform_1050_init = 0;
@@ -7284,7 +7284,7 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 						int nEuroform_0600 = 0;		int nEuroform_0600_init = 0;
 						int nEuroform_etc = 0;		int nEuroform_etc_init = 0;
 						int nPlywood_etc = 0;		int nPlywood_etc_init = 0;
-						double etc_length;
+						double etc_length = 0.0;
 
 						struct TempCell
 						{
@@ -7311,36 +7311,36 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 							remainHalfLength = remainFullLength / 2;
 
 							while (remainFullLength > EPS) {
-								// 남은 길이가 900 이상일 경우
-								if (remainFullLength > 0.900 - EPS) {
+								// 남은 길이가 1000 이상일 경우
+								if (remainFullLength > 1.000 - EPS) {
 									// 유로폼 1200 계수
-									if ((autoArrayInfo.bUseEuroform_1200 == true) || (remainFullLength > 1.200 - EPS)) {
+									if ((autoArrayInfo.bUseEuroform_1200 == true) && (remainFullLength > 1.200 - EPS)) {
 										remainFullLength -= 1.200;
 										nEuroform_1200++;
 									}
 									// 유로폼 1050 계수
-									if ((autoArrayInfo.bUseEuroform_1050 == true) || (remainFullLength > 1.050 - EPS)) {
+									else if ((autoArrayInfo.bUseEuroform_1050 == true) && (remainFullLength > 1.050 - EPS)) {
 										remainFullLength -= 1.050;
 										nEuroform_1050++;
 									}
 									// 유로폼 900 계수
-									if ((autoArrayInfo.bUseEuroform_0900 == true) || (remainFullLength > 0.900 - EPS)) {
+									else if ((autoArrayInfo.bUseEuroform_0900 == true) && (remainFullLength > 0.900 - EPS)) {
 										remainFullLength -= 0.900;
 										nEuroform_0900++;
 									}
 									// 유로폼 750 계수
-									if ((autoArrayInfo.bUseEuroform_0750 == true) || (remainFullLength > 0.750 - EPS)) {
+									else if ((autoArrayInfo.bUseEuroform_0750 == true) && (remainFullLength > 0.750 - EPS)) {
 										remainFullLength -= 0.750;
 										nEuroform_0750++;
 									}
 									// 유로폼 600 계수
-									if ((autoArrayInfo.bUseEuroform_0600 == true) || (remainFullLength > 0.600 - EPS)) {
+									else if ((autoArrayInfo.bUseEuroform_0600 == true) && (remainFullLength > 0.600 - EPS)) {
 										remainFullLength -= 0.600;
 										nEuroform_0600++;
 									}
 								}
-								// 남은 길이가 900 미만 700 초과일 경우
-								else if ((remainFullLength < 0.900) && (remainFullLength > 0.700)) {
+								// 남은 길이가 1000 미만 700 초과일 경우
+								else if ((remainFullLength < 1.000) && (remainFullLength > 0.700)) {
 									remainFullLength -= 0.600;
 									nEuroform_0600++;
 
@@ -7378,27 +7378,27 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 								// 남은 길이가 700 이상일 경우
 								if (remainHalfLength > 0.700 - EPS) {
 									// 유로폼 1200 계수
-									if ((autoArrayInfo.bUseEuroform_1200 == true) || (remainHalfLength > 1.200 - EPS)) {
+									if ((autoArrayInfo.bUseEuroform_1200 == true) && (remainHalfLength > 1.200 - EPS)) {
 										remainHalfLength -= 1.200;
 										nEuroform_1200++;
 									}
 									// 유로폼 1050 계수
-									if ((autoArrayInfo.bUseEuroform_1050 == true) || (remainHalfLength > 1.050 - EPS)) {
+									else if ((autoArrayInfo.bUseEuroform_1050 == true) && (remainHalfLength > 1.050 - EPS)) {
 										remainHalfLength -= 1.050;
 										nEuroform_1050++;
 									}
 									// 유로폼 900 계수
-									if ((autoArrayInfo.bUseEuroform_0900 == true) || (remainHalfLength > 0.900 - EPS)) {
+									else if ((autoArrayInfo.bUseEuroform_0900 == true) && (remainHalfLength > 0.900 - EPS)) {
 										remainHalfLength -= 0.900;
 										nEuroform_0900++;
 									}
 									// 유로폼 750 계수
-									if ((autoArrayInfo.bUseEuroform_0750 == true) || (remainHalfLength > 0.750 - EPS)) {
+									else if ((autoArrayInfo.bUseEuroform_0750 == true) && (remainHalfLength > 0.750 - EPS)) {
 										remainHalfLength -= 0.750;
 										nEuroform_0750++;
 									}
-									// 유로폼 600 계수
-									if ((autoArrayInfo.bUseEuroform_0600 == true) || (remainHalfLength > 0.600 - EPS)) {
+									else // 유로폼 600 계수
+									if ((autoArrayInfo.bUseEuroform_0600 == true) && (remainHalfLength > 0.600 - EPS)) {
 										remainHalfLength -= 0.600;
 										nEuroform_0600++;
 									}
@@ -7590,6 +7590,8 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 								nCells++;
 							}
 						}
+
+						placingZone.nCells = nCells;
 						
 						// 왼쪽 끝 여백 채우기 여부 (체크박스)
 						placingZone.CHECKBOX_MARGIN_LEFT_END = DGAppendDialogItem(dialogID, DG_ITM_CHECKBOX, DG_BT_PUSHTEXT, 0, 120, 70, 70, 70);
@@ -7628,10 +7630,10 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 							DGPopUpInsertItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx], DG_POPUP_BOTTOM);
 							DGPopUpSetItemText(dialogID, placingZone.POPUP_OBJ_TYPE[xx], DG_POPUP_BOTTOM, L"합판");
 							if (cells[xx].objType == EUROFORM)
-								DGPopUpSelectItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx], 1);
-							else if (cells[xx].objType == PLYWOOD)
 								DGPopUpSelectItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx], 2);
-							DGShowItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx]);
+							else if (cells[xx].objType == PLYWOOD)
+								DGPopUpSelectItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx], 3);
+							DGShowItem(dialogID, placingZone.POPUP_OBJ_TYPE[xx]);							
 
 							// 너비 (팝업컨트롤)
 							placingZone.POPUP_WIDTH[xx] = DGAppendDialogItem(dialogID, DG_ITM_POPUPCONTROL, 50, 1, itmPosX, itmPosY + 68, 70, 23);
@@ -7648,22 +7650,58 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 							DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM, "600");
 							DGPopUpInsertItem(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM);
 							DGPopUpSetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DG_POPUP_BOTTOM, L"기타");
-							// ... 선택하기
-							DGShowItem(dialogID, placingZone.POPUP_WIDTH[xx]);
+							if ((cells[xx].objType == EUROFORM) && (abs(cells[xx].dirLen - 1.200) < EPS))
+								DGPopUpSelectItem(dialogID, placingZone.POPUP_WIDTH[xx], 1);
+							else if ((cells[xx].objType == EUROFORM) && (abs(cells[xx].dirLen - 1.050) < EPS))
+								DGPopUpSelectItem(dialogID, placingZone.POPUP_WIDTH[xx], 2);
+							else if ((cells[xx].objType == EUROFORM) && (abs(cells[xx].dirLen - 0.900) < EPS))
+								DGPopUpSelectItem(dialogID, placingZone.POPUP_WIDTH[xx], 3);
+							else if ((cells[xx].objType == EUROFORM) && (abs(cells[xx].dirLen - 0.750) < EPS))
+								DGPopUpSelectItem(dialogID, placingZone.POPUP_WIDTH[xx], 4);
+							else if ((cells[xx].objType == EUROFORM) && (abs(cells[xx].dirLen - 0.600) < EPS))
+								DGPopUpSelectItem(dialogID, placingZone.POPUP_WIDTH[xx], 5);
+							else
+								DGPopUpSelectItem(dialogID, placingZone.POPUP_WIDTH[xx], 6);
+							if (DGPopUpGetSelected(dialogID, placingZone.POPUP_OBJ_TYPE[xx]) == 2)
+								DGEnableItem(dialogID, placingZone.POPUP_WIDTH[xx]);
+							else
+								DGDisableItem(dialogID, placingZone.POPUP_WIDTH[xx]);
+							if (cells[xx].objType == EUROFORM) {
+								DGShowItem(dialogID, placingZone.POPUP_WIDTH[xx]);
+							}
+							else {
+								DGHideItem(dialogID, placingZone.POPUP_WIDTH[xx]);
+							}
 
-			//				placingZone.EDITCONTROL_WIDTH_EUROFORM[xx] = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, itmPosY + 68 + 25, 70, 23);
-			//				DGShowItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
-			//				DGDisableItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
-			//				DGSetItemMinDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 0.050);
-			//				DGSetItemMaxDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 1.500);
-			//				DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 0.150);
+							placingZone.EDITCONTROL_WIDTH_EUROFORM[xx] = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, itmPosY + 68 + 25, 70, 23);
+							DGShowItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+							if ((cells[xx].objType == EUROFORM) && (DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx]) == 6)) {
+								DGEnableItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+								DGShowItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+							}
+							else {
+								DGDisableItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+								DGHideItem(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx]);
+							}
+							DGSetItemMinDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 0.050);
+							DGSetItemMaxDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 1.500);
+							if (DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx]) == 6)
+								DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], cells[xx].dirLen);
+							else
+								DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH_EUROFORM[xx], 0.150);
 
 							// 너비 (Edit컨트롤컨트롤) - 처음에는 숨김
-			//				placingZone.EDITCONTROL_WIDTH[xx] = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, itmPosY + 68, 70, 23);
-			//				DGHideItem(dialogID, placingZone.EDITCONTROL_WIDTH[xx]);
-			//				DGSetItemMinDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx], 0.090);
-			//				DGSetItemMaxDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx], 2.440);
-			//				DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx], 0.150);
+							placingZone.EDITCONTROL_WIDTH[xx] = DGAppendDialogItem(dialogID, DG_ITM_EDITTEXT, DG_ET_LENGTH, 0, itmPosX, itmPosY + 68, 70, 23);
+							if (DGPopUpGetSelected(dialogID, placingZone.POPUP_OBJ_TYPE[xx]) == 3)
+								DGShowItem(dialogID, placingZone.EDITCONTROL_WIDTH[xx]);
+							else
+								DGHideItem(dialogID, placingZone.EDITCONTROL_WIDTH[xx]);
+							DGSetItemMinDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx], 0.090);
+							DGSetItemMaxDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx], 2.440);
+							if (cells[xx].objType == PLYWOOD)
+								DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx], cells[xx].dirLen);
+							else
+								DGSetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx], 0.150);
 
 							itmPosX += 70;
 						}
@@ -7686,12 +7724,12 @@ short DGCALLBACK beamTableformPlacerHandler2 (short message, short dialogID, sho
 						lengthDouble = placingZone.beamLength;
 						if (DGGetItemValLong(dialogID, placingZone.CHECKBOX_MARGIN_LEFT_END) == TRUE)	lengthDouble -= DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_MARGIN_LEFT_END);
 						if (DGGetItemValLong(dialogID, placingZone.CHECKBOX_MARGIN_RIGHT_END) == TRUE)	lengthDouble -= DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_MARGIN_RIGHT_END);
-			//			for (xx = 0; xx < placingZone.nCells; ++xx) {
-			//				if (DGPopUpGetSelected(dialogID, placingZone.POPUP_OBJ_TYPE[xx]) == EUROFORM + 1)
-			//					lengthDouble -= atof(DGPopUpGetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx])).ToCStr().Get()) / 1000.0;
-			//				else if (DGPopUpGetSelected(dialogID, placingZone.POPUP_OBJ_TYPE[xx]) == PLYWOOD + 1)
-			//					lengthDouble -= DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx]);
-			//			}
+						for (xx = 0; xx < placingZone.nCells; ++xx) {
+							if (DGPopUpGetSelected(dialogID, placingZone.POPUP_OBJ_TYPE[xx]) == EUROFORM + 1)
+								lengthDouble -= atof(DGPopUpGetItemText(dialogID, placingZone.POPUP_WIDTH[xx], DGPopUpGetSelected(dialogID, placingZone.POPUP_WIDTH[xx])).ToCStr().Get()) / 1000.0;
+							else if (DGPopUpGetSelected(dialogID, placingZone.POPUP_OBJ_TYPE[xx]) == PLYWOOD + 1)
+								lengthDouble -= DGGetItemValDouble(dialogID, placingZone.EDITCONTROL_WIDTH[xx]);
+						}
 						DGSetItemValDouble(dialogID, EDITCONTROL_REMAIN_LENGTH, lengthDouble);
 						DGDisableItem(dialogID, EDITCONTROL_TOTAL_LENGTH);
 						DGDisableItem(dialogID, EDITCONTROL_REMAIN_LENGTH);
@@ -7830,6 +7868,24 @@ short DGCALLBACK beamTableformPlacerHandler2_AutoArray(short message, short dial
 		DGSetItemText(dialogID, CHECKBOX_USE_EUROFORM_ETC, L"기타");
 		DGShowItem(dialogID, CHECKBOX_USE_EUROFORM_ETC);
 		DGSetItemValLong(dialogID, CHECKBOX_USE_EUROFORM_ETC, autoArrayInfo->bUseEuroform_etc);
+
+		// 센터필러 타입에 따라 팝업컨트롤/Edit컨트롤 사용 여부 결정
+		// 센터필러 유로폼의 타입에 따라 Edit컨트롤 활성화 여부가 달라짐
+		if (DGPopUpGetSelected(dialogID, POPUP_CENTER_FILLER_TYPE) == NONE + 1) {
+			DGDisableItem(dialogID, POPUP_CENTER_FILLER_LENGTH);
+			DGDisableItem(dialogID, EDITCONTROL_CENTER_FILLER_LENGTH);
+		}
+		else if (DGPopUpGetSelected(dialogID, POPUP_CENTER_FILLER_TYPE) == EUROFORM + 1) {
+			DGEnableItem(dialogID, POPUP_CENTER_FILLER_LENGTH);
+			if (DGPopUpGetSelected(dialogID, POPUP_CENTER_FILLER_LENGTH) == 6)
+				DGEnableItem(dialogID, EDITCONTROL_CENTER_FILLER_LENGTH);
+			else
+				DGDisableItem(dialogID, EDITCONTROL_CENTER_FILLER_LENGTH);
+		}
+		else if (DGPopUpGetSelected(dialogID, POPUP_CENTER_FILLER_TYPE) == PLYWOOD + 1) {
+			DGDisableItem(dialogID, POPUP_CENTER_FILLER_LENGTH);
+			DGEnableItem(dialogID, EDITCONTROL_CENTER_FILLER_LENGTH);
+		}
 
 		break;
 
