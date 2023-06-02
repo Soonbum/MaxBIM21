@@ -353,15 +353,15 @@
 /* [ 13] */	RightText		230		 20		 90		 23		LargePlain		"Beam Width"
 /* [ 14] */	LengthEdit		325		 13		 50		 25		LargePlain		"-10.0"	"10.0"	/* Beam Width */
 
-/* [ 15] */	RightText		 60		 50		 90		 23		LargePlain		"Slab Thk (L)"
-/* [ 16] */	LengthEdit		155		 43		 50		 25		LargePlain		"-10.0"	"10.0"	/* Slab Thickness (L) */
-/* [ 17] */	RightText		230		 50		 90		 23		LargePlain		"Slab Thk (R)"
-/* [ 18] */	LengthEdit		325		 43		 50		 25		LargePlain		"-10.0"	"10.0"	/* Slab Thickness (R) */
+/* [ 15] */	RightText		 60		 50		 90		 23		LargePlain		"Morph Height (L)"
+/* [ 16] */	LengthEdit		155		 43		 50		 25		LargePlain		"-10.0"	"10.0"	/* Morph Height (L) */
+/* [ 17] */	RightText		230		 50		 90		 23		LargePlain		"Morph Height (R)"
+/* [ 18] */	LengthEdit		325		 43		 50		 25		LargePlain		"-10.0"	"10.0"	/* Morph Height (R) */
 
-/* [ 19] */	RightText		 60		 80		 90		 23		LargePlain		"Morph Height (L)"
-/* [ 20] */	LengthEdit		155		 73		 50		 25		LargePlain		"-10.0"	"10.0"	/* Morph Height (L) */
-/* [ 21] */	RightText		230		 80		 90		 23		LargePlain		"Morph Height (R)"
-/* [ 22] */	LengthEdit		325		 73		 50		 25		LargePlain		"-10.0"	"10.0"	/* Morph Height (R) */
+/* [ 19] */	RightText		 60		 80		 90		 23		LargePlain		"Slab Thk (L)"
+/* [ 20] */	LengthEdit		155		 73		 50		 25		LargePlain		"-10.0"	"10.0"	/* Slab Thickness (L) */
+/* [ 21] */	RightText		230		 80		 90		 23		LargePlain		"Slab Thk (R)"
+/* [ 22] */	LengthEdit		325		 73		 50		 25		LargePlain		"-10.0"	"10.0"	/* Slab Thickness (R) */
 
 /* [ 23] */	CheckBox		 45		105		 25		 25		LargePlain		""	/* Insulation On/Off */
 

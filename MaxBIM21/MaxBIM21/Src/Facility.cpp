@@ -1318,6 +1318,7 @@ GSErrCode	rotateMultipleObjects(void)
 
 	CHCopyC(convertStr(GS::UniString(L"회전축의 중심점을 클릭하십시오.")), pointInfo.prompt);
 	pointInfo.changeCursorSet = true;
+	pointInfo.enableQuickSelection = true;
 
 	/* 중심점을 나타내는 교차 커서 표시하기 */
 	pointInfo.cursorSet.nothingOnCursor = APICursor_XPoint;
@@ -1372,34 +1373,75 @@ GSErrCode	rotateMultipleObjects(void)
 	if (!err) {
 		// 원점, 시작점과 끝점, 회전각도(+,-) 값을 가져옴
 		API_Coord3D	origo, startCoord, endCoord;	// 중심점, 시작점, 끝점
-		double		radAng;							// 회전각도 (반시계방향 +, 시계방향 -)
+		double		startRadAng;					// 시작 각도
+		double		endRadAng;						// 끝 각도
+		double		radAng;							// 회전 각도 (반시계방향 +, 시계방향 -)
+		double		offset_x, offset_y;				// 시작/끝점으로부터 객체가 떨어져 있는 거리
+
+		API_Element		elem, mask;
 
 		origo.x = arcInfo.origo.x;
 		origo.y = arcInfo.origo.y;
 		origo.z = arcInfo.origo.z;
 
-		startCoord.x = arcInfo.startCoord.x;
-		startCoord.y = arcInfo.startCoord.y;
-		startCoord.z = arcInfo.startCoord.z;
+		// 반시계 방향인 경우
+		if (!arcInfo.negArc) {
+			startCoord.x = arcInfo.startCoord.x;
+			startCoord.y = arcInfo.startCoord.y;
+			startCoord.z = arcInfo.startCoord.z;
 
-		endCoord.x = arcInfo.pos.x;
-		endCoord.y = arcInfo.pos.y;
-		endCoord.z = arcInfo.pos.z;
+			endCoord.x = arcInfo.pos.x;
+			endCoord.y = arcInfo.pos.y;
+			endCoord.z = arcInfo.pos.z;
+		}
+		// 시계 방향인 경우
+		else {
+			endCoord.x = arcInfo.startCoord.x;
+			endCoord.y = arcInfo.startCoord.y;
+			endCoord.z = arcInfo.startCoord.z;
 
-		// !!!
-		// arcInfo.negArc : 시계방향이면 true, 반시계방향이면 false
-		// radAng
-		ACAPI_WriteReport("start: %lf, %lf", startCoord.x, startCoord.y, true);
-		ACAPI_WriteReport("end: %lf, %lf", endCoord.x, endCoord.y, true);
+			startCoord.x = arcInfo.pos.x;
+			startCoord.y = arcInfo.pos.y;
+			startCoord.z = arcInfo.pos.z;
+		}
+
+		startRadAng = atan2((startCoord.y - origo.y), (startCoord.x - origo.x));
+		endRadAng = atan2((endCoord.y - origo.y), (endCoord.x - origo.x));
+		radAng = endRadAng - startRadAng;
+
+		// 선택한 객체들의 GUID를 수집함
+		GS::Array<API_Guid>		objects;
+		long					nObjects = 0;
+
+		// 그룹화 일시정지 ON
+		suspendGroups(true);
+
+		// 선택한 요소 가져오기
+		if (getGuidsOfSelection(&objects, API_ObjectID, &nObjects) != NoError) {
+			DGAlert(DG_ERROR, L"오류", L"요소들을 선택해야 합니다.", "", L"확인", "", "");
+			return err;
+		}
+
+		// 객체를 원점으로 이동시킨 후, 회전각도만큼 회전시키고 다시 이동한 만큼 원래 자리로 이동한다.
+		for (int i = 0; i < objects.GetSize(); i++) {
+			BNZeroMemory(&elem, sizeof (API_Element));
+			elem.header.guid = objects[i];
+			ACAPI_Element_Get(&elem);
+
+			ACAPI_ELEMENT_MASK_CLEAR(mask);
+			ACAPI_ELEMENT_MASK_SET(mask, API_ObjectType, pos);
+			ACAPI_ELEMENT_MASK_SET(mask, API_ObjectType, level);
+			ACAPI_ELEMENT_MASK_SET(mask, API_ObjectType, angle);
+			// ... 객체의 좌표와 회전각도를 조작한다 (이동: startCoord.x - offset_x, startCoord.y - offset_y, 회전: origo에서 radAng 회전, 이동: endCoord.x + offset_x, endCoord.y + offset_y)
+			elem.object.pos;		//
+			elem.object.level;		//
+			elem.object.angle;		//
+
+			err = ACAPI_Element_Change(&elem, &mask, NULL, 0, true);	//
+		}
 	}
 	else if (err == APIERR_CANCEL)
 		DGAlert(DG_ERROR, L"오류", L"입력이 중지되었습니다.", "", L"확인", "", "");
-
-	// 선택한 객체들의 GUID를 수집함
-	// ...
-	
-	// 객체를 원점으로 이동시킨 후, 회전각도만큼 회전시키고 다시 이동한 만큼 원래 자리로 이동한다.
-	// ...
 
 	return err;
 }
