@@ -3595,14 +3595,21 @@ GSErrCode	calcTableformArea(void)
 	short	action_mode;
 	short	mm;
 
-	// 모든 객체, 보 저장
+	// 모든 객체, 모프 저장
 	GS::Array<API_Guid>		elemList;
 	GS::Array<API_Guid>		objects;
 	long					nObjects = 0;
+	GS::Array<API_Guid>		morphs;
+	long					nMorphs = 0;
 
 	// 선택한 요소들의 정보 요약하기
 	API_Element			elem;
 	API_ElementMemo		memo;
+
+	API_ElementQuantity	quantity;
+	API_Quantities		quantities;
+	API_QuantitiesMask	mask;
+	API_QuantityPar		params;
 
 	// 레이어 관련 변수
 	short			nLayers;
@@ -3714,7 +3721,7 @@ GSErrCode	calcTableformArea(void)
 	ACAPI_Interface(APIIo_SetNextProcessPhaseID, &subtitle, &total);
 
 	totalAreaAll = 0.0;
-	sprintf(buffer, "안내: 면적 값의 단위는 m2(제곱미터)입니다.\n고려되는 객체: 유로폼 / 합판 / 아웃코너판넬 / 인코너판넬 / 변각인코너판넬 / 인코너M형판넬 / 목재 / 매직바(합판) / 매직아웃코너(합판) / 매직인코너(합판)\n\n");
+	sprintf(buffer, "안내: 면적 값의 단위는 m2(제곱미터)입니다.\n고려되는 객체: 유로폼 / 합판 / 아웃코너판넬 / 인코너판넬 / 변각인코너판넬 / 인코너M형판넬 / 목재 / 매직바(합판) / 매직아웃코너(합판) / 매직인코너(합판) / 모프\n\n");
 	fprintf(fp_unite, buffer);
 
 	// 헤더 출력
@@ -3733,6 +3740,7 @@ GSErrCode	calcTableformArea(void)
 
 		// 초기화
 		objects.Clear();
+		morphs.Clear();
 
 		if (err == NoError) {
 			// 레이어 보이기
@@ -3748,7 +3756,13 @@ GSErrCode	calcTableformArea(void)
 			}
 			nObjects = objects.GetSize();
 
-			if (nObjects == 0)
+			ACAPI_Element_GetElemList(API_MorphID, &elemList, APIFilt_OnVisLayer);	// 보이는 레이어에 있음, 모프 타입만
+			while (elemList.GetSize() > 0) {
+				morphs.Push(elemList.Pop());
+			}
+			nMorphs = morphs.GetSize();
+
+			if (nObjects == 0 && nMorphs == 0)
 				continue;
 
 			// 레이어 이름 가져옴
@@ -3893,6 +3907,53 @@ GSErrCode	calcTableformArea(void)
 					}
 
 					ACAPI_DisposeElemMemoHdls(&memo);
+				}
+			}
+
+			// 모프에서 면적 값 가져와서 합산하기
+			for (xx = 0; xx < nMorphs; ++xx) {
+				extractedValue = 0.0;
+				bFound = false;
+
+				ACAPI_ELEMENT_QUANTITY_MASK_CLEAR(mask);
+				ACAPI_ELEMENT_QUANTITY_MASK_SET(mask, morph, surface);
+				quantities.elements = &quantity;
+
+				if (ACAPI_Element_GetQuantities(morphs[xx], &params, &quantities, &mask) == NoError) {
+					extractedValue = quantity.morph.surface;
+
+					bFound = true;
+				}
+
+				if (bFound == true) {
+					totalArea += extractedValue;
+					totalAreaAll += extractedValue;
+
+					if (action_mode == 1) {
+						if (verifyLayerName(fullLayerName) == true) {
+							// 레이어 체계에 속한 레이어의 경우, 표로 정리해서 면적 값을 표시할 것
+							// 기존 필드를 검색해보고 존재할 경우 면적을 합산함
+							for (yy = 0; yy < table[0].GetSize(); yy++) {
+								if ((my_strcmp(table[0][yy].c_str(), getLayerCode(fullLayerName, 2)) == 0) &&
+									(my_strcmp(table[1][yy].c_str(), getLayerCode(fullLayerName, 3)) == 0) &&
+									(my_strcmp(table[2][yy].c_str(), getLayerCode(fullLayerName, 7)) == 0)) {
+									sprintf(areaValueStr, "%.2f", atof(table[3][yy].c_str()) + extractedValue);
+									table[3][yy] = areaValueStr;
+									break;
+								}
+							}
+
+							// 기존 필드가 없으면 새로운 필드 생성
+							if (yy == table[0].GetSize()) {
+								table[0].Push(getLayerCode(fullLayerName, 2));
+								table[1].Push(getLayerCode(fullLayerName, 3));
+								table[2].Push(getLayerCode(fullLayerName, 7));
+
+								sprintf(areaValueStr, "%.2f", extractedValue);
+								table[3].Push(areaValueStr);
+							}
+						}
+					}
 				}
 			}
 
