@@ -1376,7 +1376,6 @@ GSErrCode	rotateMultipleObjects(void)
 		double		startRadAng;					// 시작 각도
 		double		endRadAng;						// 끝 각도
 		double		radAng;							// 회전 각도 (반시계방향 +, 시계방향 -)
-		double		offset_x, offset_y;				// 시작/끝점으로부터 객체가 떨어져 있는 거리
 
 		API_Element		elem, mask;
 
@@ -1423,21 +1422,50 @@ GSErrCode	rotateMultipleObjects(void)
 		}
 
 		// 객체를 원점으로 이동시킨 후, 회전각도만큼 회전시키고 다시 이동한 만큼 원래 자리로 이동한다.
-		for (int i = 0; i < objects.GetSize(); i++) {
+		while (!objects.IsEmpty()) {
 			BNZeroMemory(&elem, sizeof (API_Element));
-			elem.header.guid = objects[i];
+			BNZeroMemory(&mask, sizeof(API_Element));
+			elem.header.guid = objects.Pop();
 			ACAPI_Element_Get(&elem);
 
+			API_Coord	elemPos = elem.object.pos;
+			API_Coord	origoPos;
+			API_Coord	aPointPos;
+			double		elemRadAng = elem.object.angle;
+
+			origoPos.x = origo.x;
+			origoPos.y = origo.y;
+			aPointPos.x = startCoord.x;
+			aPointPos.y = startCoord.y;
+			
+			double	offsetY = distOfPointBetweenLine(elemPos, origoPos, aPointPos);
+			double	offsetX = offsetY / tan(startRadAng);
+
+			// 객체에서 변경할 변수 선택
 			ACAPI_ELEMENT_MASK_CLEAR(mask);
 			ACAPI_ELEMENT_MASK_SET(mask, API_ObjectType, pos);
-			ACAPI_ELEMENT_MASK_SET(mask, API_ObjectType, level);
 			ACAPI_ELEMENT_MASK_SET(mask, API_ObjectType, angle);
-			// ... 객체의 좌표와 회전각도를 조작한다 (이동: startCoord.x - offset_x, startCoord.y - offset_y, 회전: origo에서 radAng 회전, 이동: endCoord.x + offset_x, endCoord.y + offset_y)
-			elem.object.pos;		//
-			elem.object.level;		//
-			elem.object.angle;		//
 
-			err = ACAPI_Element_Change(&elem, &mask, NULL, 0, true);	//
+			// 객체의 새 위치를 반영함 !!! 1,2,3,4분면 중 어디에 있느냐에 따라 위치값이 달라짐
+			if (getQuadrantOfPoint(origoPos, aPointPos, elemPos, startRadAng) == 1) {
+				elem.object.pos.x = endCoord.x - offsetY * sin(endRadAng) + offsetX * cos(endRadAng);
+				elem.object.pos.y = endCoord.y + offsetY * cos(endRadAng) + offsetX * sin(endRadAng);
+			}
+			else if (getQuadrantOfPoint(origoPos, aPointPos, elemPos, startRadAng) == 2) {
+				elem.object.pos.x = endCoord.x - offsetY * sin(endRadAng) - offsetX * cos(endRadAng);
+				elem.object.pos.y = endCoord.y + offsetY * cos(endRadAng) - offsetX * sin(endRadAng);
+			}
+			else if (getQuadrantOfPoint(origoPos, aPointPos, elemPos, startRadAng) == 3) {
+				elem.object.pos.x = endCoord.x + offsetY * sin(endRadAng) - offsetX * cos(endRadAng);
+				elem.object.pos.y = endCoord.y - offsetY * cos(endRadAng) - offsetX * sin(endRadAng);
+			}
+			else if (getQuadrantOfPoint(origoPos, aPointPos, elemPos, startRadAng) == 4) {
+				elem.object.pos.x = endCoord.x + offsetY * sin(endRadAng) + offsetX * cos(endRadAng);
+				elem.object.pos.y = endCoord.y - offsetY * cos(endRadAng) + offsetX * sin(endRadAng);
+			}
+			elem.object.angle = elemRadAng + radAng;
+
+			err = ACAPI_Element_Change(&elem, &mask, NULL, 0, false);
 		}
 	}
 	else if (err == APIERR_CANCEL)

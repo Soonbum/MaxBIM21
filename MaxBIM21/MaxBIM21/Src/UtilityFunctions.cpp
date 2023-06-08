@@ -64,6 +64,52 @@ double	distOfPointBetweenLine(API_Coord3D p, API_Coord a, API_Coord b)
 	return	area / dist_ab;
 }
 
+// 점 O를 기준으로 회전된 점 A이 있을 때, A로부터 떨어져 있는 점 B가 원래 어느 사분면에 있었는지 알아내는 함수
+int		getQuadrantOfPoint(API_Coord o, API_Coord a, API_Coord b, double radAng)
+{
+	double ox, oy, ax, ay, offsetX, offsetY;
+	double angle_theta, sin_theta, cos_theta;
+	double new_ax, new_ay, new_bx, new_by, a_to_bx, a_to_by;
+
+	// 초기화
+	ox = o.x;
+	oy = o.y;
+	ax = a.x;
+	ay = a.y;
+	offsetY = distOfPointBetweenLine(b, o, a);
+	offsetX = offsetY / tan(radAng);
+	angle_theta = radAng;
+
+	sin_theta = sin(angle_theta);
+	cos_theta = cos(angle_theta);
+
+	// 회전 변환 공식을 사용해 점 A의 새로운 좌표를 계산
+	new_ax = ox + (ax - ox) * cos_theta - (ay - oy) * sin_theta;
+	new_ay = oy + (ax - ox) * sin_theta + (ay - oy) * cos_theta;
+
+	// 회전 변환 공식을 사용해 점 B의 새로운 좌표를 계산
+	new_bx = new_ax + offsetX;
+	new_by = new_ay + offsetY;
+
+	a_to_bx = new_bx - new_ax;
+	a_to_by = new_by - new_ay;
+
+	if (a_to_bx > 0 && a_to_by > 0) {
+		return 1;
+	}
+	else if (a_to_bx < 0 && a_to_by > 0) {
+		return 2;
+	}
+	else if (a_to_bx < 0 && a_to_by < 0) {
+		return 3;
+	}
+	else if (a_to_bx > 0 && a_to_by < 0) {
+		return 4;
+	}
+
+	return 0;
+}
+
 ////////////////////////////////////////////////// 비교하기
 // 어떤 수가 더 큰지 비교함 : 오류(-100), A<B(-1), A==B(0), A>B(+1)
 long	compareDoubles(const double a, const double b)

@@ -17,7 +17,7 @@ double	GetDistance(const double begX, const double begY, const double begZ, cons
 double	GetDistance(const API_Coord3D begPoint, API_Coord3D endPoint);																		// 3차원에서 2점 간의 거리를 알려줌
 double	distOfPointBetweenLine(API_Coord p, API_Coord a, API_Coord b);																		// 선분 AB와 점 P와의 거리를 구하는 함수
 double	distOfPointBetweenLine(API_Coord3D p, API_Coord a, API_Coord b);																	// 선분 AB와 점 P와의 거리를 구하는 함수
-
+int		getQuadrantOfPoint(API_Coord o, API_Coord a, API_Coord b, double radAng);															// 점 O를 기준으로 회전된 점 A이 있을 때, A로부터 떨어져 있는 점 B가 원래 어느 사분면에 있었는지 알아내는 함수
 // 비교하기
 long	compareDoubles(const double a, const double b);							// 어떤 수가 더 큰지 비교함
 long	compareRanges(double aMin, double aMax, double bMin, double bMax);		// a와 b의 각 값 범위의 관계를 알려줌
