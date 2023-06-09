@@ -1302,7 +1302,7 @@ int checkIntersect(Rect rect1, Rect rect2) {
 	return 1;
 }
 
-// 여러 객체 동시에 회전시키기
+// 여러 객체 동시에 회전시키기 (불필요한 기능)
 GSErrCode	rotateMultipleObjects(void)
 {
 	GSErrCode	err = NoError;

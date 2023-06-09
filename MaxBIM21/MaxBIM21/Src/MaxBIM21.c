@@ -238,14 +238,6 @@ GSErrCode __ACENV_CALL MenuCommandHandler(const API_MenuParams *menuParams)
 						return err;
 					});
 					break;
-				case 6:		// 여러 객체 동시에 회전시키기
-					err = ACAPI_CallUndoableCommand(L"여러 객체 동시에 회전시키기", [&]() -> GSErrCode {
-						//err = rotateMultipleObjects();
-						DGAlert(DG_INFORMATION, L"안내", L"이 기능은 작동하지 않습니다.", "", L"확인", "", "");
-						err = NoError;
-						return err;
-					});
-					break;
 			}
 			break;
 	}
