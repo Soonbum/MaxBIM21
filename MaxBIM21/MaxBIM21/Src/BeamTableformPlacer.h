@@ -9,8 +9,8 @@ namespace beamTableformPlacerDG {
 		NONE,			// 없음
 		EUROFORM,		// 유로폼v2.0
 		PLYWOOD,		// 합판v1.0
-		TIMBER,			// 목재v1.0
-		FILLERSP		// 휠러스페이서v1.0
+		FILLERSP,		// 휠러스페이서v1.0
+		TIMBER			// 목재v1.0
 	};
 
 	// 다이얼로그 항목 인덱스
@@ -120,6 +120,8 @@ namespace beamTableformPlacerDG {
 		EDITCONTROL_REMAIN_LENGTH,
 		LABEL_TABLEFORM_TYPE,
 		POPUP_TABLEFORM_TYPE,
+		LABEL_BEAM_BRACKET_TYPE,
+		POPUP_BEAM_BRACKET_TYPE,
 		BUTTON_ADD_COL,
 		BUTTON_DEL_COL,
 		BUTTON_AUTO_ARRAY,
@@ -277,6 +279,7 @@ class BeamTableformPlacingZone
 {
 public:
 	short	tableformType;		// 테이블폼 타입: 타입A (1), 타입B (2)
+	short	beamBracketType;	// 보 브라켓 타입: 보 브라켓 (최홍승) (1), 블루 보 브라켓 (2)
 
 	// 보 기하 정보
 	double	level;				// 보 윗면 고도
