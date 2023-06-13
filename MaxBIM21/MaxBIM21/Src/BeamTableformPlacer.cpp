@@ -1585,6 +1585,34 @@ GSErrCode	BeamTableformPlacingZone::placeBasicObjects (BeamTableformPlacingZone*
 		}
 	}
 
+	// !!! -- 10mm씩 쪼개야 함
+	// 휠러 셀 배치 (측면 뷰에서 휠러로 선택한 경우)
+	for (xx = 0; xx < placingZone->nCells; ++xx) {
+		if ((placingZone->cellsAtLSide[0][xx].objType == FILLERSP) && (placingZone->cellsAtLSide[0][xx].perLen > EPS) && (placingZone->cellsAtLSide[0][xx].dirLen > EPS)) {
+			// 측면(L) 휠러스페이서 배치
+			fillersp.init(L("휠러스페이서v1.0.gsm"), layerInd_Fillerspacer, infoBeam.floorInd, placingZone->cellsAtLSide[0][xx].leftBottomX, placingZone->cellsAtLSide[0][xx].leftBottomY, placingZone->cellsAtLSide[0][xx].leftBottomZ, placingZone->cellsAtLSide[0][xx].ang);
+			moveIn3DSlope('x', fillersp.radAng, placingZone->slantAngle, placingZone->cellsAtLSide[0][xx].dirLen, &fillersp.posX, &fillersp.posY, &fillersp.posZ);
+			elemList_Plywood [getAreaSeqNumOfCell (placingZone, true, false, xx)].Push(fillersp.placeObject (4,
+				"f_thk", APIParT_Length, format_string("%f", placingZone->cellsAtLSide[0][xx].dirLen).c_str(),
+				"f_leng", APIParT_Length, format_string("%f", placingZone->cellsAtLSide[0][xx].perLen).c_str(),
+				"f_ang", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str(),
+				"f_rota", APIParT_Angle, format_string("%f", 0.0).c_str()));
+
+			// 측면(R) 휠러스페이서 배치
+			fillersp.init(L("휠러스페이서v1.0.gsm"), layerInd_Fillerspacer, infoBeam.floorInd, placingZone->cellsAtRSide[0][xx].leftBottomX, placingZone->cellsAtRSide[0][xx].leftBottomY, placingZone->cellsAtRSide[0][xx].leftBottomZ, placingZone->cellsAtRSide[0][xx].ang);
+			moveIn3DSlope('x', fillersp.radAng, placingZone->slantAngle, placingZone->cellsAtLSide[0][xx].dirLen, &fillersp.posX, &fillersp.posY, &fillersp.posZ);
+			fillersp.radAng += DegreeToRad(180.0);
+			elemList_Plywood[getAreaSeqNumOfCell(placingZone, true, false, xx)].Push(fillersp.placeObjectMirrored(4,
+				"f_thk", APIParT_Length, format_string("%f", placingZone->cellsAtRSide[0][xx].dirLen).c_str(),
+				"f_leng", APIParT_Length, format_string("%f", placingZone->cellsAtRSide[0][xx].perLen).c_str(),
+				"f_ang", APIParT_Angle, format_string("%f", DegreeToRad(90.0) + placingZone->slantAngle).c_str(),
+				"f_rota", APIParT_Angle, format_string("%f", 0.0).c_str()));
+
+			// 하부 휠러스페이서 배치
+			// !!!
+		}
+	}
+
 	return	err;
 }
 
