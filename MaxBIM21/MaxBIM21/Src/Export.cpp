@@ -344,6 +344,11 @@ GSErrCode	exportSelectedElementInfo(void)
 	char				filename[512];
 	result = DGBlankModalDialog(300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData)&inputFilename);
 
+	if (result == DG_CANCEL) {
+		DGAlert(DG_INFORMATION, L"알림", L"작업을 취소하였습니다.", "", L"확인", "", "");
+		return	NoError;
+	}
+
 	if (inputFilename.GetLength() <= 0)
 		inputFilename = "notitle";
 
@@ -1716,6 +1721,11 @@ GSErrCode	exportElementInfoOnVisibleLayers(void)
 
 	result = DGBlankModalDialog(300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData)&inputFilename);
 
+	if (result == DG_CANCEL) {
+		DGAlert(DG_INFORMATION, L"알림", L"작업을 취소하였습니다.", "", L"확인", "", "");
+		return	NoError;
+	}
+
 	if (inputFilename.GetLength() <= 0)
 		inputFilename = "notitle";
 
@@ -2835,6 +2845,11 @@ GSErrCode	exportBeamTableformInformation(void)
 
 	result = DGBlankModalDialog(300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData)&inputFilename);
 
+	if (result == DG_CANCEL) {
+		DGAlert(DG_INFORMATION, L"알림", L"작업을 취소하였습니다.", "", L"확인", "", "");
+		return	NoError;
+	}
+
 	if (inputFilename.GetLength() <= 0)
 		inputFilename = "notitle";
 
@@ -3699,6 +3714,11 @@ GSErrCode	calcTableformArea(void)
 
 	result = DGBlankModalDialog(300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData)&inputFilename);
 
+	if (result == DG_CANCEL) {
+		DGAlert(DG_INFORMATION, L"알림", L"작업을 취소하였습니다.", "", L"확인", "", "");
+		return	NoError;
+	}
+
 	if (inputFilename.GetLength() <= 0)
 		inputFilename = "notitle";
 
@@ -4351,6 +4371,11 @@ GSErrCode	exportQuantityPlywoodAreaOnVisibleLayers(void)
 	suspendGroups(true);
 
 	result = DGBlankModalDialog(300, 150, DG_DLG_VGROW | DG_DLG_HGROW, 0, DG_DLG_THICKFRAME, filenameQuestionHandler, (DGUserData)&inputFilename);
+
+	if (result == DG_CANCEL) {
+		DGAlert(DG_INFORMATION, L"알림", L"작업을 취소하였습니다.", "", L"확인", "", "");
+		return	NoError;
+	}
 
 	if (inputFilename.GetLength() <= 0)
 		inputFilename = "notitle";
